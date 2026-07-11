@@ -12,7 +12,9 @@ export default async function AdminSellersPage() {
 
   const { data: verifications } = await admin
     .from("seller_verifications")
-    .select("id, status, sla_deadline, submitted_at, profiles ( id, email ), user_id")
+    .select(
+      "id, status, sla_deadline, submitted_at, profiles!seller_verifications_user_id_fkey ( id, email ), user_id",
+    )
     .order("submitted_at", { ascending: true });
 
   const pending = (verifications ?? []).filter(
