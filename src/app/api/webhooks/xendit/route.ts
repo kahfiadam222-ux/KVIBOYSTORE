@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
   const { data: order } = await admin
     .from("orders")
-    .select("id, amount, state")
+    .select("id, amount, is_platform_owned, state, listings ( products ( id, is_platform_owned ) )")
     .eq("id", orderId)
     .single();
 
@@ -44,6 +44,37 @@ export async function POST(request: NextRequest) {
     direction: "credit",
     amount: order.amount,
   });
+
+  const product = (order.listings as unknown as { products: { id: string; is_platform_owned: boolean } })
+    .products;
+
+  // Tier 1 platform-owned products are "Instant Delivery" — no seller action needed,
+  // so fulfillment fires immediately instead of waiting on a manual delivery step.
+  if (product?.is_platform_owned) {
+    const { data: code } = await admin.rpc("claim_product_code", {
+      p_product_id: product.id,
+      p_order_id: orderId,
+    });
+
+    if (code) {
+      await admin.from("deliveries").insert({
+        order_id: orderId,
+        payload_encrypted: code,
+        delivery_method: "redeem_code",
+        delivered_at: new Date().toISOString(),
+      });
+
+      await admin.from("orders").update({ state: "delivered" }).eq("id", orderId);
+
+      await admin.from("order_state_transitions").insert({
+        order_id: orderId,
+        from_state: "payment_held",
+        to_state: "delivered",
+        actor_type: "system",
+        reason: "Instant delivery: code claimed from inventory",
+      });
+    }
+  }
 
   return NextResponse.json({ received: true });
 }
