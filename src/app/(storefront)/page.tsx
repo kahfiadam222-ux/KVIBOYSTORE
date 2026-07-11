@@ -1,5 +1,6 @@
 import { getActiveListings } from "@/lib/catalog/queries";
 import { tierLabels } from "@/lib/catalog/tierLabels";
+import { createCheckout } from "./checkout/actions";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -52,7 +53,12 @@ export default async function StorefrontPage() {
                   </p>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full">Beli Sekarang</Button>
+                  <form action={createCheckout} className="w-full">
+                    <input type="hidden" name="listingId" value={listing.listingId} />
+                    <Button type="submit" className="w-full">
+                      Beli Sekarang
+                    </Button>
+                  </form>
                 </CardFooter>
               </Card>
             );
