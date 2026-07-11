@@ -9,6 +9,12 @@ export async function Navbar() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const profile = user
+    ? (
+        await supabase.from("profiles").select("role").eq("id", user.id).single()
+      ).data
+    : null;
+
   return (
     <header className="border-b">
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
@@ -21,6 +27,19 @@ export async function Navbar() {
               <Link href="/orders" className="text-sm text-muted-foreground hover:text-foreground">
                 Pesanan Saya
               </Link>
+              {profile?.role === "buyer" && (
+                <Link href="/sell" className="text-sm text-muted-foreground hover:text-foreground">
+                  Jadi Penjual
+                </Link>
+              )}
+              {profile?.role === "admin" && (
+                <Link
+                  href="/admin/sellers"
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Admin
+                </Link>
+              )}
               <span className="text-sm text-muted-foreground">{user.email}</span>
               <form action={logout}>
                 <Button type="submit" variant="outline" size="sm">
