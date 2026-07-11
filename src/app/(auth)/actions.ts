@@ -32,3 +32,9 @@ export async function signup(formData: FormData) {
 
   redirect("/signup/check-email");
 }
+
+export async function logout() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/");
+}

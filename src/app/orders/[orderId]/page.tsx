@@ -44,8 +44,8 @@ export default async function OrderStatusPage({
   const confirmDeliveryWithId = confirmDelivery.bind(null, order.id);
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <Card className="w-full max-w-md">
+    <div className="mx-auto max-w-md px-4 py-12">
+      <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Pesanan #{order.id.slice(0, 8)}</CardTitle>
