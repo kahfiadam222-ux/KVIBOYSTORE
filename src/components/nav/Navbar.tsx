@@ -16,9 +16,9 @@ export async function Navbar() {
     : null;
 
   return (
-    <header className="border-b">
+    <header className="glass-panel sticky top-0 z-40 border-x-0 border-t-0 backdrop-blur-xl">
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
+        <Link href="/" className="font-display text-lg font-medium tracking-tight">
           KVIBOYSTORE
         </Link>
         <div className="flex items-center gap-4">

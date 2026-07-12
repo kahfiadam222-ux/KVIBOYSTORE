@@ -31,8 +31,10 @@ export default async function StorefrontPage({
   return (
     <main className="mx-auto max-w-5xl px-4 py-12">
       <header className="mb-10">
-        <h1 className="text-3xl font-semibold tracking-tight">KVIBOYSTORE</h1>
-        <p className="mt-2 text-muted-foreground">
+        <h1 className="font-display text-4xl font-medium tracking-tight sm:text-5xl">
+          KVIBOYSTORE
+        </h1>
+        <p className="mt-3 max-w-md text-muted-foreground">
           Marketplace langganan digital premium — terpercaya, terverifikasi.
         </p>
         {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
@@ -49,12 +51,12 @@ export default async function StorefrontPage({
                 <CardHeader>
                   <div className="flex items-center justify-between gap-2">
                     <CardTitle>{listing.productTypeName}</CardTitle>
-                    <Badge variant="secondary">{tier.label}</Badge>
+                    <Badge>{tier.label}</Badge>
                   </div>
                   <CardDescription>{tier.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-semibold">
+                  <p className="font-display text-2xl font-medium text-primary">
                     {formatPrice(listing.price, listing.currency)}
                   </p>
                   {!listing.isPlatformOwned && listing.sellerReputation !== null && (
