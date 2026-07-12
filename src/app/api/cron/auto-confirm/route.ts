@@ -2,6 +2,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { completeOrder } from "@/lib/orders/completeOrder";
 
+// A cron endpoint must never serve a cached result — each invocation has to
+// see the database's current state, not a snapshot from the last run.
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
