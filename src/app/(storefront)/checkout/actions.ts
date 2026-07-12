@@ -35,6 +35,16 @@ export async function createCheckout(formData: FormData) {
     seller_id: string | null;
   };
 
+  // Atomically claims one unit of stock — prevents overselling when two
+  // buyers hit the last unit of a listing at the same time.
+  const { data: stockClaimed } = await admin.rpc("decrement_listing_stock", {
+    p_listing_id: listing!.id,
+  });
+
+  if (!stockClaimed) {
+    redirect(`/?error=${encodeURIComponent("Stok produk ini sudah habis.")}`);
+  }
+
   const { data: order, error: orderError } = await admin
     .from("orders")
     .insert({

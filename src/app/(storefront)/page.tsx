@@ -20,7 +20,12 @@ function formatPrice(amount: number, currency: string) {
   }).format(amount);
 }
 
-export default async function StorefrontPage() {
+export default async function StorefrontPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
   const listings = await getActiveListings();
 
   return (
@@ -30,6 +35,7 @@ export default async function StorefrontPage() {
         <p className="mt-2 text-muted-foreground">
           Marketplace langganan digital premium — terpercaya, terverifikasi.
         </p>
+        {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
       </header>
 
       {listings.length === 0 ? (
