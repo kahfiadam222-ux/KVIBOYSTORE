@@ -1,27 +1,65 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { HomepageBanner } from "@/lib/banners/queries";
 import { Button } from "@/components/ui/button";
 
+const AUTO_SLIDE_MS = 5000;
+const SWIPE_THRESHOLD_PX = 50;
+
 export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
   const [index, setIndex] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const touchStartX = useRef<number | null>(null);
+
+  const goTo = useCallback(
+    (next: number) => {
+      setIndex(((next % banners.length) + banners.length) % banners.length);
+    },
+    [banners.length],
+  );
+
+  // Restarts the 5s countdown from zero — a manual slide (dot, arrow, or
+  // swipe) counts as the user "taking the wheel," so auto-advance shouldn't
+  // fire a moment later on the old schedule.
+  const resetAutoSlide = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (banners.length <= 1) return;
+    timerRef.current = setInterval(() => {
+      setIndex((i) => (i + 1) % banners.length);
+    }, AUTO_SLIDE_MS);
+  }, [banners.length]);
 
   useEffect(() => {
-    if (banners.length <= 1) return;
-    const timer = setInterval(() => {
-      setIndex((i) => (i + 1) % banners.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [banners.length]);
+    resetAutoSlide();
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [resetAutoSlide]);
+
+  const handleManualNav = (next: number) => {
+    goTo(next);
+    resetAutoSlide();
+  };
 
   if (banners.length === 0) return null;
 
   return (
     <div
-      className="relative mb-10 h-64 overflow-hidden rounded-3xl border border-border sm:h-72"
+      className="group relative mb-10 h-64 touch-pan-y overflow-hidden rounded-3xl border border-border sm:h-72"
       style={{ perspective: "1200px" }}
+      onTouchStart={(e) => {
+        touchStartX.current = e.touches[0].clientX;
+      }}
+      onTouchEnd={(e) => {
+        if (touchStartX.current === null) return;
+        const delta = e.changedTouches[0].clientX - touchStartX.current;
+        if (Math.abs(delta) > SWIPE_THRESHOLD_PX) {
+          handleManualNav(index + (delta < 0 ? 1 : -1));
+        }
+        touchStartX.current = null;
+      }}
     >
       {banners.map((banner, i) => {
         const offset = i - index;
@@ -68,18 +106,39 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
       })}
 
       {banners.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5">
-          {banners.map((banner, i) => (
-            <button
-              key={banner.id}
-              aria-label={`Slide ${i + 1}`}
-              onClick={() => setIndex(i)}
-              className={`h-1.5 rounded-full transition-all ${
-                i === index ? "w-6 bg-white" : "w-1.5 bg-white/40"
-              }`}
-            />
-          ))}
-        </div>
+        <>
+          <button
+            aria-label="Sebelumnya"
+            onClick={() => handleManualNav(index - 1)}
+            className="absolute top-1/2 left-3 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white opacity-0 backdrop-blur transition-opacity group-hover:opacity-100"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <button
+            aria-label="Berikutnya"
+            onClick={() => handleManualNav(index + 1)}
+            className="absolute top-1/2 right-3 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white opacity-0 backdrop-blur transition-opacity group-hover:opacity-100"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+
+          <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5">
+            {banners.map((banner, i) => (
+              <button
+                key={banner.id}
+                aria-label={`Slide ${i + 1}`}
+                onClick={() => handleManualNav(i)}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === index ? "w-6 bg-white" : "w-1.5 bg-white/40"
+                }`}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
