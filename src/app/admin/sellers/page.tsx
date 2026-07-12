@@ -38,9 +38,9 @@ export default async function AdminSellersPage() {
 
             return (
               <Card key={v.id}>
-                <CardContent className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{profile?.email}</p>
+                <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{profile?.email}</p>
                     <p className="text-sm text-muted-foreground">
                       Diajukan{" "}
                       {new Date(v.submitted_at).toLocaleDateString("id-ID", {
@@ -48,7 +48,7 @@ export default async function AdminSellersPage() {
                       })}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="secondary">{v.status}</Badge>
                     <form action={approveWithIds}>
                       <Button type="submit" size="sm">

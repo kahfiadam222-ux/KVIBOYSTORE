@@ -55,7 +55,7 @@ export default async function OrderStatusPage({
     <div className="mx-auto max-w-md px-4 py-12">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle>Pesanan #{order.id.slice(0, 8)}</CardTitle>
             <Badge>{status.label}</Badge>
           </div>

@@ -54,7 +54,7 @@ export default async function AdminDisputesPage() {
             return (
               <Card key={dispute.id}>
                 <CardContent>
-                  <div className="mb-2 flex items-center justify-between">
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <p className="font-medium">Pesanan #{dispute.order_id.slice(0, 8)}</p>
                     <Badge variant="secondary">
                       {order ? formatPrice(order.amount, order.currency) : "-"}
@@ -63,7 +63,7 @@ export default async function AdminDisputesPage() {
                   <p className="mb-3 text-sm text-muted-foreground">
                     {reasonLabels[dispute.reason] ?? dispute.reason}
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <form action={refundWithIds}>
                       <Button type="submit" size="sm" variant="destructive">
                         Refund Buyer

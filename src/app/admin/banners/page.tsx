@@ -72,10 +72,10 @@ export default async function AdminBannersPage() {
             const deleteWithId = deleteBanner.bind(null, banner.id);
             return (
               <Card key={banner.id}>
-                <CardContent className="flex items-center justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium">{banner.title}</p>
+                <CardContent className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="truncate font-medium">{banner.title}</p>
                       <Badge variant={banner.is_active ? "default" : "secondary"}>
                         {banner.is_active ? "Aktif" : "Nonaktif"}
                       </Badge>
@@ -84,7 +84,7 @@ export default async function AdminBannersPage() {
                       <p className="text-sm text-muted-foreground">{banner.subtitle}</p>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <form action={toggleWithId}>
                       <Button type="submit" size="sm" variant="secondary">
                         {banner.is_active ? "Nonaktifkan" : "Aktifkan"}

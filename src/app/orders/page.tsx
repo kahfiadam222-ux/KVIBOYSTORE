@@ -35,16 +35,16 @@ export default async function OrdersListPage() {
             return (
               <Link key={order.id} href={`/orders/${order.id}`}>
                 <Card className="transition-colors hover:bg-muted/50">
-                  <CardContent className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Pesanan #{order.id.slice(0, 8)}</p>
+                  <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">Pesanan #{order.id.slice(0, 8)}</p>
                       <p className="text-sm text-muted-foreground">
                         {new Date(order.created_at).toLocaleDateString("id-ID", {
                           dateStyle: "medium",
                         })}
                       </p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                       <span className="font-semibold">
                         {formatPrice(order.amount, order.currency)}
                       </span>

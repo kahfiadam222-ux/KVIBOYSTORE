@@ -161,7 +161,7 @@ export default async function SellerDashboardPage() {
                   <p className="mb-3 text-sm text-muted-foreground">
                     {formatPrice(order.amount, order.currency)}
                   </p>
-                  <form action={deliverWithId} className="flex gap-2">
+                  <form action={deliverWithId} className="flex flex-col gap-2 sm:flex-row">
                     <Input
                       name="payload"
                       placeholder="Kredensial / kode akun untuk pembeli"
@@ -193,9 +193,9 @@ export default async function SellerDashboardPage() {
             )[0];
             return (
               <Card key={product.id}>
-                <CardContent className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{product.title}</p>
+                <CardContent className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{product.title}</p>
                     <p className="text-sm text-muted-foreground">
                       Stok: {listing?.stock_count ?? 0}
                     </p>
