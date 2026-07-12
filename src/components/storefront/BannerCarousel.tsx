@@ -43,12 +43,18 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
     resetAutoSlide();
   };
 
+  const pauseAutoSlide = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+  }, []);
+
   if (banners.length === 0) return null;
 
   return (
     <div
       className="group relative mb-10 h-64 touch-pan-y overflow-hidden rounded-3xl border border-border sm:h-72"
       style={{ perspective: "1200px" }}
+      onMouseEnter={pauseAutoSlide}
+      onMouseLeave={resetAutoSlide}
       onTouchStart={(e) => {
         touchStartX.current = e.touches[0].clientX;
       }}
