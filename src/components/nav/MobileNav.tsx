@@ -44,7 +44,7 @@ export function MobileNav({
       </button>
 
       {open && (
-        <div className="glass-panel absolute inset-x-0 top-full flex flex-col gap-1 border-t-0 p-4">
+        <div className="absolute inset-x-0 top-full z-50 flex flex-col gap-1 border-b border-border bg-popover p-4 shadow-lg">
           {links.map((link) => (
             <Link
               key={link.href}
