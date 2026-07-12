@@ -89,3 +89,42 @@ export async function confirmDelivery(orderId: string) {
 
   revalidatePath(`/orders/${orderId}`);
 }
+
+export async function openDispute(orderId: string, formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const reason = formData.get("reason") as string;
+
+  const admin = createAdminClient();
+
+  const { data: order } = await admin
+    .from("orders")
+    .select("id, buyer_id, state")
+    .eq("id", orderId)
+    .single();
+
+  if (!order || order.buyer_id !== user.id || order.state !== "delivered") return;
+
+  await admin.from("disputes").insert({
+    order_id: orderId,
+    opened_by: "buyer",
+    reason,
+    status: "open",
+  });
+
+  await admin.from("orders").update({ state: "buyer_disputed" }).eq("id", orderId);
+  await admin.from("order_state_transitions").insert({
+    order_id: orderId,
+    from_state: "delivered",
+    to_state: "buyer_disputed",
+    actor_type: "buyer",
+    actor_id: user.id,
+    reason: "Buyer opened a dispute",
+  });
+
+  revalidatePath(`/orders/${orderId}`);
+}

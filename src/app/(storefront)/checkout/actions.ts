@@ -72,5 +72,8 @@ export async function createCheckout(formData: FormData) {
     },
   });
 
+  // Needed later to call Xendit's Refund API, which refunds against this invoice ID.
+  await admin.from("orders").update({ xendit_invoice_id: invoice.id }).eq("id", order!.id);
+
   redirect(invoice.invoiceUrl);
 }

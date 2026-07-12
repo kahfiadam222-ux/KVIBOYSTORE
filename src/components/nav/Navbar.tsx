@@ -41,12 +41,20 @@ export async function Navbar() {
                 </Link>
               )}
               {profile?.role === "admin" && (
-                <Link
-                  href="/admin/sellers"
-                  className="text-sm text-muted-foreground hover:text-foreground"
-                >
-                  Admin
-                </Link>
+                <>
+                  <Link
+                    href="/admin/sellers"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    Admin
+                  </Link>
+                  <Link
+                    href="/admin/disputes"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    Sengketa
+                  </Link>
+                </>
               )}
               <span className="text-sm text-muted-foreground">{user.email}</span>
               <form action={logout}>

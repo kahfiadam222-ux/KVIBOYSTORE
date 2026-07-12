@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { orderStateLabels } from "@/lib/orders/stateLabels";
-import { confirmDelivery } from "./actions";
+import { confirmDelivery, openDispute } from "./actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,7 @@ export default async function OrderStatusPage({
   };
 
   const confirmDeliveryWithId = confirmDelivery.bind(null, order.id);
+  const openDisputeWithId = openDispute.bind(null, order.id);
 
   return (
     <div className="mx-auto max-w-md px-4 py-12">
@@ -70,11 +71,33 @@ export default async function OrderStatusPage({
           )}
 
           {order.state === "delivered" && (
-            <form action={confirmDeliveryWithId}>
-              <Button type="submit" className="w-full">
-                Konfirmasi — Semua Berjalan Baik
-              </Button>
-            </form>
+            <>
+              <form action={confirmDeliveryWithId}>
+                <Button type="submit" className="w-full">
+                  Konfirmasi — Semua Berjalan Baik
+                </Button>
+              </form>
+
+              <form action={openDisputeWithId} className="flex flex-col gap-2">
+                <select
+                  name="reason"
+                  required
+                  defaultValue=""
+                  className="h-8 rounded-lg border border-border bg-background px-2.5 text-sm"
+                >
+                  <option value="" disabled>
+                    Ada masalah? Pilih alasan
+                  </option>
+                  <option value="not_received">Tidak menerima produk</option>
+                  <option value="credentials_invalid">Kredensial/kode tidak berfungsi</option>
+                  <option value="not_as_described">Tidak sesuai deskripsi</option>
+                  <option value="other">Lainnya</option>
+                </select>
+                <Button type="submit" variant="destructive" className="w-full">
+                  Laporkan Masalah
+                </Button>
+              </form>
+            </>
           )}
         </CardContent>
       </Card>
