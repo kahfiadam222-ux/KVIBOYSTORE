@@ -131,6 +131,10 @@ export default async function SellerDashboardPage() {
               <Input id="description" name="description" />
             </div>
             <div className="flex flex-col gap-2">
+              <Label htmlFor="imageUrl">URL Foto Produk</Label>
+              <Input id="imageUrl" name="imageUrl" type="url" placeholder="https://..." />
+            </div>
+            <div className="flex flex-col gap-2">
               <Label htmlFor="price">Harga (IDR)</Label>
               <Input id="price" name="price" type="number" min={0} required />
             </div>

@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { StorefrontListing } from "@/types/catalog";
 
-export async function getActiveListings(): Promise<StorefrontListing[]> {
+export async function getActiveListings(searchQuery?: string): Promise<StorefrontListing[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -15,6 +15,7 @@ export async function getActiveListings(): Promise<StorefrontListing[]> {
         id,
         title,
         description,
+        image_url,
         is_platform_owned,
         product_types ( name, risk_tier, delivery_method ),
         seller_profiles ( reputation_score )
@@ -33,6 +34,7 @@ export async function getActiveListings(): Promise<StorefrontListing[]> {
       id: string;
       title: string;
       description: string | null;
+      image_url: string | null;
       is_platform_owned: boolean;
       product_types: {
         name: string;
@@ -43,13 +45,14 @@ export async function getActiveListings(): Promise<StorefrontListing[]> {
     } | null;
   };
 
-  return ((data ?? []) as unknown as Row[])
+  const listings = ((data ?? []) as unknown as Row[])
     .filter((row) => row.products && row.products.product_types)
     .map((row) => ({
       listingId: row.id,
       productId: row.products!.id,
       title: row.products!.title,
       description: row.products!.description,
+      imageUrl: row.products!.image_url,
       price: row.price,
       currency: row.currency,
       productTypeName: row.products!.product_types!.name,
@@ -58,4 +61,13 @@ export async function getActiveListings(): Promise<StorefrontListing[]> {
       isPlatformOwned: row.products!.is_platform_owned,
       sellerReputation: row.products!.seller_profiles?.reputation_score ?? null,
     }));
+
+  if (!searchQuery) return listings;
+
+  const needle = searchQuery.toLowerCase();
+  return listings.filter(
+    (l) =>
+      l.title.toLowerCase().includes(needle) ||
+      l.productTypeName.toLowerCase().includes(needle),
+  );
 }

@@ -54,6 +54,12 @@ export async function Navbar() {
                   >
                     Sengketa
                   </Link>
+                  <Link
+                    href="/admin/banners"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    Banner
+                  </Link>
                 </>
               )}
               <span className="text-sm text-muted-foreground">{user.email}</span>

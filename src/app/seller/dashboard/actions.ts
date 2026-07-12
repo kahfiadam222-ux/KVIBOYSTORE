@@ -13,6 +13,7 @@ export async function createListing(formData: FormData) {
   const productTypeId = formData.get("productTypeId") as string;
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
+  const imageUrl = formData.get("imageUrl") as string;
   const price = Number(formData.get("price"));
   const stockCount = Number(formData.get("stockCount"));
 
@@ -23,6 +24,7 @@ export async function createListing(formData: FormData) {
       product_type_id: productTypeId,
       title,
       description,
+      image_url: imageUrl || null,
       is_platform_owned: false,
       status: "active",
     })

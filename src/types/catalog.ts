@@ -14,6 +14,7 @@ export interface StorefrontListing {
   productId: string;
   title: string;
   description: string | null;
+  imageUrl: string | null;
   price: number;
   currency: string;
   productTypeName: string;
