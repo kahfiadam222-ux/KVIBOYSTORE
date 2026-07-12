@@ -32,6 +32,14 @@ export async function Navbar() {
                   Jadi Penjual
                 </Link>
               )}
+              {profile?.role === "seller" && (
+                <Link
+                  href="/seller/dashboard"
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Dashboard Penjual
+                </Link>
+              )}
               {profile?.role === "admin" && (
                 <Link
                   href="/admin/sellers"
