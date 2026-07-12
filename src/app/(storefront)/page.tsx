@@ -57,6 +57,11 @@ export default async function StorefrontPage({
                   <p className="text-2xl font-semibold">
                     {formatPrice(listing.price, listing.currency)}
                   </p>
+                  {!listing.isPlatformOwned && listing.sellerReputation !== null && (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      ⭐ {listing.sellerReputation.toFixed(1)} rating penjual
+                    </p>
+                  )}
                 </CardContent>
                 <CardFooter>
                   <form action={createCheckout} className="w-full">

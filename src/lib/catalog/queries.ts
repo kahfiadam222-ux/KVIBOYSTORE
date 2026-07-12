@@ -16,7 +16,8 @@ export async function getActiveListings(): Promise<StorefrontListing[]> {
         title,
         description,
         is_platform_owned,
-        product_types ( name, risk_tier, delivery_method )
+        product_types ( name, risk_tier, delivery_method ),
+        seller_profiles ( reputation_score )
       )
     `,
     )
@@ -38,6 +39,7 @@ export async function getActiveListings(): Promise<StorefrontListing[]> {
         risk_tier: StorefrontListing["riskTier"];
         delivery_method: StorefrontListing["deliveryMethod"];
       } | null;
+      seller_profiles: { reputation_score: number } | null;
     } | null;
   };
 
@@ -54,5 +56,6 @@ export async function getActiveListings(): Promise<StorefrontListing[]> {
       riskTier: row.products!.product_types!.risk_tier,
       deliveryMethod: row.products!.product_types!.delivery_method,
       isPlatformOwned: row.products!.is_platform_owned,
+      sellerReputation: row.products!.seller_profiles?.reputation_score ?? null,
     }));
 }

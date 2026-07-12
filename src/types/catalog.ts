@@ -20,4 +20,5 @@ export interface StorefrontListing {
   riskTier: RiskTier;
   deliveryMethod: DeliveryMethod;
   isPlatformOwned: boolean;
+  sellerReputation: number | null;
 }

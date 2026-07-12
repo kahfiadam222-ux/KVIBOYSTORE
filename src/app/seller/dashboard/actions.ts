@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireSeller } from "@/lib/auth/requireSeller";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { revealExpiresAt } from "@/lib/orders/autoConfirm";
 
 export async function createListing(formData: FormData) {
   const user = await requireSeller();
@@ -86,11 +87,13 @@ export async function deliverOrder(orderId: string, formData: FormData) {
   // these writes use the admin client because orders/deliveries have no client-facing write policy.
   const admin = createAdminClient();
 
+  const deliveredAt = new Date();
   await admin.from("deliveries").insert({
     order_id: orderId,
     payload_encrypted: payload,
     delivery_method: deliveryMethod,
-    delivered_at: new Date().toISOString(),
+    delivered_at: deliveredAt.toISOString(),
+    reveal_expires_at: revealExpiresAt(deliveredAt),
   });
 
   await admin.from("orders").update({ state: "delivered" }).eq("id", orderId);

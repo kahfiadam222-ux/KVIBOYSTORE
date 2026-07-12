@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { revealExpiresAt } from "@/lib/orders/autoConfirm";
 
 export async function POST(request: NextRequest) {
   const token = request.headers.get("x-callback-token");
@@ -57,11 +58,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (code) {
+      const deliveredAt = new Date();
       await admin.from("deliveries").insert({
         order_id: orderId,
         payload_encrypted: code,
         delivery_method: "redeem_code",
-        delivered_at: new Date().toISOString(),
+        delivered_at: deliveredAt.toISOString(),
+        reveal_expires_at: revealExpiresAt(deliveredAt),
       });
 
       await admin.from("orders").update({ state: "delivered" }).eq("id", orderId);

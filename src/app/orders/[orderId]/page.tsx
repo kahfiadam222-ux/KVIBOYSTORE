@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { orderStateLabels } from "@/lib/orders/stateLabels";
-import { confirmDelivery, openDispute } from "./actions";
+import { confirmDelivery, openDispute, submitReview } from "./actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ export default async function OrderStatusPage({
 
   const { data: order } = await supabase
     .from("orders")
-    .select("id, amount, currency, state, created_at")
+    .select("id, amount, currency, state, created_at, is_platform_owned")
     .eq("id", orderId)
     .single();
 
@@ -36,6 +36,12 @@ export default async function OrderStatusPage({
     .eq("order_id", orderId)
     .maybeSingle();
 
+  const { data: review } = await supabase
+    .from("reviews")
+    .select("rating, comment")
+    .eq("order_id", orderId)
+    .maybeSingle();
+
   const status = orderStateLabels[order.state] ?? {
     label: order.state,
     description: "",
@@ -43,6 +49,7 @@ export default async function OrderStatusPage({
 
   const confirmDeliveryWithId = confirmDelivery.bind(null, order.id);
   const openDisputeWithId = openDispute.bind(null, order.id);
+  const submitReviewWithId = submitReview.bind(null, order.id);
 
   return (
     <div className="mx-auto max-w-md px-4 py-12">
@@ -97,6 +104,45 @@ export default async function OrderStatusPage({
                   Laporkan Masalah
                 </Button>
               </form>
+            </>
+          )}
+
+          {order.state === "completed" && !order.is_platform_owned && (
+            <>
+              {review ? (
+                <div className="rounded-md border bg-muted p-3">
+                  <p className="text-sm font-medium">Ulasan Anda: {review.rating}/5</p>
+                  {review.comment && (
+                    <p className="mt-1 text-sm text-muted-foreground">{review.comment}</p>
+                  )}
+                </div>
+              ) : (
+                <form action={submitReviewWithId} className="flex flex-col gap-2">
+                  <select
+                    name="rating"
+                    required
+                    defaultValue=""
+                    className="h-8 rounded-lg border border-border bg-background px-2.5 text-sm"
+                  >
+                    <option value="" disabled>
+                      Beri rating penjual
+                    </option>
+                    <option value="5">5 - Sangat baik</option>
+                    <option value="4">4 - Baik</option>
+                    <option value="3">3 - Cukup</option>
+                    <option value="2">2 - Kurang</option>
+                    <option value="1">1 - Buruk</option>
+                  </select>
+                  <textarea
+                    name="comment"
+                    placeholder="Komentar (opsional)"
+                    className="min-h-16 rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm"
+                  />
+                  <Button type="submit" className="w-full">
+                    Kirim Ulasan
+                  </Button>
+                </form>
+              )}
             </>
           )}
         </CardContent>
