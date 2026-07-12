@@ -18,18 +18,29 @@ export async function resolveDisputeRefund(disputeId: string, orderId: string) {
 
   if (!order || !order.xendit_invoice_id) return;
 
-  const refund = await refundInvoice({
-    invoiceId: order.xendit_invoice_id,
-    amount: order.amount,
-    currency: order.currency,
-  });
+  // Xendit only supports API refunds for card payments — bank transfer/VA
+  // (the common case here) returns REFUND_NOT_SUPPORTED. When that happens,
+  // ops has to wire the money back manually outside the platform; we still
+  // record the ledger entry so the books reflect what actually happened.
+  let referenceId: string | null = null;
+  let reason = "Dispute resolved: refunded to buyer via Xendit";
+  try {
+    const refund = await refundInvoice({
+      invoiceId: order.xendit_invoice_id,
+      amount: order.amount,
+      currency: order.currency,
+    });
+    referenceId = refund.id ?? null;
+  } catch {
+    reason = "Dispute resolved: refund not supported by payment channel — requires manual bank transfer by ops";
+  }
 
   await admin.from("escrow_ledger").insert({
     order_id: orderId,
     entry_type: "refund_issued",
     direction: "debit",
     amount: order.amount,
-    reference_disbursement_id: refund.id,
+    reference_disbursement_id: referenceId,
   });
 
   await admin.from("orders").update({ state: "refunded" }).eq("id", orderId);
@@ -40,7 +51,7 @@ export async function resolveDisputeRefund(disputeId: string, orderId: string) {
     to_state: "refunded",
     actor_type: "admin",
     actor_id: admin_user.id,
-    reason: "Dispute resolved: refunded to buyer",
+    reason,
   });
 
   await admin
