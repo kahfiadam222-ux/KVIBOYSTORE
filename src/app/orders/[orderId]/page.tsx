@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { orderStateLabels } from "@/lib/orders/stateLabels";
 import { confirmDelivery, openDispute, submitReview } from "./actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DeliveryReveal } from "@/components/effects/DeliveryReveal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -67,14 +68,7 @@ export default async function OrderStatusPage({
           <p className="text-sm text-muted-foreground">{status.description}</p>
 
           {delivery && (
-            <div className="rounded-md border bg-muted p-3">
-              <p className="mb-1 text-xs font-medium text-muted-foreground">
-                Kode Aktivasi
-              </p>
-              <code className="text-sm font-semibold">
-                {delivery.payload_encrypted}
-              </code>
-            </div>
+            <DeliveryReveal orderId={order.id} code={delivery.payload_encrypted} />
           )}
 
           {order.state === "delivered" && (

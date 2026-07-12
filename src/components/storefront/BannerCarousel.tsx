@@ -12,6 +12,7 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
   const [index, setIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const touchStartX = useRef<number | null>(null);
+  const [glowStyle, setGlowStyle] = useState<React.CSSProperties>({ opacity: 0 });
 
   const goTo = useCallback(
     (next: number) => {
@@ -54,7 +55,19 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
       className="group relative mb-10 h-64 touch-pan-y overflow-hidden rounded-3xl border border-border sm:h-72"
       style={{ perspective: "1200px" }}
       onMouseEnter={pauseAutoSlide}
-      onMouseLeave={resetAutoSlide}
+      onMouseLeave={() => {
+        resetAutoSlide();
+        setGlowStyle({ opacity: 0, transition: "opacity 0.4s ease-out" });
+      }}
+      onMouseMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const px = ((e.clientX - rect.left) / rect.width) * 100;
+        const py = ((e.clientY - rect.top) / rect.height) * 100;
+        setGlowStyle({
+          opacity: 1,
+          background: `radial-gradient(360px circle at ${px}% ${py}%, color-mix(in oklch, var(--primary) 26%, transparent), transparent 70%)`,
+        });
+      }}
       onTouchStart={(e) => {
         touchStartX.current = e.touches[0].clientX;
       }}
@@ -110,6 +123,8 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
           </div>
         );
       })}
+
+      <div className="pointer-events-none absolute inset-0 z-10" style={glowStyle} />
 
       {banners.length > 1 && (
         <>

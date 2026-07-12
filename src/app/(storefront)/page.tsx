@@ -4,6 +4,7 @@ import { getActiveBanners } from "@/lib/banners/queries";
 import { createCheckout } from "./checkout/actions";
 import { BannerCarousel } from "@/components/storefront/BannerCarousel";
 import { SearchBar } from "@/components/storefront/SearchBar";
+import { TiltCard } from "@/components/effects/TiltCard";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -57,41 +58,43 @@ export default async function StorefrontPage({
           {listings.map((listing) => {
             const tier = getDeliveryLabel(listing);
             return (
-              <Card key={listing.listingId}>
-                <div
-                  className="h-32 bg-cover bg-center"
-                  style={{
-                    backgroundImage: listing.imageUrl
-                      ? `url(${listing.imageUrl})`
-                      : "var(--primary-gradient)",
-                  }}
-                />
-                <CardHeader>
-                  <div className="flex items-center justify-between gap-2">
-                    <CardTitle>{listing.productTypeName}</CardTitle>
-                    <Badge>{tier.label}</Badge>
-                  </div>
-                  <CardDescription>{tier.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-primary">
-                    {formatPrice(listing.price, listing.currency)}
-                  </p>
-                  {!listing.isPlatformOwned && listing.sellerReputation !== null && (
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      ⭐ {listing.sellerReputation.toFixed(1)} rating penjual
+              <TiltCard key={listing.listingId} className="relative rounded-2xl">
+                <Card>
+                  <div
+                    className="h-32 bg-cover bg-center"
+                    style={{
+                      backgroundImage: listing.imageUrl
+                        ? `url(${listing.imageUrl})`
+                        : "var(--primary-gradient)",
+                    }}
+                  />
+                  <CardHeader>
+                    <div className="flex items-center justify-between gap-2">
+                      <CardTitle>{listing.productTypeName}</CardTitle>
+                      <Badge>{tier.label}</Badge>
+                    </div>
+                    <CardDescription>{tier.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold text-primary">
+                      {formatPrice(listing.price, listing.currency)}
                     </p>
-                  )}
-                </CardContent>
-                <CardFooter>
-                  <form action={createCheckout} className="w-full">
-                    <input type="hidden" name="listingId" value={listing.listingId} />
-                    <Button type="submit" className="w-full">
-                      Beli Sekarang
-                    </Button>
-                  </form>
-                </CardFooter>
-              </Card>
+                    {!listing.isPlatformOwned && listing.sellerReputation !== null && (
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        ⭐ {listing.sellerReputation.toFixed(1)} rating penjual
+                      </p>
+                    )}
+                  </CardContent>
+                  <CardFooter>
+                    <form action={createCheckout} className="w-full">
+                      <input type="hidden" name="listingId" value={listing.listingId} />
+                      <Button type="submit" className="w-full">
+                        Beli Sekarang
+                      </Button>
+                    </form>
+                  </CardFooter>
+                </Card>
+              </TiltCard>
             );
           })}
         </div>
