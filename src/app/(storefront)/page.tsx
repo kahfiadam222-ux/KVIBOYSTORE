@@ -31,7 +31,7 @@ export default async function StorefrontPage({
   return (
     <main className="mx-auto max-w-5xl px-4 py-12">
       <header className="mb-10">
-        <h1 className="font-display text-4xl font-medium tracking-tight sm:text-5xl">
+        <h1 className="btn-gradient inline-block bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl">
           KVIBOYSTORE
         </h1>
         <p className="mt-3 max-w-md text-muted-foreground">
@@ -56,7 +56,7 @@ export default async function StorefrontPage({
                   <CardDescription>{tier.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="font-display text-2xl font-medium text-primary">
+                  <p className="text-2xl font-bold text-primary">
                     {formatPrice(listing.price, listing.currency)}
                   </p>
                   {!listing.isPlatformOwned && listing.sellerReputation !== null && (
