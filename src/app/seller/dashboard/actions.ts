@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireSeller } from "@/lib/auth/requireSeller";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function createListing(formData: FormData) {
   const user = await requireSeller();
@@ -34,6 +35,54 @@ export async function createListing(formData: FormData) {
     price,
     stock_count: stockCount,
     is_active: true,
+  });
+
+  revalidatePath("/seller/dashboard");
+}
+
+export async function deliverOrder(orderId: string, formData: FormData) {
+  const user = await requireSeller();
+  const supabase = await createClient();
+
+  const payload = formData.get("payload") as string;
+
+  // RLS scopes this to orders where seller_id = auth.uid(), so a seller can
+  // only ever deliver their own orders even if orderId were guessed/tampered.
+  const { data: order } = await supabase
+    .from("orders")
+    .select("id, state, seller_id, listings ( products ( product_types ( delivery_method ) ) )")
+    .eq("id", orderId)
+    .eq("seller_id", user.id)
+    .single();
+
+  if (!order || order.state !== "awaiting_delivery") return;
+
+  const deliveryMethod = (
+    order.listings as unknown as {
+      products: { product_types: { delivery_method: string } };
+    }
+  ).products.product_types.delivery_method;
+
+  // Ownership was already verified above via the RLS-scoped read (seller_id = auth.uid());
+  // these writes use the admin client because orders/deliveries have no client-facing write policy.
+  const admin = createAdminClient();
+
+  await admin.from("deliveries").insert({
+    order_id: orderId,
+    payload_encrypted: payload,
+    delivery_method: deliveryMethod,
+    delivered_at: new Date().toISOString(),
+  });
+
+  await admin.from("orders").update({ state: "delivered" }).eq("id", orderId);
+
+  await admin.from("order_state_transitions").insert({
+    order_id: orderId,
+    from_state: "awaiting_delivery",
+    to_state: "delivered",
+    actor_type: "seller",
+    actor_id: user.id,
+    reason: "Seller delivered manually",
   });
 
   revalidatePath("/seller/dashboard");

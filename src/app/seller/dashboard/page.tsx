@@ -1,6 +1,6 @@
 import { requireSeller } from "@/lib/auth/requireSeller";
 import { createClient } from "@/lib/supabase/server";
-import { createListing } from "./actions";
+import { createListing, deliverOrder } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,13 +24,19 @@ export default async function SellerDashboardPage() {
   const user = await requireSeller();
   const supabase = await createClient();
 
-  const [{ data: productTypes }, { data: products }] = await Promise.all([
+  const [{ data: productTypes }, { data: products }, { data: pendingOrders }] = await Promise.all([
     supabase.from("product_types").select("id, name").order("name"),
     supabase
       .from("products")
       .select("id, title, status, listings ( id, price, currency, stock_count, is_active )")
       .eq("seller_id", user.id)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("orders")
+      .select("id, amount, currency, created_at")
+      .eq("seller_id", user.id)
+      .eq("state", "awaiting_delivery")
+      .order("created_at", { ascending: true }),
   ]);
 
   return (
@@ -79,6 +85,36 @@ export default async function SellerDashboardPage() {
           </form>
         </CardContent>
       </Card>
+
+      <h2 className="mb-4 text-lg font-semibold">Pesanan Menunggu Pengiriman</h2>
+      {!pendingOrders || pendingOrders.length === 0 ? (
+        <p className="mb-8 text-muted-foreground">Tidak ada pesanan yang perlu dikirim.</p>
+      ) : (
+        <div className="mb-8 flex flex-col gap-3">
+          {pendingOrders.map((order) => {
+            const deliverWithId = deliverOrder.bind(null, order.id);
+            return (
+              <Card key={order.id}>
+                <CardContent>
+                  <p className="mb-1 font-medium">Pesanan #{order.id.slice(0, 8)}</p>
+                  <p className="mb-3 text-sm text-muted-foreground">
+                    {formatPrice(order.amount, order.currency)}
+                  </p>
+                  <form action={deliverWithId} className="flex gap-2">
+                    <Input
+                      name="payload"
+                      placeholder="Kredensial / kode akun untuk pembeli"
+                      required
+                      className="flex-1"
+                    />
+                    <Button type="submit">Kirim</Button>
+                  </form>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       <h2 className="mb-4 text-lg font-semibold">Listing Saya</h2>
       {!products || products.length === 0 ? (

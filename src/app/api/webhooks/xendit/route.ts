@@ -74,6 +74,17 @@ export async function POST(request: NextRequest) {
         reason: "Instant delivery: code claimed from inventory",
       });
     }
+  } else {
+    // Seller-owned orders need the seller to deliver manually from their dashboard.
+    await admin.from("orders").update({ state: "awaiting_delivery" }).eq("id", orderId);
+
+    await admin.from("order_state_transitions").insert({
+      order_id: orderId,
+      from_state: "payment_held",
+      to_state: "awaiting_delivery",
+      actor_type: "system",
+      reason: "Awaiting manual delivery from seller",
+    });
   }
 
   return NextResponse.json({ received: true });

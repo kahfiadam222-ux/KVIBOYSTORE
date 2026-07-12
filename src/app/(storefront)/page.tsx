@@ -1,5 +1,5 @@
 import { getActiveListings } from "@/lib/catalog/queries";
-import { tierLabels } from "@/lib/catalog/tierLabels";
+import { getDeliveryLabel } from "@/lib/catalog/tierLabels";
 import { createCheckout } from "./checkout/actions";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -37,7 +37,7 @@ export default async function StorefrontPage() {
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {listings.map((listing) => {
-            const tier = tierLabels[listing.riskTier];
+            const tier = getDeliveryLabel(listing);
             return (
               <Card key={listing.listingId}>
                 <CardHeader>
