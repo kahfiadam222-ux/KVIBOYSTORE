@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { orderStateLabels } from "@/lib/orders/stateLabels";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/orders/StatusBadge";
 
 function formatPrice(amount: number, currency: string) {
   return new Intl.NumberFormat("id-ID", {
@@ -31,6 +31,7 @@ export default async function OrdersListPage() {
           {orders.map((order) => {
             const status = orderStateLabels[order.state] ?? {
               label: order.state,
+              tone: "neutral" as const,
             };
             return (
               <Link key={order.id} href={`/orders/${order.id}`}>
@@ -48,7 +49,7 @@ export default async function OrdersListPage() {
                       <span className="font-semibold">
                         {formatPrice(order.amount, order.currency)}
                       </span>
-                      <Badge>{status.label}</Badge>
+                      <StatusBadge label={status.label} tone={status.tone} />
                     </div>
                   </CardContent>
                 </Card>

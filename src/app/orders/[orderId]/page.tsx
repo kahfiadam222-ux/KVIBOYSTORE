@@ -4,7 +4,7 @@ import { orderStateLabels } from "@/lib/orders/stateLabels";
 import { confirmDelivery, openDispute, submitReview } from "./actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DeliveryReveal } from "@/components/effects/DeliveryReveal";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/orders/StatusBadge";
 import { Button } from "@/components/ui/button";
 
 function formatPrice(amount: number, currency: string) {
@@ -46,6 +46,7 @@ export default async function OrderStatusPage({
   const status = orderStateLabels[order.state] ?? {
     label: order.state,
     description: "",
+    tone: "neutral" as const,
   };
 
   const confirmDeliveryWithId = confirmDelivery.bind(null, order.id);
@@ -58,7 +59,7 @@ export default async function OrderStatusPage({
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle>Pesanan #{order.id.slice(0, 8)}</CardTitle>
-            <Badge>{status.label}</Badge>
+            <StatusBadge label={status.label} tone={status.tone} />
           </div>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
