@@ -39,19 +39,27 @@ export async function logout() {
   redirect("/");
 }
 
-export async function loginWithGoogle() {
+async function loginWithOAuth(provider: "google" | "github") {
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
+    provider,
     options: {
       redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
     },
   });
 
   if (error || !data.url) {
-    redirect(`/login?error=${encodeURIComponent(error?.message ?? "Gagal masuk dengan Google.")}`);
+    redirect(`/login?error=${encodeURIComponent(error?.message ?? `Gagal masuk dengan ${provider}.`)}`);
   }
 
   redirect(data.url);
+}
+
+export async function loginWithGoogle() {
+  await loginWithOAuth("google");
+}
+
+export async function loginWithGithub() {
+  await loginWithOAuth("github");
 }
