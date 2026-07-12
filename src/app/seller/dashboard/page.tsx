@@ -1,6 +1,6 @@
 import { requireSeller } from "@/lib/auth/requireSeller";
 import { createClient } from "@/lib/supabase/server";
-import { createListing, deliverOrder } from "./actions";
+import { createListing, deliverOrder, updatePayoutAccount } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,24 +24,81 @@ export default async function SellerDashboardPage() {
   const user = await requireSeller();
   const supabase = await createClient();
 
-  const [{ data: productTypes }, { data: products }, { data: pendingOrders }] = await Promise.all([
-    supabase.from("product_types").select("id, name").order("name"),
-    supabase
-      .from("products")
-      .select("id, title, status, listings ( id, price, currency, stock_count, is_active )")
-      .eq("seller_id", user.id)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("orders")
-      .select("id, amount, currency, created_at")
-      .eq("seller_id", user.id)
-      .eq("state", "awaiting_delivery")
-      .order("created_at", { ascending: true }),
-  ]);
+  const [{ data: productTypes }, { data: products }, { data: pendingOrders }, { data: sellerProfile }] =
+    await Promise.all([
+      supabase.from("product_types").select("id, name").order("name"),
+      supabase
+        .from("products")
+        .select("id, title, status, listings ( id, price, currency, stock_count, is_active )")
+        .eq("seller_id", user.id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("orders")
+        .select("id, amount, currency, created_at")
+        .eq("seller_id", user.id)
+        .eq("state", "awaiting_delivery")
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("seller_profiles")
+        .select("payout_channel_code, payout_account_number, payout_account_holder_name")
+        .eq("user_id", user.id)
+        .single(),
+    ]);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-12">
       <h1 className="mb-8 text-2xl font-semibold tracking-tight">Dashboard Penjual</h1>
+
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Rekening Pencairan Dana</CardTitle>
+          <CardDescription>
+            Dana pesanan dilepas ke sini otomatis setelah pembeli konfirmasi.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form action={updatePayoutAccount} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="payoutChannelCode">Bank</Label>
+              <select
+                id="payoutChannelCode"
+                name="payoutChannelCode"
+                required
+                defaultValue={sellerProfile?.payout_channel_code ?? ""}
+                className="h-8 rounded-lg border border-border bg-background px-2.5 text-sm"
+              >
+                <option value="" disabled>
+                  Pilih bank
+                </option>
+                <option value="ID_BCA">BCA</option>
+                <option value="ID_MANDIRI">Mandiri</option>
+                <option value="ID_BNI">BNI</option>
+                <option value="ID_BRI">BRI</option>
+                <option value="ID_PERMATA">Permata</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="payoutAccountNumber">Nomor Rekening</Label>
+              <Input
+                id="payoutAccountNumber"
+                name="payoutAccountNumber"
+                required
+                defaultValue={sellerProfile?.payout_account_number ?? ""}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="payoutAccountHolderName">Nama Pemilik Rekening</Label>
+              <Input
+                id="payoutAccountHolderName"
+                name="payoutAccountHolderName"
+                required
+                defaultValue={sellerProfile?.payout_account_holder_name ?? ""}
+              />
+            </div>
+            <Button type="submit">Simpan Rekening</Button>
+          </form>
+        </CardContent>
+      </Card>
 
       <Card className="mb-8">
         <CardHeader>

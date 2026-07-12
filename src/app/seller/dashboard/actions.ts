@@ -40,6 +40,25 @@ export async function createListing(formData: FormData) {
   revalidatePath("/seller/dashboard");
 }
 
+export async function updatePayoutAccount(formData: FormData) {
+  const user = await requireSeller();
+  // seller_profiles has no client-facing UPDATE policy, so this goes through
+  // the admin client; requireSeller() + the eq("user_id", user.id) filter
+  // below is what keeps a seller from touching anyone else's payout info.
+  const admin = createAdminClient();
+
+  await admin
+    .from("seller_profiles")
+    .update({
+      payout_channel_code: formData.get("payoutChannelCode") as string,
+      payout_account_number: formData.get("payoutAccountNumber") as string,
+      payout_account_holder_name: formData.get("payoutAccountHolderName") as string,
+    })
+    .eq("user_id", user.id);
+
+  revalidatePath("/seller/dashboard");
+}
+
 export async function deliverOrder(orderId: string, formData: FormData) {
   const user = await requireSeller();
   const supabase = await createClient();
