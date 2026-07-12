@@ -38,3 +38,20 @@ export async function logout() {
   await supabase.auth.signOut();
   redirect("/");
 }
+
+export async function loginWithGoogle() {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+    },
+  });
+
+  if (error || !data.url) {
+    redirect(`/login?error=${encodeURIComponent(error?.message ?? "Gagal masuk dengan Google.")}`);
+  }
+
+  redirect(data.url);
+}
