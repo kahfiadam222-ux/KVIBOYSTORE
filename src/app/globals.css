@@ -88,11 +88,11 @@
   --sidebar-border: rgba(20, 20, 24, 0.09);
   --sidebar-ring: #6D4CE0;
   --body-gradient:
-    radial-gradient(550px 550px at 6% -8%, color-mix(in oklch, #8B6CF5 22%, transparent), transparent 60%),
-    radial-gradient(480px 480px at 32% -4%, color-mix(in oklch, #EC4899 16%, transparent), transparent 60%),
-    radial-gradient(520px 520px at 98% -6%, color-mix(in oklch, #F5C778 20%, transparent), transparent 58%),
-    radial-gradient(600px 600px at 100% 42%, color-mix(in oklch, #3B82F6 14%, transparent), transparent 60%),
-    radial-gradient(650px 650px at 50% 115%, color-mix(in oklch, var(--primary) 10%, transparent), transparent 60%),
+    radial-gradient(550px 550px at 6% -8%, color-mix(in oklch, #8B6CF5 14%, transparent), transparent 60%),
+    radial-gradient(480px 480px at 32% -4%, color-mix(in oklch, #EC4899 10%, transparent), transparent 60%),
+    radial-gradient(520px 520px at 98% -6%, color-mix(in oklch, #F5C778 13%, transparent), transparent 58%),
+    radial-gradient(600px 600px at 100% 42%, color-mix(in oklch, #3B82F6 9%, transparent), transparent 60%),
+    radial-gradient(650px 650px at 50% 115%, color-mix(in oklch, var(--primary) 7%, transparent), transparent 60%),
     linear-gradient(160deg, #FCFCFD 0%, #F7F7F9 45%, #F1F1F4 100%);
 }
 
@@ -132,11 +132,11 @@
   --sidebar-border: rgba(255, 255, 255, 0.08);
   --sidebar-ring: #8B6CF5;
   --body-gradient:
-    radial-gradient(600px 600px at 6% -8%, color-mix(in oklch, #9B7DFF 42%, transparent), transparent 62%),
-    radial-gradient(520px 520px at 34% -4%, color-mix(in oklch, #F472B6 32%, transparent), transparent 62%),
-    radial-gradient(560px 560px at 98% -6%, color-mix(in oklch, #E8B84B 36%, transparent), transparent 60%),
-    radial-gradient(650px 650px at 100% 42%, color-mix(in oklch, #60A5FA 28%, transparent), transparent 62%),
-    radial-gradient(700px 700px at 50% 118%, color-mix(in oklch, var(--primary) 22%, transparent), transparent 62%),
+    radial-gradient(600px 600px at 6% -8%, color-mix(in oklch, #9B7DFF 26%, transparent), transparent 62%),
+    radial-gradient(520px 520px at 34% -4%, color-mix(in oklch, #F472B6 19%, transparent), transparent 62%),
+    radial-gradient(560px 560px at 98% -6%, color-mix(in oklch, #E8B84B 22%, transparent), transparent 60%),
+    radial-gradient(650px 650px at 100% 42%, color-mix(in oklch, #60A5FA 17%, transparent), transparent 62%),
+    radial-gradient(700px 700px at 50% 118%, color-mix(in oklch, var(--primary) 14%, transparent), transparent 62%),
     linear-gradient(160deg, #0E0E13 0%, #131318 40%, #0A0A0E 100%);
 }
 
@@ -147,8 +147,32 @@
   body {
     @apply text-foreground;
     background-color: var(--background);
+    position: relative;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: -10%;
+    z-index: -20;
     background-image: var(--body-gradient);
-    background-attachment: fixed;
+    animation: bg-drift 26s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body::before {
+      animation: none;
+    }
+  }
+  @keyframes bg-drift {
+    0% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(-1.5%, 1.5%) scale(1.04);
+    }
+    100% {
+      transform: translate(1.5%, -1%) scale(1.02);
+    }
   }
   html {
     @apply font-sans;
