@@ -24,12 +24,23 @@ export async function createListing(formData: FormData) {
     throw new Error("Akses ditolak. Anda tidak memiliki izin untuk membuat produk.");
   }
 
-  const productTypeId = formData.get("productTypeId") as string;
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
-  const imageUrl = formData.get("imageUrl") as string;
-  const price = Number(formData.get("price"));
-  const stockCount = Number(formData.get("stockCount"));
+  const productTypeId = formData.get("productTypeId");
+  const title = formData.get("title");
+  const description = formData.get("description");
+  const imageUrl = formData.get("imageUrl");
+  const priceStr = formData.get("price");
+  const stockCountStr = formData.get("stockCount");
+
+  if (!productTypeId || !title || !description || !priceStr || !stockCountStr) {
+    throw new Error("Semua field wajib diisi (kecuali gambar).");
+  }
+
+  const price = Number(priceStr);
+  const stockCount = Number(stockCountStr);
+
+  if (isNaN(price) || isNaN(stockCount) || price <= 0 || stockCount < 0) {
+    throw new Error("Harga dan stok harus berupa angka valid.");
+  }
 
   // If user is admin, allow specifying a different seller_id, otherwise use current user
   let sellerId = user.id;
@@ -44,10 +55,10 @@ export async function createListing(formData: FormData) {
     .from("products")
     .insert({
       seller_id: sellerId,
-      product_type_id: productTypeId,
-      title,
-      description,
-      image_url: imageUrl || null,
+      product_type_id: productTypeId as string,
+      title: title as string,
+      description: description as string,
+      image_url: imageUrl ? (imageUrl as string) : null,
       is_platform_owned: false,
       status: "active",
     })
@@ -161,12 +172,23 @@ export async function updateListing(listingId: string, formData: FormData) {
     throw new Error("Akses ditolak. Anda tidak memiliki izin untuk mengedit produk.");
   }
 
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
-  const imageUrl = formData.get("imageUrl") as string;
-  const productTypeId = formData.get("productTypeId") as string;
-  const price = Number(formData.get("price"));
-  const stockCount = Number(formData.get("stockCount"));
+  const title = formData.get("title");
+  const description = formData.get("description");
+  const imageUrl = formData.get("imageUrl");
+  const productTypeId = formData.get("productTypeId");
+  const priceStr = formData.get("price");
+  const stockCountStr = formData.get("stockCount");
+
+  if (!title || !description || !productTypeId || !priceStr || !stockCountStr) {
+    throw new Error("Semua field wajib diisi (kecuali gambar).");
+  }
+
+  const price = Number(priceStr);
+  const stockCount = Number(stockCountStr);
+
+  if (isNaN(price) || isNaN(stockCount) || price <= 0 || stockCount < 0) {
+    throw new Error("Harga dan stok harus berupa angka valid.");
+  }
 
   const { data: listing } = await supabase
     .from("listings")
@@ -194,10 +216,10 @@ export async function updateListing(listingId: string, formData: FormData) {
   await supabase
     .from("products")
     .update({
-      title,
-      description,
-      image_url: imageUrl || null,
-      product_type_id: productTypeId,
+      title: title as string,
+      description: description as string,
+      image_url: imageUrl ? (imageUrl as string) : null,
+      product_type_id: productTypeId as string,
     })
     .eq("id", listing.product_id);
 

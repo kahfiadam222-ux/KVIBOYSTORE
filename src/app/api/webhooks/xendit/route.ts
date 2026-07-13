@@ -4,7 +4,12 @@ import { revealExpiresAt } from "@/lib/orders/autoConfirm";
 
 export async function POST(request: NextRequest) {
   const token = request.headers.get("x-callback-token");
-  if (process.env.XENDIT_WEBHOOK_TOKEN && token !== process.env.XENDIT_WEBHOOK_TOKEN) {
+  const expectedToken = process.env.XENDIT_WEBHOOK_TOKEN;
+  if (!expectedToken) {
+    console.error("XENDIT_WEBHOOK_TOKEN not configured");
+    return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
+  }
+  if (token !== expectedToken) {
     return NextResponse.json({ error: "Invalid webhook token" }, { status: 401 });
   }
 

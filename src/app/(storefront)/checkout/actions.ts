@@ -37,9 +37,14 @@ export async function createCheckout(formData: FormData) {
 
   // Atomically claims one unit of stock — prevents overselling when two
   // buyers hit the last unit of a listing at the same time.
-  const { data: stockClaimed } = await admin.rpc("decrement_listing_stock", {
+  const { data: stockClaimed, error: stockError } = await admin.rpc("decrement_listing_stock", {
     p_listing_id: listing!.id,
   });
+
+  if (stockError) {
+    console.error("Stock decrement failed:", stockError);
+    redirect(`/?error=${encodeURIComponent("Terjadi kesalahan sistem. Silakan coba lagi.")}`);
+  }
 
   if (!stockClaimed) {
     redirect(`/?error=${encodeURIComponent("Stok produk ini sudah habis.")}`);

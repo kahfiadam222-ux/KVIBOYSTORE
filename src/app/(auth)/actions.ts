@@ -6,9 +6,16 @@ import { createClient } from "@/lib/supabase/server";
 export async function login(formData: FormData) {
   const supabase = await createClient();
 
+  const email = formData.get("email");
+  const password = formData.get("password");
+
+  if (!email || !password) {
+    redirect(`/login?error=${encodeURIComponent("Email dan password wajib diisi.")}`);
+  }
+
   const { error } = await supabase.auth.signInWithPassword({
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
+    email: email as string,
+    password: password as string,
   });
 
   if (error) {
@@ -21,9 +28,16 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
   const supabase = await createClient();
 
+  const email = formData.get("email");
+  const password = formData.get("password");
+
+  if (!email || !password) {
+    redirect(`/signup?error=${encodeURIComponent("Email dan password wajib diisi.")}`);
+  }
+
   const { error } = await supabase.auth.signUp({
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
+    email: email as string,
+    password: password as string,
   });
 
   if (error) {

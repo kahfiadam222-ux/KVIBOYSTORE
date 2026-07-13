@@ -40,6 +40,7 @@ export async function submitReview(orderId: string, formData: FormData) {
   if (!user) return;
 
   const rating = Number(formData.get("rating"));
+  if (isNaN(rating) || rating < 1 || rating > 5) return;
   const comment = formData.get("comment") as string;
 
   const admin = createAdminClient();
