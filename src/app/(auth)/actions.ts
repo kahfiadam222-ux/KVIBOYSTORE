@@ -2,6 +2,18 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit } from "@/lib/security/rateLimiter";
+
+// 5 login attempts per 15 minutes per email — enough headroom for a
+// forgetful user, tight enough to blunt brute-force attempts.
+const LOGIN_LIMIT = { max: 5, windowMs: 15 * 60 * 1000 };
+// 3 signups per hour per email — prevents automated account farming.
+const SIGNUP_LIMIT = { max: 3, windowMs: 60 * 60 * 1000 };
+
+function formatMinutes(ms: number): string {
+  const minutes = Math.max(1, Math.ceil(ms / 60_000));
+  return `${minutes} menit`;
+}
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -11,6 +23,17 @@ export async function login(formData: FormData) {
 
   if (!email || !password) {
     redirect(`/login?error=${encodeURIComponent("Email dan password wajib diisi.")}`);
+  }
+
+  const { allowed, resetIn } = checkRateLimit(
+    `login:${String(email).toLowerCase()}`,
+    LOGIN_LIMIT.max,
+    LOGIN_LIMIT.windowMs,
+  );
+  if (!allowed) {
+    redirect(`/login?error=${encodeURIComponent(
+      `Terlalu banyak percobaan masuk. Coba lagi dalam ${formatMinutes(resetIn)}.`,
+    )}`);
   }
 
   const { error } = await supabase.auth.signInWithPassword({
@@ -33,6 +56,17 @@ export async function signup(formData: FormData) {
 
   if (!email || !password) {
     redirect(`/signup?error=${encodeURIComponent("Email dan password wajib diisi.")}`);
+  }
+
+  const { allowed, resetIn } = checkRateLimit(
+    `signup:${String(email).toLowerCase()}`,
+    SIGNUP_LIMIT.max,
+    SIGNUP_LIMIT.windowMs,
+  );
+  if (!allowed) {
+    redirect(`/signup?error=${encodeURIComponent(
+      `Terlalu banyak percobaan daftar. Coba lagi dalam ${formatMinutes(resetIn)}.`,
+    )}`);
   }
 
   const { error } = await supabase.auth.signUp({

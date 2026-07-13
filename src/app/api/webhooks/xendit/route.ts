@@ -2,6 +2,20 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revealExpiresAt } from "@/lib/orders/autoConfirm";
 
+interface XenditWebhookBody {
+  external_id: string;
+  status: string;
+}
+
+function isXenditWebhookBody(body: unknown): body is XenditWebhookBody {
+  return (
+    typeof body === "object" &&
+    body !== null &&
+    typeof (body as Record<string, unknown>).external_id === "string" &&
+    typeof (body as Record<string, unknown>).status === "string"
+  );
+}
+
 export async function POST(request: NextRequest) {
   const token = request.headers.get("x-callback-token");
   const expectedToken = process.env.XENDIT_WEBHOOK_TOKEN;
@@ -13,9 +27,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid webhook token" }, { status: 401 });
   }
 
-  const body = await request.json();
-  const orderId = body.external_id as string;
-  const status = body.status as string;
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    // Malformed JSON — can't come from a legitimate Xendit webhook.
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  if (!isXenditWebhookBody(body)) {
+    console.error("Xendit webhook body missing expected fields:", body);
+    return NextResponse.json({ error: "Invalid payload structure" }, { status: 400 });
+  }
+
+  const orderId = body.external_id;
+  const status = body.status;
 
   if (status !== "PAID") {
     return NextResponse.json({ received: true });

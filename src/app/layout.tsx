@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import { SpaceBackground } from "@/components/effects/SpaceBackground";
 import "./globals.css";
 
@@ -18,11 +19,15 @@ export const metadata: Metadata = {
   description: "Marketplace langganan digital premium — terpercaya, terverifikasi.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // The nonce is generated per-request in src/proxy.ts and forwarded here so the
+  // inline theme bootstrap script can run under the strict Content-Security-Policy.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <html
       lang="id"
@@ -30,6 +35,7 @@ export default function RootLayout({
     >
       <head>
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `
               try {
