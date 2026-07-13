@@ -94,7 +94,7 @@ export function VerticalBannerCarousel({ banners }: { banners: HomepageBanner[] 
             }}
           >
             <div
-              className="flex h-full w-full flex-col justify-end gap-2 px-6 py-6"
+              className="flex h-full w-full flex-col justify-end gap-1.5 px-3 py-4 sm:gap-2 sm:px-6 sm:py-6"
               style={{
                 backgroundImage: banner.imageUrl
                   ? `linear-gradient(0deg, color-mix(in oklch, var(--background) 65%, transparent), color-mix(in oklch, var(--background) 10%, transparent)), url(${banner.imageUrl})`
@@ -103,14 +103,16 @@ export function VerticalBannerCarousel({ banners }: { banners: HomepageBanner[] 
                 backgroundPosition: "center",
               }}
             >
-              <h2 className="text-lg font-bold text-white drop-shadow-sm sm:text-xl">
+              <h2 className="text-sm font-bold text-white drop-shadow-sm sm:text-lg lg:text-xl">
                 {banner.title}
               </h2>
               {banner.subtitle && (
-                <p className="text-xs text-white/85 sm:text-sm">{banner.subtitle}</p>
+                <p className="hidden text-xs text-white/85 sm:block sm:text-sm">
+                  {banner.subtitle}
+                </p>
               )}
               {banner.ctaLabel && banner.ctaHref && (
-                <Link href={banner.ctaHref} className="w-fit">
+                <Link href={banner.ctaHref} className="hidden w-fit sm:block">
                   <Button size="sm" className="mt-1">
                     {banner.ctaLabel}
                   </Button>

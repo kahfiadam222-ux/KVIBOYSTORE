@@ -97,7 +97,7 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
             }}
           >
             <div
-              className="flex h-full w-full flex-col justify-center gap-3 px-8 sm:px-12"
+              className="flex h-full w-full flex-col justify-center gap-2 px-4 sm:gap-3 sm:px-8 lg:px-12"
               style={{
                 backgroundImage: banner.imageUrl
                   ? `linear-gradient(120deg, color-mix(in oklch, var(--background) 55%, transparent), color-mix(in oklch, var(--background) 15%, transparent)), url(${banner.imageUrl})`
@@ -106,15 +106,20 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
                 backgroundPosition: "center",
               }}
             >
-              <h2 className="max-w-md text-2xl font-bold text-white drop-shadow-sm sm:text-3xl">
+              <h2 className="max-w-md text-lg font-bold text-white drop-shadow-sm sm:text-2xl lg:text-3xl">
                 {banner.title}
               </h2>
               {banner.subtitle && (
-                <p className="max-w-md text-sm text-white/85 sm:text-base">{banner.subtitle}</p>
+                <p className="max-w-md text-xs text-white/85 sm:text-sm lg:text-base">
+                  {banner.subtitle}
+                </p>
               )}
               {banner.ctaLabel && banner.ctaHref && (
                 <Link href={banner.ctaHref} className="w-fit">
-                  <Button size="lg" className="mt-2">
+                  <Button size="sm" className="mt-1 sm:hidden">
+                    {banner.ctaLabel}
+                  </Button>
+                  <Button size="lg" className="mt-2 hidden sm:inline-flex">
                     {banner.ctaLabel}
                   </Button>
                 </Link>

@@ -38,7 +38,7 @@ export async function Navbar() {
 
   return (
     <header className="glass-panel sticky top-0 z-40 border-x-0 border-t-0 backdrop-blur-xl">
-      <nav className="relative mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-3">
+      <nav className="relative mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:px-6 lg:px-8">
         <Link
           href="/"
           className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight"

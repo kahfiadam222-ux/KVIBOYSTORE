@@ -39,15 +39,17 @@ export default async function StorefrontPage({
   const verticalBanners = banners.filter((b) => b.layout === "vertical");
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10">
+    <main className="mx-auto max-w-7xl px-3 py-10 sm:px-6 lg:px-8">
       <SearchBar defaultValue={q} />
 
       {verticalBanners.length > 0 ? (
-        <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="sm:col-span-2">
+        <div className="mb-10 flex flex-row gap-3 sm:gap-4">
+          <div className="min-w-0 flex-[2.2]">
             <BannerCarousel banners={horizontalBanners} />
           </div>
-          <VerticalBannerCarousel banners={verticalBanners} />
+          <div className="min-w-0 flex-1">
+            <VerticalBannerCarousel banners={verticalBanners} />
+          </div>
         </div>
       ) : (
         <div className="mb-10">
@@ -68,7 +70,7 @@ export default async function StorefrontPage({
       {listings.length === 0 ? (
         <p className="text-muted-foreground">Belum ada produk tersedia.</p>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {listings.map((listing) => {
             const tier = getDeliveryLabel(listing);
             return (
