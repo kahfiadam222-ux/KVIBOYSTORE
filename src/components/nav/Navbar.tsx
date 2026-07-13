@@ -39,8 +39,29 @@ export async function Navbar() {
   return (
     <header className="glass-panel sticky top-0 z-40 border-x-0 border-t-0 backdrop-blur-xl">
       <nav className="relative mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-3">
-        <Link href="/" className="shrink-0 text-lg font-bold tracking-tight">
-          KVIBOYSTORE
+        <Link
+          href="/"
+          className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight"
+        >
+          <span
+            aria-hidden
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-input text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 11.5 12 4l9 7.5" />
+              <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" />
+            </svg>
+          </span>
+          <span className="hidden sm:inline">KVIBOYSTORE</span>
         </Link>
 
         <div className="hidden min-w-0 items-center gap-4 sm:flex">
