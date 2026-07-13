@@ -3,6 +3,7 @@ import { getDeliveryLabel } from "@/lib/catalog/tierLabels";
 import { getActiveBanners } from "@/lib/banners/queries";
 import { createCheckout } from "./checkout/actions";
 import { BannerCarousel } from "@/components/storefront/BannerCarousel";
+import { VerticalBannerCarousel } from "@/components/storefront/VerticalBannerCarousel";
 import { SearchBar } from "@/components/storefront/SearchBar";
 import { TiltCard } from "@/components/effects/TiltCard";
 import { Badge } from "@/components/ui/badge";
@@ -34,12 +35,25 @@ export default async function StorefrontPage({
     getActiveListings(q),
     getActiveBanners(),
   ]);
+  const horizontalBanners = banners.filter((b) => b.layout === "horizontal");
+  const verticalBanners = banners.filter((b) => b.layout === "vertical");
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
       <SearchBar defaultValue={q} />
 
-      <BannerCarousel banners={banners} />
+      {verticalBanners.length > 0 ? (
+        <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="sm:col-span-2">
+            <BannerCarousel banners={horizontalBanners} />
+          </div>
+          <VerticalBannerCarousel banners={verticalBanners} />
+        </div>
+      ) : (
+        <div className="mb-10">
+          <BannerCarousel banners={horizontalBanners} />
+        </div>
+      )}
 
       <header className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight">

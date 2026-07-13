@@ -8,6 +8,8 @@ export async function createBanner(formData: FormData) {
   await requireAdmin();
   const admin = createAdminClient();
 
+  const layout = formData.get("layout") as string;
+
   await admin.from("homepage_banners").insert({
     title: formData.get("title") as string,
     subtitle: (formData.get("subtitle") as string) || null,
@@ -15,6 +17,7 @@ export async function createBanner(formData: FormData) {
     cta_label: (formData.get("ctaLabel") as string) || null,
     cta_href: (formData.get("ctaHref") as string) || null,
     sort_order: Number(formData.get("sortOrder")) || 0,
+    layout: layout === "vertical" ? "vertical" : "horizontal",
   });
 
   revalidatePath("/admin/banners");

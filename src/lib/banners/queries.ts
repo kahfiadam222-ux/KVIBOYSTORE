@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 
+export type BannerLayout = "horizontal" | "vertical";
+
 export interface HomepageBanner {
   id: string;
   title: string;
@@ -7,6 +9,7 @@ export interface HomepageBanner {
   imageUrl: string | null;
   ctaLabel: string | null;
   ctaHref: string | null;
+  layout: BannerLayout;
 }
 
 export async function getActiveBanners(): Promise<HomepageBanner[]> {
@@ -14,7 +17,7 @@ export async function getActiveBanners(): Promise<HomepageBanner[]> {
 
   const { data, error } = await supabase
     .from("homepage_banners")
-    .select("id, title, subtitle, image_url, cta_label, cta_href")
+    .select("id, title, subtitle, image_url, cta_label, cta_href, layout")
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
@@ -27,5 +30,6 @@ export async function getActiveBanners(): Promise<HomepageBanner[]> {
     imageUrl: row.image_url,
     ctaLabel: row.cta_label,
     ctaHref: row.cta_href,
+    layout: row.layout === "vertical" ? "vertical" : "horizontal",
   }));
 }

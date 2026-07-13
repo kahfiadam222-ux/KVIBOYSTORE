@@ -19,7 +19,7 @@ export default async function AdminBannersPage() {
 
   const { data: banners } = await admin
     .from("homepage_banners")
-    .select("id, title, subtitle, image_url, cta_label, cta_href, is_active, sort_order")
+    .select("id, title, subtitle, image_url, cta_label, cta_href, is_active, sort_order, layout")
     .order("sort_order", { ascending: true });
 
   return (
@@ -57,6 +57,18 @@ export default async function AdminBannersPage() {
               <Label htmlFor="sortOrder">Urutan</Label>
               <Input id="sortOrder" name="sortOrder" type="number" defaultValue={0} />
             </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="layout">Tipe Banner</Label>
+              <select
+                id="layout"
+                name="layout"
+                defaultValue="horizontal"
+                className="h-10 rounded-lg border border-input bg-transparent px-3 text-sm"
+              >
+                <option value="horizontal">Horizontal (slide samping)</option>
+                <option value="vertical">Vertikal (slide atas-bawah)</option>
+              </select>
+            </div>
             <Button type="submit">Tambah Banner</Button>
           </form>
         </CardContent>
@@ -78,6 +90,9 @@ export default async function AdminBannersPage() {
                       <p className="truncate font-medium">{banner.title}</p>
                       <Badge variant={banner.is_active ? "default" : "secondary"}>
                         {banner.is_active ? "Aktif" : "Nonaktif"}
+                      </Badge>
+                      <Badge variant="outline">
+                        {banner.layout === "vertical" ? "Vertikal" : "Horizontal"}
                       </Badge>
                     </div>
                     {banner.subtitle && (
