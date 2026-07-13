@@ -28,6 +28,22 @@ export default function RootLayout({
       lang="id"
       className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const t = localStorage.getItem("kvibo-theme");
+                if (t) {
+                  document.documentElement.classList.add(t);
+                } else {
+                  document.documentElement.classList.add("theme-cyber");
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <SpaceBackground />
         {children}

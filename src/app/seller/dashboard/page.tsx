@@ -1,6 +1,8 @@
 import { requireSeller } from "@/lib/auth/requireSeller";
 import { createClient } from "@/lib/supabase/server";
 import { createListing, deliverOrder, updatePayoutAccount } from "./actions";
+import { SellerListingCard } from "@/components/storefront/SellerListingCard";
+import { CreateListingForm } from "@/components/storefront/CreateListingForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,7 +31,7 @@ export default async function SellerDashboardPage() {
       supabase.from("product_types").select("id, name").order("name"),
       supabase
         .from("products")
-        .select("id, title, status, listings ( id, price, currency, stock_count, is_active )")
+        .select("id, title, description, image_url, product_type_id, status, listings ( id, price, currency, stock_count, is_active )")
         .eq("seller_id", user.id)
         .order("created_at", { ascending: false }),
       supabase
@@ -59,93 +61,52 @@ export default async function SellerDashboardPage() {
         <CardContent>
           <form action={updatePayoutAccount} className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="payoutChannelCode">Bank</Label>
+              <Label htmlFor="payoutChannelCode" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Bank</Label>
               <select
                 id="payoutChannelCode"
                 name="payoutChannelCode"
                 required
                 defaultValue={sellerProfile?.payout_channel_code ?? ""}
-                className="h-8 rounded-lg border border-border bg-background px-2.5 text-sm"
+                className="form-select-glass h-10 rounded-xl px-3 text-sm cursor-pointer border-border bg-background/30"
               >
-                <option value="" disabled>
+                <option value="" disabled className="bg-popover text-foreground">
                   Pilih bank
                 </option>
-                <option value="ID_BCA">BCA</option>
-                <option value="ID_MANDIRI">Mandiri</option>
-                <option value="ID_BNI">BNI</option>
-                <option value="ID_BRI">BRI</option>
-                <option value="ID_PERMATA">Permata</option>
+                <option value="ID_BCA" className="bg-popover text-foreground">BCA</option>
+                <option value="ID_MANDIRI" className="bg-popover text-foreground">Mandiri</option>
+                <option value="ID_BNI" className="bg-popover text-foreground">BNI</option>
+                <option value="ID_BRI" className="bg-popover text-foreground">BRI</option>
+                <option value="ID_PERMATA" className="bg-popover text-foreground">Permata</option>
               </select>
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="payoutAccountNumber">Nomor Rekening</Label>
+              <Label htmlFor="payoutAccountNumber" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nomor Rekening</Label>
               <Input
                 id="payoutAccountNumber"
                 name="payoutAccountNumber"
                 required
+                placeholder="1234567890"
                 defaultValue={sellerProfile?.payout_account_number ?? ""}
+                className="h-10 rounded-xl px-4 border-border bg-background/30"
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="payoutAccountHolderName">Nama Pemilik Rekening</Label>
+              <Label htmlFor="payoutAccountHolderName" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nama Pemilik Rekening</Label>
               <Input
                 id="payoutAccountHolderName"
                 name="payoutAccountHolderName"
                 required
+                placeholder="JANE DOE"
                 defaultValue={sellerProfile?.payout_account_holder_name ?? ""}
+                className="h-10 rounded-xl px-4 border-border bg-background/30"
               />
             </div>
-            <Button type="submit">Simpan Rekening</Button>
+            <Button type="submit" className="h-10 rounded-xl font-semibold mt-2">Simpan Rekening</Button>
           </form>
         </CardContent>
       </Card>
 
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Buat Listing Baru</CardTitle>
-          <CardDescription>Listing baru langsung aktif setelah dibuat.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form action={createListing} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="productTypeId">Jenis Produk</Label>
-              <select
-                id="productTypeId"
-                name="productTypeId"
-                required
-                className="h-8 rounded-lg border border-border bg-background px-2.5 text-sm"
-              >
-                {(productTypes ?? []).map((pt) => (
-                  <option key={pt.id} value={pt.id}>
-                    {pt.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="title">Judul Listing</Label>
-              <Input id="title" name="title" required />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="description">Deskripsi</Label>
-              <Input id="description" name="description" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="imageUrl">URL Foto Produk</Label>
-              <Input id="imageUrl" name="imageUrl" type="url" placeholder="https://..." />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="price">Harga (IDR)</Label>
-              <Input id="price" name="price" type="number" min={0} required />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="stockCount">Stok</Label>
-              <Input id="stockCount" name="stockCount" type="number" min={0} defaultValue={1} required />
-            </div>
-            <Button type="submit">Buat Listing</Button>
-          </form>
-        </CardContent>
-      </Card>
+      <CreateListingForm productTypes={productTypes ?? []} />
 
       <h2 className="mb-4 text-lg font-semibold">Pesanan Menunggu Pengiriman</h2>
       {!pendingOrders || pendingOrders.length === 0 ? (
@@ -181,32 +142,14 @@ export default async function SellerDashboardPage() {
       {!products || products.length === 0 ? (
         <p className="text-muted-foreground">Belum ada listing.</p>
       ) : (
-        <div className="flex flex-col gap-3">
-          {products.map((product) => {
-            const listing = (
-              product.listings as unknown as Array<{
-                price: number;
-                currency: string;
-                stock_count: number;
-                is_active: boolean;
-              }>
-            )[0];
-            return (
-              <Card key={product.id}>
-                <CardContent className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="truncate font-medium">{product.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Stok: {listing?.stock_count ?? 0}
-                    </p>
-                  </div>
-                  <span className="font-semibold">
-                    {listing ? formatPrice(listing.price, listing.currency) : "-"}
-                  </span>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <div className="flex flex-col gap-4">
+          {products.map((product) => (
+            <SellerListingCard
+              key={product.id}
+              product={product as any}
+              productTypes={productTypes ?? []}
+            />
+          ))}
         </div>
       )}
     </main>

@@ -7,8 +7,22 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { revealExpiresAt } from "@/lib/orders/autoConfirm";
 
 export async function createListing(formData: FormData) {
-  const user = await requireSeller();
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error("Sesi tidak valid. Silakan login kembali.");
+  }
+
+  // Get user role
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || (profile.role !== "seller" && profile.role !== "admin")) {
+    throw new Error("Akses ditolak. Anda tidak memiliki izin untuk membuat produk.");
+  }
 
   const productTypeId = formData.get("productTypeId") as string;
   const title = formData.get("title") as string;
@@ -17,10 +31,19 @@ export async function createListing(formData: FormData) {
   const price = Number(formData.get("price"));
   const stockCount = Number(formData.get("stockCount"));
 
+  // If user is admin, allow specifying a different seller_id, otherwise use current user
+  let sellerId = user.id;
+  if (profile.role === "admin") {
+    const specifiedSellerId = formData.get("sellerId") as string;
+    if (specifiedSellerId) {
+      sellerId = specifiedSellerId;
+    }
+  }
+
   const { data: product, error: productError } = await supabase
     .from("products")
     .insert({
-      seller_id: user.id,
+      seller_id: sellerId,
       product_type_id: productTypeId,
       title,
       description,
@@ -31,16 +54,24 @@ export async function createListing(formData: FormData) {
     .select("id")
     .single();
 
-  if (productError || !product) return;
+  if (productError || !product) {
+    throw new Error(productError?.message || "Gagal membuat produk.");
+  }
 
-  await supabase.from("listings").insert({
+  const { error: listingError } = await supabase.from("listings").insert({
     product_id: product.id,
     price,
     stock_count: stockCount,
     is_active: true,
   });
 
+  if (listingError) {
+    throw new Error(`Gagal membuat daftar harga: ${listingError.message}`);
+  }
+
   revalidatePath("/seller/dashboard");
+  revalidatePath("/admin/listings");
+  revalidatePath("/");
 }
 
 export async function updatePayoutAccount(formData: FormData) {
@@ -108,6 +139,76 @@ export async function deliverOrder(orderId: string, formData: FormData) {
     actor_id: user.id,
     reason: "Seller delivered manually",
   });
+
+  revalidatePath("/seller/dashboard");
+}
+
+export async function updateListing(listingId: string, formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error("Sesi tidak valid. Silakan login kembali.");
+  }
+
+  // Get user role
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || (profile.role !== "seller" && profile.role !== "admin")) {
+    throw new Error("Akses ditolak. Anda tidak memiliki izin untuk mengedit produk.");
+  }
+
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const imageUrl = formData.get("imageUrl") as string;
+  const productTypeId = formData.get("productTypeId") as string;
+  const price = Number(formData.get("price"));
+  const stockCount = Number(formData.get("stockCount"));
+
+  const { data: listing } = await supabase
+    .from("listings")
+    .select("id, product_id")
+    .eq("id", listingId)
+    .single();
+
+  if (!listing) return;
+
+  // Verify ownership if not admin
+  if (profile.role !== "admin") {
+    const { data: product } = await supabase
+      .from("products")
+      .select("id")
+      .eq("id", listing.product_id)
+      .eq("seller_id", user.id)
+      .single();
+
+    if (!product) {
+      throw new Error("Akses ditolak. Produk ini bukan milik Anda.");
+    }
+  }
+
+  // Update products details
+  await supabase
+    .from("products")
+    .update({
+      title,
+      description,
+      image_url: imageUrl || null,
+      product_type_id: productTypeId,
+    })
+    .eq("id", listing.product_id);
+
+  // Update listing pricing and stock
+  await supabase
+    .from("listings")
+    .update({
+      price,
+      stock_count: stockCount,
+    })
+    .eq("id", listingId);
 
   revalidatePath("/seller/dashboard");
 }

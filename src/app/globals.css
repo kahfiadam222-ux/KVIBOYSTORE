@@ -183,8 +183,125 @@
   background: var(--glass-fill);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+    0 8px 32px 0 rgba(0, 0, 0, 0.25);
 }
 
 @utility btn-gradient {
   background-image: var(--primary-gradient);
+}
+
+@utility form-select-glass {
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  color: var(--foreground);
+  outline: none;
+  transition: all 0.2s ease-in-out;
+
+  &:focus {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--ring) 25%, transparent);
+  }
+}
+
+.theme-graffiti {
+  --background: #07030C;
+  --foreground: #FFF5FA;
+  --card: #110B1B;
+  --card-foreground: #FFF5FA;
+  --popover: #150F22;
+  --popover-foreground: #FFF5FA;
+  --primary: #FF1493;
+  --primary-gradient: linear-gradient(to right, #FF1493, #FF1493);
+  --secondary: #1C132C;
+  --secondary-foreground: #FFF5FA;
+  --muted: #1C132C;
+  --muted-foreground: #B5A6CC;
+  --accent: #261A3D;
+  --accent-foreground: #FFF5FA;
+  --destructive: #FF3366;
+  --border: rgba(0, 240, 255, 0.18);
+  --input: rgba(0, 240, 255, 0.25);
+  --ring: #00F0FF;
+  --glass-fill: rgba(17, 11, 27, 0.65);
+  --glass-border: rgba(255, 20, 147, 0.22);
+  --body-gradient:
+    radial-gradient(450px 450px at 10% 20%, rgba(255, 20, 147, 0.15), transparent 70%),
+    radial-gradient(550px 550px at 90% 10%, rgba(0, 240, 255, 0.14), transparent 70%),
+    radial-gradient(600px 600px at 50% 80%, rgba(127, 0, 255, 0.12), transparent 70%),
+    linear-gradient(160deg, #07030D 0%, #0F0A1C 50%, #050208 100%);
+}
+
+.theme-cyber {
+  --background: #0A0A0C;
+  --foreground: #F5F5F7;
+  --primary: #8B6CF5;
+  --primary-gradient: linear-gradient(135deg, #9B7DFF, #5B3FE0);
+  --ring: #8B6CF5;
+  --body-gradient:
+    radial-gradient(600px 600px at 6% -8%, color-mix(in oklch, #9B7DFF 26%, transparent), transparent 62%),
+    radial-gradient(520px 520px at 34% -4%, color-mix(in oklch, #F472B6 19%, transparent), transparent 62%),
+    radial-gradient(560px 560px at 98% -6%, color-mix(in oklch, #E8B84B 22%, transparent), transparent 60%),
+    radial-gradient(650px 650px at 100% 42%, color-mix(in oklch, #60A5FA 17%, transparent), transparent 62%),
+    radial-gradient(700px 700px at 50% 118%, color-mix(in oklch, var(--primary) 14%, transparent), transparent 62%),
+    linear-gradient(160deg, #0E0E13 0%, #131318 40%, #0A0A0E 100%);
+}
+
+.theme-emerald {
+  --background: #050A07;
+  --foreground: #ECFDF5;
+  --primary: #10B981;
+  --primary-gradient: linear-gradient(135deg, #34D399, #047857);
+  --ring: #10B981;
+  --body-gradient:
+    radial-gradient(600px 600px at 6% -8%, color-mix(in oklch, #34D399 24%, transparent), transparent 62%),
+    radial-gradient(520px 520px at 34% -4%, color-mix(in oklch, #059669 16%, transparent), transparent 62%),
+    radial-gradient(560px 560px at 98% -6%, color-mix(in oklch, #10B981 18%, transparent), transparent 60%),
+    radial-gradient(650px 650px at 100% 42%, color-mix(in oklch, #047857 14%, transparent), transparent 62%),
+    radial-gradient(700px 700px at 50% 118%, color-mix(in oklch, var(--primary) 12%, transparent), transparent 62%),
+    linear-gradient(160deg, #030A05 0%, #06110B 40%, #020603 100%);
+}
+
+.theme-rose {
+  --background: #0C0609;
+  --foreground: #FFF1F2;
+  --primary: #F43F5E;
+  --primary-gradient: linear-gradient(135deg, #FB7185, #BE123C);
+  --ring: #F43F5E;
+  --body-gradient:
+    radial-gradient(600px 600px at 6% -8%, color-mix(in oklch, #FB7185 24%, transparent), transparent 62%),
+    radial-gradient(520px 520px at 34% -4%, color-mix(in oklch, #E11D48 18%, transparent), transparent 62%),
+    radial-gradient(560px 560px at 98% -6%, color-mix(in oklch, #BE123C 16%, transparent), transparent 60%),
+    radial-gradient(650px 650px at 100% 42%, color-mix(in oklch, #9F1239 14%, transparent), transparent 62%),
+    radial-gradient(700px 700px at 50% 118%, color-mix(in oklch, var(--primary) 12%, transparent), transparent 62%),
+    linear-gradient(160deg, #090306 0%, #11050A 40%, #050103 100%);
+}
+
+.theme-slate {
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  --primary: #475569;
+  --primary-gradient: linear-gradient(135deg, #64748B, #334155);
+  --secondary: #F1F5F9;
+  --secondary-foreground: #0F172A;
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+  --accent: #E2E8F0;
+  --accent-foreground: #0F172A;
+  --destructive: #EF4444;
+  --border: rgba(15, 23, 42, 0.08);
+  --input: rgba(15, 23, 42, 0.10);
+  --ring: #475569;
+  --glass-fill: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --body-gradient:
+    radial-gradient(600px 600px at 6% -8%, rgba(148, 163, 184, 0.12), transparent 60%),
+    radial-gradient(520px 520px at 98% -6%, rgba(100, 116, 139, 0.10), transparent 60%),
+    linear-gradient(160deg, #F8FAFC 0%, #F1F5F9 50%, #E2E8F0 100%);
 }

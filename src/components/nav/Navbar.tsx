@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/(auth)/actions";
 import { MobileNav } from "./MobileNav";
+import { ThemeSwitcher } from "./ThemeSwitcher";
 import { Button, buttonVariants } from "@/components/ui/button";
 
 export async function Navbar() {
@@ -18,6 +19,7 @@ export async function Navbar() {
 
   const links = user
     ? [
+        { href: "/profile", label: "Profil Saya" },
         { href: "/orders", label: "Pesanan Saya" },
         ...(profile?.role === "buyer" ? [{ href: "/sell", label: "Jadi Penjual" }] : []),
         ...(profile?.role === "seller"
@@ -25,7 +27,8 @@ export async function Navbar() {
           : []),
         ...(profile?.role === "admin"
           ? [
-              { href: "/admin/sellers", label: "Admin" },
+              { href: "/admin/sellers", label: "Penjual" },
+              { href: "/admin/listings", label: "Stok Jualan" },
               { href: "/admin/disputes", label: "Sengketa" },
               { href: "/admin/banners", label: "Banner" },
             ]
@@ -61,7 +64,9 @@ export async function Navbar() {
               <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" />
             </svg>
           </span>
-          <span className="hidden sm:inline">KVIBOYSTORE</span>
+          <span className="text-sm font-extrabold tracking-wider bg-gradient-to-r from-primary via-primary/80 to-foreground bg-clip-text text-transparent sm:text-base">
+            KVIBOYSTORE
+          </span>
         </Link>
 
         <div className="hidden min-w-0 items-center gap-4 sm:flex">
@@ -71,14 +76,18 @@ export async function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="whitespace-nowrap text-sm text-muted-foreground hover:text-foreground"
+                  className="relative whitespace-nowrap text-sm text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground py-1 group"
                 >
                   {link.label}
+                  <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary transition-all duration-300 group-hover:w-full rounded-full" />
                 </Link>
               ))}
-              <span className="hidden max-w-[160px] truncate text-sm text-muted-foreground lg:inline">
+              <Link
+                href="/profile"
+                className="hidden max-w-[160px] truncate text-sm text-muted-foreground lg:inline border-l pl-4 border-border/60 hover:text-foreground transition-colors duration-200"
+              >
                 {user.email}
-              </span>
+              </Link>
               <form action={logout}>
                 <Button type="submit" variant="outline" size="sm">
                   Keluar
@@ -87,8 +96,12 @@ export async function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground">
+              <Link
+                href="/login"
+                className="relative text-sm text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground py-1 group"
+              >
                 Masuk
+                <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary transition-all duration-300 group-hover:w-full rounded-full" />
               </Link>
               <Link href="/signup" className={buttonVariants({ size: "sm" })}>
                 Daftar
@@ -97,7 +110,10 @@ export async function Navbar() {
           )}
         </div>
 
-        <MobileNav links={links} email={user?.email ?? null} />
+        <div className="flex items-center gap-2">
+          <ThemeSwitcher />
+          <MobileNav links={links} email={user?.email ?? null} />
+        </div>
       </nav>
     </header>
   );

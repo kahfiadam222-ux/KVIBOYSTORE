@@ -1,10 +1,9 @@
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createBanner, toggleBanner, deleteBanner } from "./actions";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { toggleBanner, deleteBanner } from "./actions";
+import { AdminBannerForm } from "./AdminBannerForm";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -26,51 +25,13 @@ export default async function AdminBannersPage() {
     <main className="mx-auto max-w-3xl px-4 py-12">
       <h1 className="mb-8 text-2xl font-semibold tracking-tight">Banner Homepage</h1>
 
-      <Card className="mb-8">
+      <Card className="mb-8 border-border bg-card/40 backdrop-blur-xl">
         <CardHeader>
           <CardTitle>Tambah Banner</CardTitle>
           <CardDescription>Banner aktif tampil bergiliran di beranda.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={createBanner} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="title">Judul</Label>
-              <Input id="title" name="title" required />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="subtitle">Subjudul</Label>
-              <Input id="subtitle" name="subtitle" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="imageUrl">URL Gambar Latar</Label>
-              <Input id="imageUrl" name="imageUrl" type="url" placeholder="https://..." />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="ctaLabel">Label Tombol</Label>
-              <Input id="ctaLabel" name="ctaLabel" placeholder="Lihat Produk" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="ctaHref">Tautan Tombol</Label>
-              <Input id="ctaHref" name="ctaHref" placeholder="/" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="sortOrder">Urutan</Label>
-              <Input id="sortOrder" name="sortOrder" type="number" defaultValue={0} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="layout">Tipe Banner</Label>
-              <select
-                id="layout"
-                name="layout"
-                defaultValue="horizontal"
-                className="h-10 rounded-lg border border-input bg-transparent px-3 text-sm"
-              >
-                <option value="horizontal">Horizontal (slide samping)</option>
-                <option value="vertical">Vertikal (slide atas-bawah)</option>
-              </select>
-            </div>
-            <Button type="submit">Tambah Banner</Button>
-          </form>
+          <AdminBannerForm />
         </CardContent>
       </Card>
 

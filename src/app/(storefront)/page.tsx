@@ -68,43 +68,69 @@ export default async function StorefrontPage({
       </header>
 
       {listings.length === 0 ? (
-        <p className="text-muted-foreground">Belum ada produk tersedia.</p>
+        <div className="glass-panel text-center py-16 px-6 rounded-3xl max-w-md mx-auto">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary mb-5 shadow-[0_0_15px_rgba(139,108,245,0.25)]">
+            <svg
+              className="h-7 w-7"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-foreground">Produk tidak ditemukan</h3>
+          <p className="mt-2.5 text-sm text-muted-foreground leading-relaxed">
+            Kami tidak menemukan produk yang cocok dengan pencarian Anda. Coba masukkan kata kunci yang berbeda.
+          </p>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {listings.map((listing) => {
             const tier = getDeliveryLabel(listing);
             return (
-              <TiltCard key={listing.listingId} className="relative rounded-2xl">
-                <Card>
-                  <div
-                    className="h-32 bg-cover bg-center"
-                    style={{
-                      backgroundImage: listing.imageUrl
-                        ? `url(${listing.imageUrl})`
-                        : "var(--primary-gradient)",
-                    }}
-                  />
-                  <CardHeader>
-                    <div className="flex items-center justify-between gap-2">
-                      <CardTitle>{listing.productTypeName}</CardTitle>
-                      <Badge>{tier.label}</Badge>
+              <TiltCard key={listing.listingId} className="relative rounded-xl sm:rounded-2xl">
+                <Card className="h-full">
+                  <div className="h-20 sm:h-28 w-full overflow-hidden relative">
+                    <div
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover/card:scale-110"
+                      style={{
+                        backgroundImage: listing.imageUrl
+                          ? `url(${listing.imageUrl})`
+                          : "var(--primary-gradient)",
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card/90 to-transparent opacity-70" />
+                    <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2">
+                      <Badge className="bg-background/90 backdrop-blur-md text-foreground border-border/40 text-[9px] sm:text-[10px] font-semibold py-0.5 px-1.5 sm:px-2 shadow-sm rounded-full">
+                        {tier.label}
+                      </Badge>
                     </div>
-                    <CardDescription>{tier.description}</CardDescription>
+                  </div>
+                  <CardHeader className="p-2 sm:p-3 pb-0 space-y-0.5">
+                    <CardTitle className="text-xs sm:text-sm font-bold truncate">{listing.productTypeName}</CardTitle>
+                    <CardDescription className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1">{tier.description}</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold text-primary">
+                  <CardContent className="p-2 sm:p-3 pt-1.5 sm:pt-2 pb-1.5 sm:pb-2 flex-grow">
+                    <p className="text-sm sm:text-base font-extrabold text-primary">
                       {formatPrice(listing.price, listing.currency)}
                     </p>
                     {!listing.isPlatformOwned && listing.sellerReputation !== null && (
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        ⭐ {listing.sellerReputation.toFixed(1)} rating penjual
+                      <p className="mt-0.5 text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-0.5">
+                        <span>⭐</span>
+                        <span>{listing.sellerReputation.toFixed(1)}</span>
                       </p>
                     )}
                   </CardContent>
-                  <CardFooter>
+                  <CardFooter className="p-2 sm:p-3 pt-0 border-t-0 bg-transparent">
                     <form action={createCheckout} className="w-full">
                       <input type="hidden" name="listingId" value={listing.listingId} />
-                      <Button type="submit" className="w-full">
+                      <Button type="submit" size="xs" className="w-full text-[10px] sm:text-xs font-semibold h-7 sm:h-8 rounded-lg sm:rounded-xl">
                         Beli Sekarang
                       </Button>
                     </form>

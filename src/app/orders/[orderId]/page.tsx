@@ -85,17 +85,17 @@ export default async function OrderStatusPage({
                   name="reason"
                   required
                   defaultValue=""
-                  className="h-8 rounded-lg border border-border bg-background px-2.5 text-sm"
+                  className="form-select-glass h-10 rounded-xl px-3 text-sm cursor-pointer border-border bg-background/30"
                 >
-                  <option value="" disabled>
+                  <option value="" disabled className="bg-popover text-foreground">
                     Ada masalah? Pilih alasan
                   </option>
-                  <option value="not_received">Tidak menerima produk</option>
-                  <option value="credentials_invalid">Kredensial/kode tidak berfungsi</option>
-                  <option value="not_as_described">Tidak sesuai deskripsi</option>
-                  <option value="other">Lainnya</option>
+                  <option value="not_received" className="bg-popover text-foreground">Tidak menerima produk</option>
+                  <option value="credentials_invalid" className="bg-popover text-foreground">Kredensial/kode tidak berfungsi</option>
+                  <option value="not_as_described" className="bg-popover text-foreground">Tidak sesuai deskripsi</option>
+                  <option value="other" className="bg-popover text-foreground">Lainnya</option>
                 </select>
-                <Button type="submit" variant="destructive" className="w-full">
+                <Button type="submit" variant="destructive" className="w-full h-10 rounded-xl font-semibold">
                   Laporkan Masalah
                 </Button>
               </form>
@@ -112,28 +112,28 @@ export default async function OrderStatusPage({
                   )}
                 </div>
               ) : (
-                <form action={submitReviewWithId} className="flex flex-col gap-2">
+                <form action={submitReviewWithId} className="flex flex-col gap-3">
                   <select
                     name="rating"
                     required
                     defaultValue=""
-                    className="h-8 rounded-lg border border-border bg-background px-2.5 text-sm"
+                    className="form-select-glass h-10 rounded-xl px-3 text-sm cursor-pointer border-border bg-background/30"
                   >
-                    <option value="" disabled>
+                    <option value="" disabled className="bg-popover text-foreground">
                       Beri rating penjual
                     </option>
-                    <option value="5">5 - Sangat baik</option>
-                    <option value="4">4 - Baik</option>
-                    <option value="3">3 - Cukup</option>
-                    <option value="2">2 - Kurang</option>
-                    <option value="1">1 - Buruk</option>
+                    <option value="5" className="bg-popover text-foreground">5 - Sangat baik</option>
+                    <option value="4" className="bg-popover text-foreground">4 - Baik</option>
+                    <option value="3" className="bg-popover text-foreground">3 - Cukup</option>
+                    <option value="2" className="bg-popover text-foreground">2 - Kurang</option>
+                    <option value="1" className="bg-popover text-foreground">1 - Buruk</option>
                   </select>
                   <textarea
                     name="comment"
                     placeholder="Komentar (opsional)"
-                    className="min-h-16 rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm"
+                    className="min-h-[80px] rounded-xl border border-border bg-background/20 px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 focus-visible:outline-none transition-all duration-200 dark:bg-input/20"
                   />
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full h-10 rounded-xl font-semibold">
                     Kirim Ulasan
                   </Button>
                 </form>

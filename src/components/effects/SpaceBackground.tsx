@@ -27,6 +27,17 @@ interface Crack {
   segments: Array<[number, number, number, number]>;
 }
 
+interface DataBlock {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  opacity: number;
+  speed: number;
+  rotation: number;
+  rotSpeed: number;
+}
+
 const CRACK_LIFETIME_MS = 2600;
 const METEOR_MIN_GAP_MS = 4000;
 const METEOR_MAX_GAP_MS = 9000;
@@ -93,6 +104,16 @@ export function SpaceBackground() {
 
     const meteors: Meteor[] = [];
     const cracks: Crack[] = [];
+    const dataBlocks: DataBlock[] = Array.from({ length: 14 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      w: Math.random() * 6 + 3,
+      h: Math.random() * 12 + 4,
+      opacity: Math.random() * 0.12 + 0.04,
+      speed: Math.random() * 0.25 + 0.08,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.006,
+    }));
     let nextMeteorAt = performance.now() + 1200;
 
     function spawnMeteor() {
@@ -113,12 +134,88 @@ export function SpaceBackground() {
     function frame(now: number) {
       ctx!.clearRect(0, 0, width, height);
 
+      // Resolve theme variables dynamically
+      const isLight = document.documentElement.classList.contains("theme-slate");
+      const isGraffiti = document.documentElement.classList.contains("theme-graffiti");
+      const style = typeof window !== "undefined" ? getComputedStyle(document.documentElement) : null;
+      const primaryColor = style ? style.getPropertyValue("--primary").trim() : "#8B6CF5";
+
       for (const star of stars) {
         const twinkle = 0.6 + 0.4 * Math.sin(now * 0.001 * star.speed + star.phase);
         ctx!.beginPath();
         ctx!.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-        ctx!.fillStyle = `rgba(255,255,255,${(star.baseOpacity * twinkle).toFixed(3)})`;
+        ctx!.fillStyle = isLight
+          ? `rgba(100, 116, 139, ${(star.baseOpacity * twinkle * 0.25).toFixed(3)})`
+          : isGraffiti
+          ? `rgba(255, 255, 255, ${(star.baseOpacity * twinkle * 0.45).toFixed(3)})`
+          : `rgba(255, 255, 255, ${(star.baseOpacity * twinkle).toFixed(3)})`;
         ctx!.fill();
+      }
+
+      for (const db of dataBlocks) {
+        if (isGraffiti) {
+          // Sakura petals drift downward and sway sideways
+          db.y += db.speed * 1.3;
+          db.rotation += db.rotSpeed * 1.5;
+          const sway = Math.sin(now * 0.0015 + db.x) * 0.25;
+          db.x += sway;
+
+          if (db.y > height + 20) {
+            db.y = -20;
+            db.x = Math.random() * width;
+          }
+        } else {
+          db.y -= db.speed;
+          db.rotation += db.rotSpeed;
+          if (db.y < -30) {
+            db.y = height + 20;
+            db.x = Math.random() * width;
+          }
+        }
+
+        ctx!.save();
+        ctx!.translate(db.x, db.y);
+        ctx!.rotate(db.rotation);
+        
+        ctx!.globalAlpha = isLight ? db.opacity * 0.35 : isGraffiti ? db.opacity * 1.8 : db.opacity;
+        
+        if (isGraffiti) {
+          const isSakura = db.w > 5;
+          if (isSakura) {
+            // Draw cherry blossom (Sakura) petal with soft airbrush fuchsia glow
+            ctx!.beginPath();
+            ctx!.moveTo(0, -db.h / 2);
+            ctx!.bezierCurveTo(-db.w * 1.3, -db.h / 5, -db.w * 0.9, db.h / 2, 0, db.h / 1.8);
+            ctx!.bezierCurveTo(db.w * 0.9, db.h / 2, db.w * 1.3, -db.h / 5, 0, -db.h / 2);
+            
+            const petalGrad = ctx!.createRadialGradient(0, 0, 1, 0, 0, db.h / 1.5);
+            petalGrad.addColorStop(0, "#FF66B2"); 
+            petalGrad.addColorStop(1, "rgba(255, 20, 147, 0.35)"); 
+            
+            ctx!.fillStyle = petalGrad;
+            ctx!.fill();
+          } else {
+            // Draw soft cyan airbrush spray paint splatter
+            ctx!.beginPath();
+            ctx!.arc(0, 0, db.w * 1.6, 0, Math.PI * 2);
+            const sprayGrad = ctx!.createRadialGradient(0, 0, 1, 0, 0, db.w * 1.6);
+            sprayGrad.addColorStop(0, "#00F0FF");
+            sprayGrad.addColorStop(0.3, "rgba(0, 240, 255, 0.7)");
+            sprayGrad.addColorStop(1, "rgba(0, 240, 255, 0)"); 
+            
+            ctx!.fillStyle = sprayGrad;
+            ctx!.fill();
+          }
+        } else {
+          ctx!.fillStyle = isLight ? "#64748B" : primaryColor;
+          ctx!.strokeStyle = isLight ? "#64748B" : primaryColor;
+          ctx!.lineWidth = 0.6;
+          ctx!.beginPath();
+          ctx!.rect(-db.w / 2, -db.h / 2, db.w, db.h);
+          ctx!.fill();
+          ctx!.stroke();
+        }
+        ctx!.restore();
       }
 
       if (!prefersReducedMotion && now >= nextMeteorAt) {
@@ -140,7 +237,9 @@ export function SpaceBackground() {
 
         const grad = ctx!.createLinearGradient(tailX, tailY, m.x, m.y);
         grad.addColorStop(0, "rgba(255,255,255,0)");
-        grad.addColorStop(1, `rgba(255,255,255,${(0.85 * fade).toFixed(3)})`);
+        grad.addColorStop(1, isLight 
+          ? `rgba(100, 116, 139, ${(0.45 * fade).toFixed(3)})` 
+          : `rgba(255, 255, 255, ${(0.85 * fade).toFixed(3)})`);
         ctx!.strokeStyle = grad;
         ctx!.lineWidth = 2;
         ctx!.lineCap = "round";
@@ -151,7 +250,9 @@ export function SpaceBackground() {
 
         ctx!.beginPath();
         ctx!.arc(m.x, m.y, 1.6, 0, Math.PI * 2);
-        ctx!.fillStyle = `rgba(255,255,255,${(0.9 * fade).toFixed(3)})`;
+        ctx!.fillStyle = isLight 
+          ? `rgba(100, 116, 139, ${(0.5 * fade).toFixed(3)})` 
+          : `rgba(255, 255, 255, ${(0.9 * fade).toFixed(3)})`;
         ctx!.fill();
 
         if (m.life >= m.maxLife || m.x > width + 40 || m.y > height + 40) {
