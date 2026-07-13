@@ -87,6 +87,11 @@
   --sidebar-accent-foreground: #16161A;
   --sidebar-border: rgba(20, 20, 24, 0.09);
   --sidebar-ring: #6D4CE0;
+  --body-gradient:
+    radial-gradient(1200px 600px at 12% -15%, color-mix(in oklch, var(--primary) 10%, transparent), transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, color-mix(in oklch, #F5C778 18%, transparent), transparent 55%),
+    radial-gradient(1000px 700px at 50% 115%, color-mix(in oklch, var(--primary) 7%, transparent), transparent 60%),
+    linear-gradient(160deg, #FCFCFD 0%, #F7F7F9 45%, #F1F1F4 100%);
 }
 
 .dark {
@@ -124,6 +129,11 @@
   --sidebar-accent-foreground: #F5F5F7;
   --sidebar-border: rgba(255, 255, 255, 0.08);
   --sidebar-ring: #8B6CF5;
+  --body-gradient:
+    radial-gradient(1200px 600px at 12% -15%, color-mix(in oklch, var(--primary) 22%, transparent), transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, color-mix(in oklch, #E8B84B 16%, transparent), transparent 55%),
+    radial-gradient(1100px 700px at 50% 115%, color-mix(in oklch, var(--primary) 14%, transparent), transparent 60%),
+    linear-gradient(160deg, #0E0E13 0%, #131318 40%, #0A0A0E 100%);
 }
 
 @layer base {
@@ -131,12 +141,9 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
-    background-image: radial-gradient(
-      900px 480px at 50% -20%,
-      color-mix(in oklch, var(--primary) 8%, transparent),
-      transparent 60%
-    );
+    @apply text-foreground;
+    background-color: var(--background);
+    background-image: var(--body-gradient);
     background-attachment: fixed;
   }
   html {
