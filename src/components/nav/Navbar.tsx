@@ -16,6 +16,14 @@ export async function Navbar() {
       ).data
     : null;
 
+  const userWithRole = user
+    ? {
+        id: user.id,
+        email: user.email ?? "",
+        role: (profile?.role as "buyer" | "seller" | "admin") ?? "buyer",
+      }
+    : null;
+
   const links = user
     ? [
         { href: "/profile", label: "Profil Saya" },
@@ -113,7 +121,7 @@ export async function Navbar() {
 
         {/* Mobile Navigation */}
         <div className="flex items-center gap-2 lg:hidden">
-          <MobileNav links={links} email={user?.email ?? null} />
+          <MobileNav user={userWithRole} />
         </div>
       </nav>
       {/* Gold divider — premium section break under the navbar. */}
