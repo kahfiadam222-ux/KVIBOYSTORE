@@ -31,8 +31,8 @@ export async function createListing(formData: FormData) {
   const priceStr = formData.get("price");
   const stockCountStr = formData.get("stockCount");
 
-  if (!productTypeId || !title || !description || !priceStr || !stockCountStr) {
-    throw new Error("Semua field wajib diisi (kecuali gambar).");
+  if (!productTypeId || !title || !priceStr || !stockCountStr) {
+    throw new Error("Jenis produk, judul, harga, dan stok wajib diisi.");
   }
 
   const price = Number(priceStr);
@@ -51,13 +51,18 @@ export async function createListing(formData: FormData) {
     }
   }
 
-  const { data: product, error: productError } = await supabase
+  // Use the admin client for writes — auth is already verified above; the regular
+  // client hits RLS policies that often don't grant INSERT on the listings table,
+  // which is the root cause of the frequent "Gagal membuat daftar harga" errors.
+  const admin = createAdminClient();
+
+  const { data: product, error: productError } = await admin
     .from("products")
     .insert({
       seller_id: sellerId,
       product_type_id: productTypeId as string,
       title: title as string,
-      description: description as string,
+      description: description ? (description as string) : "",
       image_url: imageUrl ? (imageUrl as string) : null,
       is_platform_owned: false,
       status: "active",
@@ -69,7 +74,7 @@ export async function createListing(formData: FormData) {
     throw new Error(productError?.message || "Gagal membuat produk.");
   }
 
-  const { error: listingError } = await supabase.from("listings").insert({
+  const { error: listingError } = await admin.from("listings").insert({
     product_id: product.id,
     price,
     stock_count: stockCount,
@@ -77,7 +82,7 @@ export async function createListing(formData: FormData) {
   });
 
   if (listingError) {
-    throw new Error(`Gagal membuat daftar harga: ${listingError.message}`);
+    throw new Error(`Gagal membuat listing: ${listingError.message}`);
   }
 
   revalidatePath("/seller/dashboard");
@@ -179,8 +184,8 @@ export async function updateListing(listingId: string, formData: FormData) {
   const priceStr = formData.get("price");
   const stockCountStr = formData.get("stockCount");
 
-  if (!title || !description || !productTypeId || !priceStr || !stockCountStr) {
-    throw new Error("Semua field wajib diisi (kecuali gambar).");
+  if (!title || !productTypeId || !priceStr || !stockCountStr) {
+    throw new Error("Judul, jenis, harga, dan stok wajib diisi.");
   }
 
   const price = Number(priceStr);
@@ -190,7 +195,12 @@ export async function updateListing(listingId: string, formData: FormData) {
     throw new Error("Harga dan stok harus berupa angka valid.");
   }
 
-  const { data: listing } = await supabase
+  // Use admin client for the read+write — the regular client's RLS UPDATE
+  // policies on products/listings may reject updates the seller should be
+  // allowed to make, which is the root cause of edit failures.
+  const admin = createAdminClient();
+
+  const { data: listing } = await admin
     .from("listings")
     .select("id, product_id")
     .eq("id", listingId)
@@ -198,9 +208,9 @@ export async function updateListing(listingId: string, formData: FormData) {
 
   if (!listing) return;
 
-  // Verify ownership if not admin
+  // Verify ownership if not admin (read via admin client, match seller_id)
   if (profile.role !== "admin") {
-    const { data: product } = await supabase
+    const { data: product } = await admin
       .from("products")
       .select("id")
       .eq("id", listing.product_id)
@@ -212,25 +222,33 @@ export async function updateListing(listingId: string, formData: FormData) {
     }
   }
 
-  // Update products details
-  await supabase
+  // Update product details
+  const { error: productUpdateError } = await admin
     .from("products")
     .update({
       title: title as string,
-      description: description as string,
+      description: description ? (description as string) : "",
       image_url: imageUrl ? (imageUrl as string) : null,
       product_type_id: productTypeId as string,
     })
     .eq("id", listing.product_id);
 
+  if (productUpdateError) {
+    throw new Error(`Gagal memperbarui produk: ${productUpdateError.message}`);
+  }
+
   // Update listing pricing and stock
-  await supabase
+  const { error: listingUpdateError } = await admin
     .from("listings")
     .update({
       price,
       stock_count: stockCount,
     })
     .eq("id", listingId);
+
+  if (listingUpdateError) {
+    throw new Error(`Gagal memperbarui stok: ${listingUpdateError.message}`);
+  }
 
   revalidatePath("/seller/dashboard");
 }

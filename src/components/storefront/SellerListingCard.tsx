@@ -155,8 +155,12 @@ export function SellerListingCard({
         ) : (
           <form
             action={async (formData) => {
-              await updateListing(listing.id, formData);
-              setIsEditing(false);
+              try {
+                await updateListing(listing.id, formData);
+                setIsEditing(false);
+              } catch (err: any) {
+                alert(err.message || "Gagal memperbarui produk. Coba lagi.");
+              }
             }}
             className="p-5 flex flex-col gap-4.5 border-t border-primary/10 bg-primary/5 rounded-2xl"
           >
