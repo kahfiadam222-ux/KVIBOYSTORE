@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 const PANEL_WIDTH = 288;
 
 export function ThemeSwitcher() {
-  const [activeTheme, setActiveTheme] = useState<ThemeId>("theme-editions");
+  const [activeTheme, setActiveTheme] = useState<ThemeId>("theme-midnight");
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
@@ -153,11 +153,11 @@ export function ThemeSwitcher() {
               >
                 <div className="flex items-center justify-between border-b border-[var(--glass-border)] px-3.5 py-3">
                   <div>
-                    <p className="font-display text-sm tracking-tight text-foreground">
-                      Editions
+                    <p className="text-sm font-semibold tracking-tight text-foreground">
+                      Tema
                     </p>
                     <p className="text-[11px] text-muted-foreground">
-                      Palet elegan, soft gradient
+                      Pilih palet warna
                     </p>
                   </div>
                   <button

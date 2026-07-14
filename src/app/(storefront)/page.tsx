@@ -72,17 +72,15 @@ export default async function StorefrontPage({
 
       <header id="produk" className="mb-7 scroll-mt-24">
         <span className="section-pill mb-3">Katalog</span>
-        <h2 className="heading-display text-3xl sm:text-4xl mt-2">
+        <h2 className="heading-display text-2xl sm:text-3xl mt-2">
           {q ? (
             <>
               Hasil untuk{" "}
-              <em className="text-premium not-italic sm:italic">
-                &ldquo;{q}&rdquo;
-              </em>
+              <span className="text-premium">&ldquo;{q}&rdquo;</span>
             </>
           ) : (
             <>
-              Produk <em className="text-premium not-italic sm:italic">pilihan</em>
+              Produk <span className="text-premium">pilihan</span>
             </>
           )}
         </h2>
@@ -211,16 +209,13 @@ export default async function StorefrontPage({
         <div className="gold-line mb-8 opacity-40" />
         <div className="glass-panel rounded-2xl px-5 py-6 sm:px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <p className="font-qurova text-lg font-bold tracking-wide text-premium">
-              KVIBOYSTORE
-            </p>
+            <p className="brand-wordmark text-lg text-premium">kviboystore</p>
             <p className="mt-1 text-xs text-muted-foreground max-w-md">
-              Marketplace langganan digital premium. Aman, cepat, dan
-              terverifikasi.
+              Marketplace langganan digital. Aman, cepat, dan terverifikasi.
             </p>
           </div>
           <p className="text-[11px] text-muted-foreground">
-            © {new Date().getFullYear()} KVIBOYSTORE · Built for modern buyers
+            © {new Date().getFullYear()} kviboystore
           </p>
         </div>
       </footer>

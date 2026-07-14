@@ -29,7 +29,7 @@ export default async function LoginPage({
             <p className="eyebrow mb-1">Selamat Datang</p>
             <CardTitle className="heading-display text-2xl sm:text-3xl">
               Masuk ke{" "}
-              <span className="text-premium">KVIBOYSTORE</span>
+              <span className="brand-wordmark text-premium">kviboystore</span>
             </CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
               Belum punya akun?{" "}

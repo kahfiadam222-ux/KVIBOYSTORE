@@ -14,7 +14,6 @@ import {
   Store,
   Settings,
   HelpCircle,
-  Sparkles,
   CreditCard,
   Gift,
   X,
@@ -123,13 +122,12 @@ export function MobileNav({ user }: { user: UserProfile | null }) {
             >
               {/* Header Logo & Close button */}
               <div className="flex h-12 items-center justify-between border-b border-glass-border pb-3">
-                <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[image:var(--primary-gradient)] shadow-md">
-                    <Sparkles className="h-4 w-4 text-primary-foreground" />
-                  </div>
-                  <span className="font-display text-xl tracking-tight text-foreground">
-                    Kviboy
-                  </span>
+                <Link
+                  href="/"
+                  className="brand-wordmark text-[1.05rem] text-foreground"
+                  onClick={() => setOpen(false)}
+                >
+                  kviboystore
                 </Link>
                 <button
                   onClick={() => setOpen(false)}

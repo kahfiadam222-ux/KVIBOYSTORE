@@ -1,25 +1,14 @@
 import type { Metadata } from "next";
-import {
-  Instrument_Serif,
-  Plus_Jakarta_Sans,
-  JetBrains_Mono,
-} from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { headers } from "next/headers";
 import { SpaceBackground } from "@/components/effects/SpaceBackground";
 import { AmbientOrbs } from "@/components/effects/AmbientOrbs";
 import "./globals.css";
 
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-});
-
-const instrument = Instrument_Serif({
-  variable: "--font-instrument",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
 });
 
 const jetbrains = JetBrains_Mono({
@@ -29,9 +18,9 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KVIBOYSTORE — Marketplace Digital Premium",
+  title: "kviboystore — Marketplace Digital",
   description:
-    "Marketplace langganan digital premium. Instant delivery, escrow aman, produk terverifikasi.",
+    "Marketplace langganan digital. Instant delivery, escrow aman, produk terverifikasi.",
 };
 
 export default async function RootLayout({
@@ -44,7 +33,7 @@ export default async function RootLayout({
   return (
     <html
       lang="id"
-      className={`dark ${jakarta.variable} ${instrument.variable} ${jetbrains.variable} h-full antialiased`}
+      className={`dark ${inter.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <head>
         <script
@@ -52,14 +41,21 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                var valid = ["theme-editions","theme-paper","theme-ink","theme-champagne","theme-slate","theme-olive","theme-dusk","theme-rose"];
-                var legacy = {"theme-cosmic":"theme-editions","theme-jetblack":"theme-ink","theme-orchid":"theme-rose","theme-wineash":"theme-champagne","theme-turquoise":"theme-olive","theme-candyblue":"theme-slate","theme-lavender":"theme-dusk","theme-violet":"theme-dusk"};
+                var valid = ["theme-midnight","theme-daylight","theme-mono","theme-ocean","theme-forest","theme-sakura","theme-aether","theme-ember"];
+                var legacy = {
+                  "theme-editions":"theme-midnight","theme-paper":"theme-daylight","theme-ink":"theme-mono",
+                  "theme-champagne":"theme-ember","theme-slate":"theme-ocean","theme-olive":"theme-forest",
+                  "theme-dusk":"theme-aether","theme-rose":"theme-sakura","theme-cosmic":"theme-aether",
+                  "theme-jetblack":"theme-mono","theme-orchid":"theme-sakura","theme-wineash":"theme-ember",
+                  "theme-turquoise":"theme-forest","theme-candyblue":"theme-ocean","theme-lavender":"theme-aether",
+                  "theme-violet":"theme-aether"
+                };
                 var t = localStorage.getItem("kvibo-theme");
                 if (legacy[t]) t = legacy[t];
-                if (!t || valid.indexOf(t) === -1) t = "theme-editions";
+                if (!t || valid.indexOf(t) === -1) t = "theme-midnight";
                 localStorage.setItem("kvibo-theme", t);
                 document.documentElement.classList.add(t);
-                if (t === "theme-paper") {
+                if (t === "theme-daylight") {
                   document.documentElement.classList.remove("dark");
                 } else {
                   document.documentElement.classList.add("dark");

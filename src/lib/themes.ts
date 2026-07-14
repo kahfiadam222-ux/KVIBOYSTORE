@@ -1,92 +1,101 @@
-export const DEFAULT_THEME = "theme-editions" as const;
+export const DEFAULT_THEME = "theme-midnight" as const;
 
 export const THEME_IDS = [
-  "theme-editions",
-  "theme-paper",
-  "theme-ink",
-  "theme-champagne",
-  "theme-slate",
-  "theme-olive",
-  "theme-dusk",
-  "theme-rose",
+  "theme-midnight",
+  "theme-daylight",
+  "theme-mono",
+  "theme-ocean",
+  "theme-forest",
+  "theme-sakura",
+  "theme-aether",
+  "theme-ember",
 ] as const;
 
 export type ThemeId = (typeof THEME_IDS)[number];
 
-/** Map legacy neon themes → elegant editions themes */
+const LIGHT_THEMES = new Set<ThemeId>(["theme-daylight"]);
+
+/** Map legacy theme ids → current set */
 export const LEGACY_THEME_MAP: Record<string, ThemeId> = {
-  "theme-cosmic": "theme-editions",
-  "theme-jetblack": "theme-ink",
-  "theme-orchid": "theme-rose",
-  "theme-wineash": "theme-champagne",
-  "theme-turquoise": "theme-olive",
-  "theme-candyblue": "theme-slate",
-  "theme-lavender": "theme-dusk",
-  "theme-violet": "theme-dusk",
+  "theme-editions": "theme-midnight",
+  "theme-paper": "theme-daylight",
+  "theme-ink": "theme-mono",
+  "theme-champagne": "theme-ember",
+  "theme-slate": "theme-ocean",
+  "theme-olive": "theme-forest",
+  "theme-dusk": "theme-aether",
+  "theme-rose": "theme-sakura",
+  "theme-cosmic": "theme-aether",
+  "theme-jetblack": "theme-mono",
+  "theme-orchid": "theme-sakura",
+  "theme-wineash": "theme-ember",
+  "theme-turquoise": "theme-forest",
+  "theme-candyblue": "theme-ocean",
+  "theme-lavender": "theme-aether",
+  "theme-violet": "theme-aether",
 };
 
 export const THEMES: Array<{
   id: ThemeId;
   label: string;
   description: string;
-  /** CSS background for swatch preview */
   swatch: string;
   mode: "dark" | "light";
 }> = [
   {
-    id: "theme-editions",
-    label: "Editions",
-    description: "Charcoal & sage",
-    swatch: "linear-gradient(135deg, #141210 0%, #1F2E26 55%, #3D6B52 100%)",
+    id: "theme-midnight",
+    label: "Midnight",
+    description: "Netral gelap modern",
+    swatch: "linear-gradient(135deg, #0C0D10 0%, #1A1C22 50%, #4F6D8A 100%)",
     mode: "dark",
   },
   {
-    id: "theme-paper",
-    label: "Paper",
-    description: "Warm gallery light",
-    swatch: "linear-gradient(135deg, #F6F1E8 0%, #E8E0D2 50%, #2F6B4F 100%)",
+    id: "theme-daylight",
+    label: "Daylight",
+    description: "Terang bersih",
+    swatch: "linear-gradient(135deg, #F7F8FA 0%, #E8ECF2 55%, #3B6E9E 100%)",
     mode: "light",
   },
   {
-    id: "theme-ink",
-    label: "Ink",
-    description: "Monochrome editorial",
-    swatch: "linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 60%, #F5F5F5 100%)",
+    id: "theme-mono",
+    label: "Mono",
+    description: "Hitam putih tegas",
+    swatch: "linear-gradient(135deg, #09090B 0%, #18181B 55%, #FAFAFA 100%)",
     mode: "dark",
   },
   {
-    id: "theme-champagne",
-    label: "Champagne",
-    description: "Soft bronze glow",
-    swatch: "linear-gradient(135deg, #1A1612 0%, #3D3228 50%, #C4A574 100%)",
+    id: "theme-ocean",
+    label: "Ocean",
+    description: "Biru laut tenang",
+    swatch: "linear-gradient(135deg, #0A121A 0%, #152433 50%, #3D8ABF 100%)",
     mode: "dark",
   },
   {
-    id: "theme-slate",
-    label: "Slate",
-    description: "Cool steel blue",
-    swatch: "linear-gradient(135deg, #0E1218 0%, #1C2533 55%, #6B8CAE 100%)",
+    id: "theme-forest",
+    label: "Forest",
+    description: "Hijau sage soft",
+    swatch: "linear-gradient(135deg, #0C120E 0%, #1A241C 50%, #4A8A62 100%)",
     mode: "dark",
   },
   {
-    id: "theme-olive",
-    label: "Olive",
-    description: "Moss & cream",
-    swatch: "linear-gradient(135deg, #12140F 0%, #2A3220 50%, #8A9A5B 100%)",
+    id: "theme-sakura",
+    label: "Sakura",
+    description: "Anime malam sakura",
+    swatch: "linear-gradient(135deg, #1A1218 0%, #3A2230 45%, #E8A0B8 100%)",
     mode: "dark",
   },
   {
-    id: "theme-dusk",
-    label: "Dusk",
-    description: "Indigo twilight",
-    swatch: "linear-gradient(135deg, #0F1018 0%, #1E2030 55%, #6B6FA8 100%)",
+    id: "theme-aether",
+    label: "Aether",
+    description: "Anime soft cyber",
+    swatch: "linear-gradient(135deg, #10101A 0%, #2A2440 45%, #8B7CF0 70%, #5EC8E8 100%)",
     mode: "dark",
   },
   {
-    id: "theme-rose",
-    label: "Rose",
-    description: "Dusty blush",
-    swatch: "linear-gradient(135deg, #161214 0%, #2A2226 50%, #C4A0A8 100%)",
+    id: "theme-ember",
+    label: "Ember",
+    description: "Hangat copper",
+    swatch: "linear-gradient(135deg, #14100E 0%, #2A2018 50%, #C4895A 100%)",
     mode: "dark",
   },
 ];
@@ -102,14 +111,17 @@ export function resolveThemeId(raw: string | null | undefined): ThemeId {
   return DEFAULT_THEME;
 }
 
+export function isLightTheme(themeId: ThemeId) {
+  return LIGHT_THEMES.has(themeId);
+}
+
 export function applyThemeClass(themeId: ThemeId) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
   for (const id of THEME_IDS) root.classList.remove(id);
   for (const id of Object.keys(LEGACY_THEME_MAP)) root.classList.remove(id);
   root.classList.add(themeId);
-  // Paper is light — drop .dark so light tokens win where needed
-  if (themeId === "theme-paper") {
+  if (isLightTheme(themeId)) {
     root.classList.remove("dark");
   } else {
     root.classList.add("dark");

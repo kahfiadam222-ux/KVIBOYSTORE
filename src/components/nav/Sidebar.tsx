@@ -15,7 +15,6 @@ import {
   HelpCircle,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
   CreditCard,
   Gift,
   Tv,
@@ -77,26 +76,19 @@ export function Sidebar({ user }: SidebarProps) {
         collapsed ? "w-[72px]" : "w-[260px]"
       )}
     >
-      <div className="flex h-16 items-center justify-between border-b border-[var(--glass-border)] px-4">
+      <div className="flex h-16 items-center justify-between border-b border-[var(--glass-border)] px-3 gap-2">
         {!collapsed && (
-          <Link href="/" className="flex items-center gap-2.5 group min-w-0">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[image:var(--primary-gradient)] shadow-[var(--shadow-glow)] transition-transform duration-300 group-hover:scale-[1.04]">
-              <Sparkles className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <div className="leading-tight min-w-0">
-              <span className="font-display block text-[1.35rem] tracking-tight text-foreground">
-                Kviboy
-              </span>
-              <span className="text-[9px] uppercase tracking-[0.22em] text-muted-foreground">
-                Store
-              </span>
-            </div>
+          <Link
+            href="/"
+            className="brand-wordmark min-w-0 truncate px-1 text-[1.05rem] text-foreground hover:text-primary transition-colors"
+          >
+            kviboystore
           </Link>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-xl border border-[var(--glass-border)] bg-background/40 text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary hover:border-primary/25",
+            "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-[var(--glass-border)] bg-background/40 text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary hover:border-primary/25",
             collapsed && "mx-auto"
           )}
           aria-label={collapsed ? "Perluas sidebar" : "Ciutkan sidebar"}

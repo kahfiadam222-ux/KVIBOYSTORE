@@ -44,28 +44,9 @@ export async function Navbar() {
       <nav className="relative mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2.5 text-lg font-bold tracking-tight lg:hidden"
+          className="brand-wordmark shrink-0 text-[1.05rem] text-foreground hover:text-primary transition-colors lg:hidden"
         >
-          <span
-            aria-hidden
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[var(--gold)] shadow-[var(--shadow-glow)] text-white"
-          >
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M12 2 4 5v6.09c0 5.05 3.41 9.76 8 11.91 4.59-2.15 8-6.86 8-11.91V5l-8-3z" />
-            </svg>
-          </span>
-          <span className="font-display text-xl tracking-tight text-foreground">
-            Kviboy
-          </span>
+          kviboystore
         </Link>
 
         <div className="hidden lg:flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80 font-semibold">

@@ -38,18 +38,15 @@ export function HeroSection({
 
       <div className="relative glass-hero rounded-[1.75rem] border border-[var(--glass-border)] px-5 py-9 sm:px-10 sm:py-12 lg:px-14 lg:py-14">
         <div className="relative z-[1] max-w-2xl">
-          <p className="eyebrow mb-4">KVIBOYSTORE · Editions</p>
-          <h1 className="heading-display text-[2.15rem] sm:text-5xl lg:text-[3.35rem]">
-            Digital storefront
+          <p className="eyebrow mb-4">kviboystore</p>
+          <h1 className="heading-display text-[2rem] sm:text-4xl lg:text-[2.75rem]">
+            Langganan digital
             <br />
-            <em className="text-premium not-italic sm:italic">
-              yang terasa premium
-            </em>
+            <span className="text-premium">yang rapi dan cepat</span>
           </h1>
           <p className="mt-4 max-w-lg text-sm sm:text-[15px] text-muted-foreground leading-relaxed">
             Marketplace lisensi dan langganan digital — checkout cepat,
-            pengiriman instan, dan pengalaman belanja setara produk startup
-            modern.
+            pengiriman instan, dan pengalaman belanja yang modern.
           </p>
 
           <div className="mt-7 flex flex-wrap items-center gap-3">

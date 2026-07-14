@@ -29,7 +29,7 @@ export default async function SignupPage({
             <p className="eyebrow mb-1">Bergabunglah</p>
             <CardTitle className="heading-display text-2xl sm:text-3xl">
               Buat Akun{" "}
-              <span className="text-premium">KVIBOYSTORE</span>
+              <span className="brand-wordmark text-premium">kviboystore</span>
             </CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
               Sudah punya akun?{" "}
