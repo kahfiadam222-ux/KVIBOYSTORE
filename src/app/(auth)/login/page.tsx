@@ -23,10 +23,14 @@ export default async function LoginPage({
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12">
-      <TiltCard className="w-full max-w-md relative rounded-3xl" glowColor="var(--primary)">
-        <Card className="w-full border-border bg-card/60 backdrop-blur-xl">
+      <TiltCard className="w-full max-w-md relative rounded-3xl" glowColor="var(--gold)">
+        <Card className="w-full glass-card rounded-[inherit] shadow-[var(--shadow-premium)]">
           <CardHeader className="space-y-2 text-center pb-4">
-            <CardTitle className="text-2xl font-bold tracking-tight">Masuk ke KVIBOYSTORE</CardTitle>
+            <p className="eyebrow mb-1">Selamat Datang</p>
+            <CardTitle className="heading-display text-2xl sm:text-3xl">
+              Masuk ke{" "}
+              <span className="text-premium">KVIBOYSTORE</span>
+            </CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
               Belum punya akun?{" "}
               <Link href="/signup" className="font-semibold text-primary underline-offset-4 hover:underline transition-colors">
@@ -41,32 +45,32 @@ export default async function LoginPage({
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="h-px flex-1 bg-border/50" />
+              <div className="gold-line flex-1 opacity-50" />
               <span className="text-xs text-muted-foreground uppercase tracking-wider">atau</span>
-              <div className="h-px flex-1 bg-border/50" />
+              <div className="gold-line flex-1 opacity-50" />
             </div>
 
             <form action={login} className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email</Label>
+                <Label htmlFor="email" className="eyebrow">Email</Label>
                 <Input
                   id="email"
                   name="email"
                   type="email"
                   required
                   placeholder="name@example.com"
-                  className="h-10 rounded-xl px-4 border-border bg-background/30 focus-visible:ring-primary/20"
+                  className="h-10 rounded-xl px-4 border-[var(--glass-border)] bg-background/30 focus-visible:ring-[var(--gold)]/20"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Kata Sandi</Label>
+                <Label htmlFor="password" className="eyebrow">Kata Sandi</Label>
                 <Input
                   id="password"
                   name="password"
                   type="password"
                   required
                   placeholder="••••••••"
-                  className="h-10 rounded-xl px-4 border-border bg-background/30 focus-visible:ring-primary/20"
+                  className="h-10 rounded-xl px-4 border-[var(--glass-border)] bg-background/30 focus-visible:ring-[var(--gold)]/20"
                 />
               </div>
               {error && (

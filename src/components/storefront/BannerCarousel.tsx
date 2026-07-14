@@ -52,7 +52,7 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
 
   return (
     <div
-      className="group relative h-40 xs:h-48 sm:h-56 md:h-64 touch-pan-y overflow-hidden rounded-2xl sm:rounded-3xl border border-border"
+      className="group relative h-40 xs:h-48 sm:h-56 md:h-64 touch-pan-y overflow-hidden rounded-2xl sm:rounded-3xl border border-[var(--glass-border)] shadow-[var(--shadow-premium)]"
       style={{ perspective: "1200px" }}
       onMouseEnter={pauseAutoSlide}
       onMouseLeave={() => {
@@ -106,7 +106,7 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
                 backgroundPosition: "center",
               }}
             >
-              <h2 className="max-w-md text-lg font-bold text-white drop-shadow-sm sm:text-2xl lg:text-3xl">
+              <h2 className="max-w-md heading-display text-xl font-bold text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)] sm:text-2xl lg:text-3xl">
                 {banner.title}
               </h2>
               {banner.subtitle && (
@@ -159,7 +159,7 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
                 aria-label={`Slide ${i + 1}`}
                 onClick={() => handleManualNav(i)}
                 className={`h-1.5 rounded-full transition-all ${
-                  i === index ? "w-6 bg-white" : "w-1.5 bg-white/40"
+                  i === index ? "w-6 bg-[var(--gold)]" : "w-1.5 bg-white/40"
                 }`}
               />
             ))}

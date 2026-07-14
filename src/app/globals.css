@@ -79,6 +79,16 @@
   --radius: 0.9rem;
   --glass-fill: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(20, 20, 24, 0.07);
+  /* Gold accent + premium shadows (light variants — darker values in .dark). */
+  --gold: #B8860B;
+  --gold-soft: #D4A93C;
+  --gold-deep: #8A6510;
+  --gold-gradient: linear-gradient(135deg, #E8C770 0%, #C9962B 55%, #8A6510 100%);
+  --gold-line: linear-gradient(to right, transparent 0%, rgba(184, 134, 11, 0.45) 50%, transparent 100%);
+  --shadow-premium: 0 20px 45px -18px rgba(60, 50, 20, 0.22), 0 8px 20px -12px color-mix(in oklch, var(--gold) 8%, transparent);
+  --shadow-card: 0 10px 26px -16px rgba(40, 40, 50, 0.18);
+  --shadow-glow: 0 0 34px -12px color-mix(in oklch, var(--primary) 30%, transparent);
+  --shadow-gold: 0 0 26px -10px color-mix(in oklch, var(--gold) 24%, transparent);
   --sidebar: #FFFFFF;
   --sidebar-foreground: #16161A;
   --sidebar-primary: #6D4CE0;
@@ -97,21 +107,21 @@
 }
 
 .dark {
-  --background: #0A0A0C;
-  --foreground: #F5F5F7;
-  --card: #131316;
-  --card-foreground: #F5F5F7;
-  --popover: #17171B;
-  --popover-foreground: #F5F5F7;
+  --background: #070709;
+  --foreground: #F6F5F8;
+  --card: #121216;
+  --card-foreground: #F6F5F8;
+  --popover: #16161B;
+  --popover-foreground: #F6F5F8;
   --primary: #8B6CF5;
   --primary-foreground: #FFFFFF;
-  --primary-gradient: linear-gradient(135deg, #9B7DFF, #5B3FE0);
-  --secondary: #1C1C21;
-  --secondary-foreground: #F5F5F7;
-  --muted: #1C1C21;
-  --muted-foreground: #8E8E98;
-  --accent: #202027;
-  --accent-foreground: #F5F5F7;
+  --primary-gradient: linear-gradient(135deg, #9B7DFF 0%, #7B5EE0 45%, #D4AF37 175%);
+  --secondary: #1A1A20;
+  --secondary-foreground: #F6F5F8;
+  --muted: #1A1A20;
+  --muted-foreground: #9A9AA6;
+  --accent: #202028;
+  --accent-foreground: #F6F5F8;
   --destructive: #F87171;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.10);
@@ -121,23 +131,36 @@
   --chart-3: #F87171;
   --chart-4: #60A5FA;
   --chart-5: #F472B6;
-  --glass-fill: rgba(19, 19, 22, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --sidebar: #131316;
-  --sidebar-foreground: #F5F5F7;
+  /* ── Gold accent system (luxury) ── */
+  --gold: #E8B85A;
+  --gold-soft: #F4D89A;
+  --gold-deep: #C9962B;
+  --gold-gradient: linear-gradient(135deg, #F5D98C 0%, #D4AF37 55%, #B8860B 100%);
+  --gold-line: linear-gradient(to right, transparent 0%, rgba(232, 184, 90, 0.55) 50%, transparent 100%);
+  /* ── Refined glass ── */
+  --glass-fill: rgba(16, 16, 20, 0.58);
+  --glass-border: color-mix(in oklch, var(--gold) 16%, rgba(255, 255, 255, 0.06));
+  /* ── Premium layered shadows ── */
+  --shadow-premium: 0 22px 50px -16px rgba(0, 0, 0, 0.65), 0 8px 22px -10px color-mix(in oklch, var(--gold) 10%, transparent);
+  --shadow-card: 0 10px 30px -14px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 38px -10px color-mix(in oklch, var(--primary) 42%, transparent);
+  --shadow-gold: 0 0 30px -8px color-mix(in oklch, var(--gold) 30%, transparent);
+  --sidebar: #121216;
+  --sidebar-foreground: #F6F5F8;
   --sidebar-primary: #8B6CF5;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #202027;
-  --sidebar-accent-foreground: #F5F5F7;
+  --sidebar-accent: #202028;
+  --sidebar-accent-foreground: #F6F5F8;
   --sidebar-border: rgba(255, 255, 255, 0.08);
   --sidebar-ring: #8B6CF5;
   --body-gradient:
-    radial-gradient(600px 600px at 6% -8%, color-mix(in oklch, #9B7DFF 26%, transparent), transparent 62%),
-    radial-gradient(520px 520px at 34% -4%, color-mix(in oklch, #F472B6 19%, transparent), transparent 62%),
-    radial-gradient(560px 560px at 98% -6%, color-mix(in oklch, #E8B84B 22%, transparent), transparent 60%),
-    radial-gradient(650px 650px at 100% 42%, color-mix(in oklch, #60A5FA 17%, transparent), transparent 62%),
-    radial-gradient(700px 700px at 50% 118%, color-mix(in oklch, var(--primary) 14%, transparent), transparent 62%),
-    linear-gradient(160deg, #0E0E13 0%, #131318 40%, #0A0A0E 100%);
+    radial-gradient(620px 620px at 6% -8%, color-mix(in oklch, #9B7DFF 28%, transparent), transparent 62%),
+    radial-gradient(540px 540px at 34% -4%, color-mix(in oklch, #F472B6 20%, transparent), transparent 62%),
+    radial-gradient(560px 560px at 98% -6%, color-mix(in oklch, #E8B85A 26%, transparent), transparent 58%),
+    radial-gradient(520px 520px at 78% 18%, color-mix(in oklch, #D4AF37 16%, transparent), transparent 60%),
+    radial-gradient(650px 650px at 100% 46%, color-mix(in oklch, #60A5FA 16%, transparent), transparent 62%),
+    radial-gradient(720px 720px at 50% 118%, color-mix(in oklch, var(--primary) 15%, transparent), transparent 62%),
+    linear-gradient(160deg, #0C0C12 0%, #131319 40%, #08080C 100%);
 }
 
 @layer base {
@@ -168,10 +191,10 @@
       transform: translate(0, 0) scale(1);
     }
     50% {
-      transform: translate(-1.5%, 1.5%) scale(1.04);
+      transform: translate(-1.2%, 1.2%) scale(1.03);
     }
     100% {
-      transform: translate(1.5%, -1%) scale(1.02);
+      transform: translate(1.2%, -0.8%) scale(1.015);
     }
   }
   html {
@@ -182,14 +205,59 @@
 @utility glass-panel {
   background: var(--glass-fill);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(20px) saturate(1.4);
-  box-shadow: 
+  backdrop-filter: blur(28px) saturate(1.6);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 0 0.5px color-mix(in oklch, var(--gold) 12%, transparent),
+    var(--shadow-premium);
+}
+
+/* Frosted surface for elevated cards — lighter than glass-panel, gold-edged. */
+@utility glass-card {
+  background: color-mix(in oklch, var(--card) 78%, transparent);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
-    0 8px 32px 0 rgba(0, 0, 0, 0.25);
+    var(--shadow-card);
 }
 
 @utility btn-gradient {
   background-image: var(--primary-gradient);
+  position: relative;
+}
+
+/* Thin gold divider that fades at both ends — premium section break. */
+@utility gold-line {
+  height: 1px;
+  width: 100%;
+  background-image: var(--gold-line);
+  border: 0;
+}
+
+/* Violet → gold gradient text for premium labels. */
+@utility text-premium {
+  background-image: linear-gradient(110deg, var(--gold-soft) 0%, var(--gold) 38%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Uppercase wide-tracking eyebrow label used above section headings. */
+@utility eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: color-mix(in oklch, var(--gold) 80%, var(--muted-foreground));
+}
+
+/* Large display heading: tight tracking, heavy weight. */
+@utility heading-display {
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
 }
 
 @utility form-select-glass {
@@ -235,18 +303,19 @@
 }
 
 .theme-cyber {
-  --background: #0A0A0C;
-  --foreground: #F5F5F7;
+  --background: #070709;
+  --foreground: #F6F5F8;
   --primary: #8B6CF5;
-  --primary-gradient: linear-gradient(135deg, #9B7DFF, #5B3FE0);
+  --primary-gradient: linear-gradient(135deg, #9B7DFF 0%, #7B5EE0 45%, #D4AF37 175%);
   --ring: #8B6CF5;
   --body-gradient:
-    radial-gradient(600px 600px at 6% -8%, color-mix(in oklch, #9B7DFF 26%, transparent), transparent 62%),
-    radial-gradient(520px 520px at 34% -4%, color-mix(in oklch, #F472B6 19%, transparent), transparent 62%),
-    radial-gradient(560px 560px at 98% -6%, color-mix(in oklch, #E8B84B 22%, transparent), transparent 60%),
-    radial-gradient(650px 650px at 100% 42%, color-mix(in oklch, #60A5FA 17%, transparent), transparent 62%),
-    radial-gradient(700px 700px at 50% 118%, color-mix(in oklch, var(--primary) 14%, transparent), transparent 62%),
-    linear-gradient(160deg, #0E0E13 0%, #131318 40%, #0A0A0E 100%);
+    radial-gradient(620px 620px at 6% -8%, color-mix(in oklch, #9B7DFF 28%, transparent), transparent 62%),
+    radial-gradient(540px 540px at 34% -4%, color-mix(in oklch, #F472B6 20%, transparent), transparent 62%),
+    radial-gradient(560px 560px at 98% -6%, color-mix(in oklch, #E8B85A 26%, transparent), transparent 58%),
+    radial-gradient(520px 520px at 78% 18%, color-mix(in oklch, #D4AF37 16%, transparent), transparent 60%),
+    radial-gradient(650px 650px at 100% 46%, color-mix(in oklch, #60A5FA 16%, transparent), transparent 62%),
+    radial-gradient(720px 720px at 50% 118%, color-mix(in oklch, var(--primary) 15%, transparent), transparent 62%),
+    linear-gradient(160deg, #0C0C12 0%, #131319 40%, #08080C 100%);
 }
 
 .theme-emerald {

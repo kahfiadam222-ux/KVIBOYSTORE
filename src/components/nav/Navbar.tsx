@@ -41,7 +41,7 @@ export async function Navbar() {
 
   return (
     <header className="glass-panel sticky top-0 z-40 border-x-0 border-t-0 backdrop-blur-xl">
-      <nav className="relative mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:px-6 lg:px-8">
+      <nav className="relative mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3.5 sm:px-6 lg:px-8">
         <Link
           href="/"
           className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight"
@@ -64,7 +64,7 @@ export async function Navbar() {
               <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" />
             </svg>
           </span>
-          <span className="text-sm font-extrabold tracking-wider bg-gradient-to-r from-primary via-primary/80 to-foreground bg-clip-text text-transparent sm:text-base">
+          <span className="text-sm font-extrabold tracking-[0.14em] bg-gradient-to-r from-primary via-[var(--gold-soft)] to-foreground bg-clip-text text-transparent sm:text-base">
             KVIBOYSTORE
           </span>
         </Link>
@@ -79,7 +79,7 @@ export async function Navbar() {
                   className="relative whitespace-nowrap text-sm text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground py-1 group"
                 >
                   {link.label}
-                  <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary transition-all duration-300 group-hover:w-full rounded-full" />
+                  <span className="absolute bottom-0 left-0 h-[2px] w-0 rounded-full bg-gradient-to-r from-primary to-[var(--gold)] transition-all duration-300 group-hover:w-full" />
                 </Link>
               ))}
               <Link
@@ -101,7 +101,7 @@ export async function Navbar() {
                 className="relative text-sm text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground py-1 group"
               >
                 Masuk
-                <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary transition-all duration-300 group-hover:w-full rounded-full" />
+                <span className="absolute bottom-0 left-0 h-[2px] w-0 rounded-full bg-gradient-to-r from-primary to-[var(--gold)] transition-all duration-300 group-hover:w-full" />
               </Link>
               <Link href="/signup" className={buttonVariants({ size: "sm" })}>
                 Daftar
@@ -115,6 +115,8 @@ export async function Navbar() {
           <MobileNav links={links} email={user?.email ?? null} />
         </div>
       </nav>
+      {/* Gold divider — premium section break under the navbar. */}
+      <div className="gold-line opacity-70" />
     </header>
   );
 }

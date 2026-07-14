@@ -57,11 +57,22 @@ export default async function StorefrontPage({
         </div>
       )}
 
+      {/* ── Gold line transition between banner and products ── */}
+      <div className="gold-line mb-10 opacity-60" />
+
       <header className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">
-          {q ? `Hasil untuk "${q}"` : "Produk Pilihan"}
+        <p className="eyebrow mb-2">Koleksi Premium</p>
+        <h1 className="heading-display text-3xl sm:text-4xl">
+          {q ? (
+            <>Hasil untuk &ldquo;{q}&rdquo;</>
+          ) : (
+            <>
+              Produk{" "}
+              <span className="text-premium">Pilihan</span>
+            </>
+          )}
         </h1>
-        <p className="mt-1 text-muted-foreground">
+        <p className="mt-2 text-muted-foreground text-sm sm:text-base">
           Marketplace langganan digital premium — terpercaya, terverifikasi.
         </p>
         {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
@@ -90,13 +101,13 @@ export default async function StorefrontPage({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {listings.map((listing) => {
             const tier = getDeliveryLabel(listing);
             return (
               <TiltCard key={listing.listingId} className="relative rounded-xl sm:rounded-2xl">
-                <Card className="h-full">
-                  <div className="h-20 sm:h-28 w-full overflow-hidden relative">
+                <Card className="h-full glass-card rounded-[inherit] transition-shadow duration-300 hover:shadow-[var(--shadow-glow)]">
+                  <div className="h-20 sm:h-28 w-full overflow-hidden relative rounded-t-[inherit]">
                     <div
                       className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover/card:scale-110"
                       style={{
@@ -105,9 +116,9 @@ export default async function StorefrontPage({
                           : "var(--primary-gradient)",
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-card/90 to-transparent opacity-70" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card/95 via-card/30 to-transparent opacity-75" />
                     <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2">
-                      <Badge className="bg-background/90 backdrop-blur-md text-foreground border-border/40 text-[9px] sm:text-[10px] font-semibold py-0.5 px-1.5 sm:px-2 shadow-sm rounded-full">
+                      <Badge className="bg-[var(--glass-fill)] backdrop-blur-lg text-foreground border-[var(--glass-border)] text-[9px] sm:text-[10px] font-semibold py-0.5 px-1.5 sm:px-2 shadow-sm rounded-full">
                         {tier.label}
                       </Badge>
                     </div>
@@ -117,7 +128,7 @@ export default async function StorefrontPage({
                     <CardDescription className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1">{tier.description}</CardDescription>
                   </CardHeader>
                   <CardContent className="p-2 sm:p-3 pt-1.5 sm:pt-2 pb-1.5 sm:pb-2 flex-grow">
-                    <p className="text-sm sm:text-base font-extrabold text-primary">
+                    <p className="text-sm sm:text-base font-extrabold text-primary drop-shadow-[0_0_10px_color-mix(in_oklch,var(--gold)_35%,transparent)]">
                       {formatPrice(listing.price, listing.currency)}
                     </p>
                     {!listing.isPlatformOwned && listing.sellerReputation !== null && (
