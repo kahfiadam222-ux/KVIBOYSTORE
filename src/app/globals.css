@@ -172,6 +172,8 @@
     @apply text-foreground;
     background-color: var(--background);
     position: relative;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
   body::before {
     content: "";
@@ -200,6 +202,8 @@
   }
   html {
     @apply font-sans;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 }
 
