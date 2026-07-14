@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 
+import { useEffect } from "react";
+
 interface SidebarProps {
   user: {
     id: string;
@@ -57,7 +59,14 @@ const categories = [
 
 export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
+
+  useEffect(() => {
+    // Expand by default on desktop, collapse on mobile
+    if (window.innerWidth >= 1024) {
+      setCollapsed(false);
+    }
+  }, []);
 
   return (
     <aside

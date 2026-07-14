@@ -27,16 +27,14 @@ export default async function StorefrontLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
-      {/* Desktop Sidebar - Hidden on mobile */}
-      <div className="hidden lg:block">
-        <Sidebar user={userWithRole} />
-      </div>
+    <div className="flex min-h-screen w-full overflow-x-hidden">
+      {/* Sidebar - Always visible on left for both mobile and desktop */}
+      <Sidebar user={userWithRole} />
 
-      {/* Main Content Area */}
-      <div className="flex flex-1 flex-col lg:ml-[260px]">
+      {/* Main Content Area - shifts to make space for sidebar */}
+      <div className="flex flex-1 flex-col pl-[72px] lg:pl-[260px] transition-all duration-300 w-full min-w-0">
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 w-full">{children}</main>
       </div>
     </div>
   );

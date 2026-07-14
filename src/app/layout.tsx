@@ -45,10 +45,12 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
+                const valid = ["theme-jetblack", "theme-cosmic", "theme-orchid", "theme-wineash", "theme-turquoise", "theme-candyblue", "theme-lavender", "theme-violet"];
                 const t = localStorage.getItem("kvibo-theme");
-                if (t) {
+                if (t && valid.indexOf(t) !== -1) {
                   document.documentElement.classList.add(t);
                 } else {
+                  localStorage.setItem("kvibo-theme", "theme-cosmic");
                   document.documentElement.classList.add("theme-cosmic");
                 }
               } catch (e) {}

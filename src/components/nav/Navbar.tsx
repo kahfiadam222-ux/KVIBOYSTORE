@@ -77,28 +77,31 @@ export async function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop: Search Bar or Page Title */}
-        <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-4">
+        {/* Right side options: Search Bar or user controls */}
+        <div className="flex flex-1 items-center justify-end gap-3 sm:gap-4">
           {user ? (
             <>
-              {links.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="relative whitespace-nowrap text-sm text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground py-1 group"
-                >
-                  {link.label}
-                  <span className="absolute bottom-0 left-0 h-[2px] w-0 rounded-full bg-gradient-to-r from-primary to-[var(--gold)] transition-all duration-300 group-hover:w-full" />
-                </Link>
-              ))}
+              {/* Menu links - show on sm screens and up */}
+              <div className="hidden sm:flex items-center gap-4">
+                {links.slice(0, 2).map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="relative whitespace-nowrap text-xs sm:text-sm text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground py-1 group"
+                  >
+                    {link.label}
+                    <span className="absolute bottom-0 left-0 h-[2px] w-0 rounded-full bg-gradient-to-r from-primary to-[var(--gold)] transition-all duration-300 group-hover:w-full" />
+                  </Link>
+                ))}
+              </div>
               <Link
                 href="/profile"
-                className="hidden max-w-[160px] truncate text-sm text-muted-foreground lg:inline border-l pl-4 border-border/60 hover:text-foreground transition-colors duration-200"
+                className="hidden max-w-[120px] sm:max-w-[160px] truncate text-xs sm:text-sm text-muted-foreground sm:inline border-l pl-3 sm:pl-4 border-border/60 hover:text-foreground transition-colors duration-200"
               >
                 {user.email}
               </Link>
               <form action={logout}>
-                <Button type="submit" variant="outline" size="sm">
+                <Button type="submit" variant="outline" size="sm" className="h-8 rounded-lg text-xs font-bold px-3">
                   Keluar
                 </Button>
               </form>
@@ -107,21 +110,16 @@ export async function Navbar() {
             <>
               <Link
                 href="/login"
-                className="relative text-sm text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground py-1 group"
+                className="relative text-xs sm:text-sm text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground py-1 group"
               >
                 Masuk
                 <span className="absolute bottom-0 left-0 h-[2px] w-0 rounded-full bg-gradient-to-r from-primary to-[var(--gold)] transition-all duration-300 group-hover:w-full" />
               </Link>
-              <Link href="/signup" className={buttonVariants({ size: "sm" })}>
+              <Link href="/signup" className={buttonVariants({ size: "sm", className: "h-8 rounded-lg text-xs font-bold px-3" })}>
                 Daftar
               </Link>
             </>
           )}
-        </div>
-
-        {/* Mobile Navigation */}
-        <div className="flex items-center gap-2 lg:hidden">
-          <MobileNav user={userWithRole} />
         </div>
       </nav>
       {/* Gold divider — premium section break under the navbar. */}
