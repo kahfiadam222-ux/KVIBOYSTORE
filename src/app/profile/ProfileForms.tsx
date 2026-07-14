@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Phone, Image as ImageIcon, Key, Mail, Shield, Upload } from "lucide-react";
+import { User, Image as ImageIcon, Key, Mail, Shield, Upload } from "lucide-react";
 
 function compressImage(file: any, maxWidth: number, maxHeight: number, quality: number): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -64,15 +64,6 @@ export function ProfileForms({
   const [uploadingCover, setUploadingCover] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
-  // WhatsApp Verification State
-  const [phoneNumber, setPhoneNumber] = useState(profile.phone ?? "");
-  const [isPhoneVerified, setIsPhoneVerified] = useState(!!profile.phone);
-  const [otpSent, setOtpSent] = useState(false);
-  const [generatedOtp, setGeneratedOtp] = useState<string | null>(null);
-  const [enteredOtp, setEnteredOtp] = useState("");
-  const [whatsappError, setWhatsappError] = useState<string | null>(null);
-  const [whatsappInfo, setWhatsappInfo] = useState<string | null>(null);
-
   const getInitials = () => {
     if (profile.display_name) {
       return profile.display_name.substring(0, 2).toUpperCase();
@@ -115,60 +106,17 @@ export function ProfileForms({
     }
   };
 
-  // WhatsApp verification helper
-  const sendWhatsAppOtp = () => {
-    if (!phoneNumber || phoneNumber.length < 9) {
-      setWhatsappError("Masukkan nomor telepon/WhatsApp yang valid.");
-      return;
-    }
-    setWhatsappError(null);
-    setWhatsappInfo(null);
-
-    // Generate random 6 digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(otp);
-    setOtpSent(true);
-
-    // Mock alert to user
-    setWhatsappInfo(`[WhatsApp Simulator] Kode OTP dikirim ke ${phoneNumber}. Kode verifikasi Anda: ${otp}`);
-  };
-
-  const verifyOtp = () => {
-    if (enteredOtp === generatedOtp) {
-      setIsPhoneVerified(true);
-      setOtpSent(false);
-      setGeneratedOtp(null);
-      setWhatsappInfo(null);
-      setWhatsappError(null);
-    } else {
-      setWhatsappError("Kode OTP salah. Silakan coba lagi.");
-    }
-  };
-
-  const resetPhoneVerification = () => {
-    setIsPhoneVerified(false);
-    setOtpSent(false);
-    setGeneratedOtp(null);
-    setEnteredOtp("");
-  };
-
   const handleProfileSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    if (!isPhoneVerified && phoneNumber !== "") {
-      setProfileError("Silakan verifikasi nomor WhatsApp Anda terlebih dahulu.");
-      return;
-    }
 
     setLoadingProfile(true);
     setProfileSuccess(null);
     setProfileError(null);
 
     const formData = new FormData(e.currentTarget);
-    // Explicitly set the avatar, cover Base64 and the verified phone number
+    // Explicitly set the avatar and cover Base64
     formData.set("avatarUrl", avatarPreview ?? "");
     formData.set("coverUrl", coverPreview ?? "");
-    formData.set("phone", isPhoneVerified ? phoneNumber : "");
 
     try {
       await updateProfile(formData);
@@ -354,97 +302,25 @@ export function ProfileForms({
                   />
                 </div>
 
-                {/* WhatsApp Phone Link & Verification Section */}
-                <div className="flex flex-col gap-1.5 md:col-span-2">
-                  <Label htmlFor="phone" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-                    <Phone className="h-3.5 w-3.5" /> Nomor Telepon (Verifikasi WhatsApp)
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="phone" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    Nomor Telepon (Opsional)
                   </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="phone"
-                      value={phoneNumber}
-                      disabled={isPhoneVerified}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      placeholder="misal: 08123456789"
-                      className={`h-10 rounded-xl px-4 border-border bg-background/50 flex-1 ${
-                        isPhoneVerified ? "text-emerald-400 bg-emerald-500/5 border-emerald-500/30" : ""
-                      }`}
-                    />
-                    {isPhoneVerified ? (
-                      <Button
-                        type="button"
-                        onClick={resetPhoneVerification}
-                        variant="outline"
-                        className="h-10 rounded-xl font-bold border-red-500/30 text-red-400 hover:bg-red-500/10 cursor-pointer px-4"
-                      >
-                        Ubah Nomor
-                      </Button>
-                    ) : (
-                      <Button
-                        type="button"
-                        onClick={sendWhatsAppOtp}
-                        className="h-10 rounded-xl font-bold bg-primary/20 text-primary border border-primary/30 hover:bg-primary hover:text-primary-foreground cursor-pointer px-4"
-                      >
-                        Kirim OTP
-                      </Button>
-                    )}
-                  </div>
-
-                  {/* Simulator Info Textbox */}
-                  {whatsappInfo && (
-                    <div className="mt-2 text-xs text-primary bg-primary/10 border border-primary/20 p-2.5 rounded-lg flex items-center gap-2">
-                      <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                      </svg>
-                      <span>{whatsappInfo}</span>
-                    </div>
-                  )}
-
-                  {/* OTP Entry fields */}
-                  {otpSent && (
-                    <div className="mt-3 bg-background/30 border border-border p-3.5 rounded-xl flex flex-col gap-2.5">
-                      <Label htmlFor="otp" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                        Masukkan 6-Digit Kode OTP WhatsApp
-                      </Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="otp"
-                          value={enteredOtp}
-                          onChange={(e) => setEnteredOtp(e.target.value)}
-                          placeholder="Ketik kode OTP..."
-                          maxLength={6}
-                          className="h-9 rounded-lg border-border text-center tracking-widest font-mono text-sm bg-background/40 w-40"
-                        />
-                        <Button
-                          type="button"
-                          onClick={verifyOtp}
-                          className="h-9 rounded-lg font-bold bg-emerald-500 hover:bg-emerald-600 cursor-pointer px-4"
-                        >
-                          Verifikasi
-                        </Button>
-                      </div>
-                      {whatsappError && (
-                        <p className="text-[11px] text-red-400 font-medium">{whatsappError}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {isPhoneVerified && (
-                    <p className="text-xs text-emerald-400 flex items-center gap-1 mt-1 font-semibold">
-                      <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                        <path d="m9 12 2 2 4-4" />
-                      </svg>
-                      Nomor telah terverifikasi via WhatsApp.
-                    </p>
-                  )}
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    defaultValue={profile.phone ?? ""}
+                    placeholder="misal: 08123456789"
+                    className="h-10 rounded-xl px-4 border-border bg-background/50"
+                  />
                 </div>
               </div>
 
               <div className="flex justify-end mt-2 border-t border-border/20 pt-4">
                 <Button
                   type="submit"
-                  disabled={loadingProfile || uploadingAvatar || (!isPhoneVerified && phoneNumber !== "")}
+                  disabled={loadingProfile || uploadingAvatar}
                   className="h-10 rounded-xl font-bold px-6 shadow-lg shadow-primary/20 hover:shadow-primary/30 cursor-pointer"
                 >
                   {loadingProfile ? "Menyimpan..." : "Simpan Perubahan"}
