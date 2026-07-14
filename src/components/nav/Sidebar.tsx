@@ -74,8 +74,8 @@ export function Sidebar({ user }: SidebarProps) {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[var(--gold)] shadow-lg shadow-primary/20">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
-            <span className="bg-gradient-to-r from-primary via-[var(--gold-soft)] to-foreground bg-clip-text text-sm font-extrabold tracking-widest text-transparent">
-              KVIBOY
+            <span className="font-qurova bg-gradient-to-r from-primary via-[var(--gold-soft)] to-foreground bg-clip-text text-2xl font-bold tracking-tight text-transparent">
+              KV
             </span>
           </Link>
         )}

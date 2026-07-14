@@ -5,15 +5,18 @@ import { Palette, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const THEMES = [
-  { id: "theme-graffiti", label: "Graffiti Anime", dot: "bg-[#FF0080]" },
-  { id: "theme-cyber", label: "Space Cyber", dot: "bg-[#8B6CF5]" },
-  { id: "theme-emerald", label: "Emerald Mint", dot: "bg-[#10B981]" },
-  { id: "theme-rose", label: "Midnight Rose", dot: "bg-[#F43F5E]" },
-  { id: "theme-slate", label: "Monochrome Slate", dot: "bg-[#64748B]" },
+  { id: "theme-jetblack", label: "Jet Black", dot: "bg-[#09090B]" },
+  { id: "theme-cosmic", label: "Cosmic", dot: "bg-gradient-to-r from-[#DA70D6] to-[#0D9488]" },
+  { id: "theme-orchid", label: "Orchid", dot: "bg-[#DA70D6]" },
+  { id: "theme-wineash", label: "Wine Ash", dot: "bg-[#9F1239]" },
+  { id: "theme-turquoise", label: "Turquoise", dot: "bg-[#0D9488]" },
+  { id: "theme-candyblue", label: "Candy Blue", dot: "bg-[#0EA5E9]" },
+  { id: "theme-lavender", label: "Lavender", dot: "bg-[#A78BFA]" },
+  { id: "theme-violet", label: "Violet", dot: "bg-[#7C3AED]" },
 ];
 
 export function ThemeSwitcher() {
-  const [activeTheme, setActiveTheme] = useState("theme-cyber");
+  const [activeTheme, setActiveTheme] = useState("theme-cosmic");
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -23,10 +26,10 @@ export function ThemeSwitcher() {
     if (savedTheme) {
       setActiveTheme(savedTheme);
       // Remove default theme just in case
-      document.documentElement.classList.remove("theme-cyber");
+      document.documentElement.classList.remove("theme-cosmic");
       document.documentElement.classList.add(savedTheme);
     } else {
-      document.documentElement.classList.add("theme-cyber");
+      document.documentElement.classList.add("theme-cosmic");
     }
 
     // Handle outside clicks
