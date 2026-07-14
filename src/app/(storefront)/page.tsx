@@ -8,7 +8,6 @@ import {
 import { createCheckout } from "./checkout/actions";
 import { BannerCarousel } from "@/components/storefront/BannerCarousel";
 import { VerticalBannerCarousel } from "@/components/storefront/VerticalBannerCarousel";
-import { FloatingBanners3D } from "@/components/storefront/FloatingBanners3D";
 import { HeroSection } from "@/components/storefront/HeroSection";
 import { SearchBar } from "@/components/storefront/SearchBar";
 import { TiltCard } from "@/components/effects/TiltCard";
@@ -53,15 +52,12 @@ export default async function StorefrontPage({
           searchQuery={q}
           productCount={listings.length}
           content={hero}
+          floatBanners={floatBanners}
         />
       ) : (
         <div className="mb-8 max-w-2xl mx-auto">
           <SearchBar defaultValue={q} />
         </div>
-      )}
-
-      {!q && floatBanners.length > 0 && (
-        <FloatingBanners3D banners={floatBanners} />
       )}
 
       {!q && (horizontalBanners.length > 0 || verticalBanners.length > 0) && (

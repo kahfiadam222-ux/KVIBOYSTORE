@@ -815,25 +815,31 @@
   scrollbar-color: color-mix(in oklch, var(--border) 80%, transparent) transparent;
 }
 
-/* Floating 3D banner — glass + soft neumorphism */
+/* Floating 3D banner — glass + soft neumorphism (keep light for mobile GPU) */
 .float-banner-card {
-  background: color-mix(in oklch, var(--card) 55%, transparent);
-  border: 1px solid color-mix(in oklch, white 14%, var(--glass-border));
-  backdrop-filter: blur(18px) saturate(1.35);
+  background: color-mix(in oklch, var(--card) 60%, transparent);
+  border: 1px solid color-mix(in oklch, white 12%, var(--glass-border));
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
   box-shadow:
-    10px 14px 28px -8px rgba(0, 0, 0, 0.45),
-    -6px -6px 18px -10px color-mix(in oklch, white 12%, transparent),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 0 rgba(0, 0, 0, 0.15),
-    0 0 0 1px color-mix(in oklch, var(--primary) 8%, transparent);
+    8px 12px 22px -8px rgba(0, 0, 0, 0.4),
+    -4px -4px 14px -8px color-mix(in oklch, white 10%, transparent),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
   transform: translateZ(0);
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  -webkit-transform: translateZ(0);
 }
-.float-banner-card:hover {
-  box-shadow:
-    14px 20px 36px -8px rgba(0, 0, 0, 0.5),
-    -8px -8px 22px -10px color-mix(in oklch, white 14%, transparent),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.16),
-    0 0 40px -12px color-mix(in oklch, var(--primary) 35%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .float-banner-card:hover {
+    box-shadow:
+      10px 16px 28px -8px rgba(0, 0, 0, 0.45),
+      -5px -5px 16px -8px color-mix(in oklch, white 12%, transparent),
+      0 0 28px -12px color-mix(in oklch, var(--primary) 30%, transparent);
+  }
+}
+@media (max-width: 640px) {
+  .float-banner-card {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
 }
 

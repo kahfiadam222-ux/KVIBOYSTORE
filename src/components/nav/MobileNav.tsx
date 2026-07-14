@@ -78,10 +78,10 @@ export function MobileNav({ user }: { user: UserProfile | null }) {
     ...(user?.role === "seller" ? [{ href: "/seller/dashboard", label: "Dashboard Penjual", icon: Store, highlight: true }] : []),
     ...(user?.role === "admin"
       ? [
+          { href: "/admin/banners", label: "Konten beranda (Admin)", icon: Gift, highlight: true },
           { href: "/admin/sellers", label: "Penjual (Admin)", icon: Store },
           { href: "/admin/listings", label: "Stok Jualan (Admin)", icon: Package },
           { href: "/admin/disputes", label: "Sengketa (Admin)", icon: HelpCircle },
-          { href: "/admin/banners", label: "Banner (Admin)", icon: Gift },
         ]
       : []),
     { href: "/topup", label: "Top Up Saldo", icon: CreditCard },

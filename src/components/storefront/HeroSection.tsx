@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { SearchBar } from "@/components/storefront/SearchBar";
+import { FloatingBanners3D } from "@/components/storefront/FloatingBanners3D";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ShieldCheck, Zap, BadgeCheck, ArrowRight } from "lucide-react";
-import type { StorefrontHeroContent } from "@/lib/storefront/defaults";
+import type {
+  FloatBanner,
+  StorefrontHeroContent,
+} from "@/lib/storefront/defaults";
 
 const trustPoints = [
   {
@@ -27,10 +31,12 @@ export function HeroSection({
   searchQuery,
   productCount,
   content,
+  floatBanners = [],
 }: {
   searchQuery?: string;
   productCount?: number;
   content: StorefrontHeroContent;
+  floatBanners?: FloatBanner[];
 }) {
   return (
     <section className="relative mb-10 overflow-hidden">
@@ -39,7 +45,7 @@ export function HeroSection({
         className="hero-depth-plane pointer-events-none absolute -right-8 top-0 hidden h-full w-[52%] md:block"
       />
 
-      <div className="relative glass-hero rounded-[1.75rem] border border-[var(--glass-border)] px-5 py-9 sm:px-10 sm:py-12 lg:px-14 lg:py-14">
+      <div className="relative glass-hero rounded-[1.75rem] border border-[var(--glass-border)] px-5 py-8 sm:px-10 sm:py-11 lg:px-14 lg:py-12">
         <div className="relative z-[1] max-w-2xl">
           <p className="eyebrow mb-4">{content.eyebrow}</p>
           <h1 className="heading-display text-[2rem] sm:text-4xl lg:text-[2.75rem]">
@@ -50,40 +56,47 @@ export function HeroSection({
           <p className="mt-4 max-w-lg text-sm sm:text-[15px] text-muted-foreground leading-relaxed">
             {content.description}
           </p>
-
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Link
-              href={content.ctaPrimaryHref || "#produk"}
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                "h-11 rounded-full px-6 text-sm font-semibold gap-2"
-              )}
-            >
-              {content.ctaPrimaryLabel}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href={content.ctaSecondaryHref || "/promo"}
-              className={cn(
-                buttonVariants({ variant: "outline", size: "lg" }),
-                "h-11 rounded-full px-6 text-sm font-semibold border-[var(--glass-border)] bg-[var(--glass-fill)]/80 backdrop-blur"
-              )}
-            >
-              {content.ctaSecondaryLabel}
-            </Link>
-            {typeof productCount === "number" && productCount > 0 && (
-              <span className="text-xs text-muted-foreground pl-1 tracking-wide">
-                {productCount} produk aktif
-              </span>
-            )}
-          </div>
         </div>
 
-        <div className="relative z-[1] mt-9 max-w-xl">
+        {/* 3D banners sit above primary CTA ("Jelajahi katalog") */}
+        {floatBanners.length > 0 && (
+          <div className="relative z-[1] mt-6 -mx-1">
+            <FloatingBanners3D banners={floatBanners} />
+          </div>
+        )}
+
+        <div className="relative z-[1] mt-2 flex flex-wrap items-center gap-3">
+          <Link
+            href={content.ctaPrimaryHref || "#produk"}
+            className={cn(
+              buttonVariants({ size: "lg" }),
+              "h-11 rounded-full px-6 text-sm font-semibold gap-2"
+            )}
+          >
+            {content.ctaPrimaryLabel}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href={content.ctaSecondaryHref || "/promo"}
+            className={cn(
+              buttonVariants({ variant: "outline", size: "lg" }),
+              "h-11 rounded-full px-6 text-sm font-semibold border-[var(--glass-border)] bg-[var(--glass-fill)]/80 backdrop-blur"
+            )}
+          >
+            {content.ctaSecondaryLabel}
+          </Link>
+          {typeof productCount === "number" && productCount > 0 && (
+            <span className="text-xs text-muted-foreground pl-1 tracking-wide">
+              {productCount} produk aktif
+            </span>
+          )}
+        </div>
+
+        <div className="relative z-[1] mt-8 max-w-xl">
           <SearchBar defaultValue={searchQuery} embedded />
         </div>
 
-        <ul className="relative z-[1] mt-9 grid gap-3 sm:grid-cols-3">
+        <ul className="relative z-[1] mt-8 grid gap-3 sm:grid-cols-3">
           {trustPoints.map(({ icon: Icon, title, desc }) => (
             <li
               key={title}

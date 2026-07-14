@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/(auth)/actions";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Shield } from "lucide-react";
 
 export async function Navbar() {
   const supabase = await createClient();
@@ -15,29 +16,8 @@ export async function Navbar() {
       ).data
     : null;
 
-  const links = user
-    ? [
-        { href: "/profile", label: "Profil" },
-        { href: "/orders", label: "Pesanan" },
-        ...(profile?.role === "buyer"
-          ? [{ href: "/sell", label: "Jadi Penjual" }]
-          : []),
-        ...(profile?.role === "seller"
-          ? [{ href: "/seller/dashboard", label: "Dashboard" }]
-          : []),
-        ...(profile?.role === "admin"
-          ? [
-              { href: "/admin/sellers", label: "Penjual" },
-              { href: "/admin/listings", label: "Stok" },
-              { href: "/admin/disputes", label: "Sengketa" },
-              { href: "/admin/banners", label: "Banner" },
-            ]
-          : []),
-      ]
-    : [
-        { href: "/login", label: "Masuk" },
-        { href: "/signup", label: "Daftar" },
-      ];
+  const role = (profile?.role as "buyer" | "seller" | "admin") ?? "buyer";
+  const isAdmin = role === "admin";
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--glass-border)] bg-[var(--glass-fill)]/80 backdrop-blur-2xl">
@@ -54,23 +34,49 @@ export async function Navbar() {
           Live storefront
         </div>
 
-        <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3">
+        <div className="flex flex-1 items-center justify-end gap-1.5 sm:gap-2">
           {user ? (
             <>
-              <div className="hidden sm:flex items-center gap-1">
-                {links.slice(0, 2).map((link) => (
+              <div className="hidden sm:flex items-center gap-0.5">
+                <Link
+                  href="/profile"
+                  className="rounded-lg px-2.5 py-1.5 text-xs sm:text-sm text-muted-foreground transition-all hover:bg-primary/10 hover:text-foreground"
+                >
+                  Profil
+                </Link>
+                <Link
+                  href="/orders"
+                  className="rounded-lg px-2.5 py-1.5 text-xs sm:text-sm text-muted-foreground transition-all hover:bg-primary/10 hover:text-foreground"
+                >
+                  Pesanan
+                </Link>
+                {role === "seller" && (
                   <Link
-                    key={link.href}
-                    href={link.href}
-                    className="relative whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs sm:text-sm text-muted-foreground transition-all duration-200 hover:bg-primary/10 hover:text-foreground"
+                    href="/seller/dashboard"
+                    className="rounded-lg px-2.5 py-1.5 text-xs sm:text-sm text-muted-foreground transition-all hover:bg-primary/10 hover:text-foreground"
                   >
-                    {link.label}
+                    Dashboard
                   </Link>
-                ))}
+                )}
               </div>
+
+              {isAdmin && (
+                <Link
+                  href="/admin/banners"
+                  className={buttonVariants({
+                    size: "sm",
+                    className:
+                      "h-8 rounded-xl text-xs font-semibold px-3 gap-1.5 shadow-[var(--shadow-glow)]",
+                  })}
+                >
+                  <Shield className="h-3.5 w-3.5" />
+                  <span className="hidden xs:inline sm:inline">Admin</span>
+                </Link>
+              )}
+
               <Link
                 href="/profile"
-                className="hidden max-w-[140px] truncate text-xs text-muted-foreground sm:inline border-l pl-3 border-[var(--glass-border)] hover:text-foreground transition-colors"
+                className="hidden max-w-[120px] truncate text-xs text-muted-foreground sm:inline border-l pl-3 border-[var(--glass-border)] hover:text-foreground transition-colors"
               >
                 {user.email}
               </Link>

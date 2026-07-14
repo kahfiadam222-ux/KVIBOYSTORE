@@ -23,6 +23,11 @@ import {
   Bot,
   Shield,
   FileText,
+  LayoutDashboard,
+  ImageIcon,
+  Users,
+  AlertTriangle,
+  PackageOpen,
 } from "lucide-react";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 
@@ -39,6 +44,13 @@ const mainNavItems = [
   { href: "/orders", label: "Pesanan Saya", icon: Package },
   { href: "/wishlist", label: "Wishlist", icon: Heart },
   { href: "/cart", label: "Keranjang", icon: ShoppingCart },
+];
+
+const adminNavItems = [
+  { href: "/admin/banners", label: "Konten beranda", icon: ImageIcon },
+  { href: "/admin/sellers", label: "Penjual", icon: Users },
+  { href: "/admin/listings", label: "Stok jualan", icon: PackageOpen },
+  { href: "/admin/disputes", label: "Sengketa", icon: AlertTriangle },
 ];
 
 const quickActions = [
@@ -163,6 +175,55 @@ export function Sidebar({ user }: SidebarProps) {
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {user?.role === "admin" && (
+          <div className="mt-6 space-y-1 px-3">
+            {!collapsed && (
+              <span className="mb-2 block px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary/80">
+                Admin
+              </span>
+            )}
+            {adminNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive =
+                pathname === item.href || pathname.startsWith(item.href + "/");
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                    isActive
+                      ? "bg-primary/15 text-primary"
+                      : "text-muted-foreground hover:bg-primary/10 hover:text-primary",
+                    collapsed && "justify-center px-0"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all",
+                      isActive
+                        ? "bg-primary/20 text-primary"
+                        : "bg-primary/10 text-primary/90 group-hover:bg-primary/15"
+                    )}
+                  >
+                    <Icon className="h-[18px] w-[18px]" />
+                  </div>
+                  {!collapsed && <span className="flex-1">{item.label}</span>}
+                </Link>
+              );
+            })}
+            {!collapsed && (
+              <Link
+                href="/admin/banners"
+                className="mt-1 flex items-center gap-2 rounded-xl bg-[image:var(--primary-gradient)] px-3 py-2.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)]"
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                Panel konten
+              </Link>
+            )}
           </div>
         )}
 
