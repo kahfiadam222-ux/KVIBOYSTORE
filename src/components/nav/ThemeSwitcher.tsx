@@ -1,103 +1,217 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { Palette, Check } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { Check, Palette, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  THEMES,
+  applyThemeClass,
+  resolveThemeId,
+  type ThemeId,
+} from "@/lib/themes";
+import { cn } from "@/lib/utils";
 
-const THEMES = [
-  { id: "theme-jetblack", label: "Jet Black", dot: "bg-[#09090B]" },
-  { id: "theme-cosmic", label: "Cosmic", dot: "bg-gradient-to-r from-[#DA70D6] to-[#0D9488]" },
-  { id: "theme-orchid", label: "Orchid", dot: "bg-[#DA70D6]" },
-  { id: "theme-wineash", label: "Wine Ash", dot: "bg-[#9F1239]" },
-  { id: "theme-turquoise", label: "Turquoise", dot: "bg-[#0D9488]" },
-  { id: "theme-candyblue", label: "Candy Blue", dot: "bg-[#0EA5E9]" },
-  { id: "theme-lavender", label: "Lavender", dot: "bg-[#A78BFA]" },
-  { id: "theme-violet", label: "Violet", dot: "bg-[#7C3AED]" },
-];
+const PANEL_WIDTH = 288;
 
 export function ThemeSwitcher() {
-  const [activeTheme, setActiveTheme] = useState("theme-cosmic");
+  const [activeTheme, setActiveTheme] = useState<ThemeId>("theme-editions");
   const [open, setOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Load theme from localStorage
-    const savedTheme = localStorage.getItem("kvibo-theme");
-    if (savedTheme) {
-      setActiveTheme(savedTheme);
-      // Remove default theme just in case
-      document.documentElement.classList.remove("theme-cosmic");
-      document.documentElement.classList.add(savedTheme);
-    } else {
-      document.documentElement.classList.add("theme-cosmic");
+    setMounted(true);
+    const saved = resolveThemeId(localStorage.getItem("kvibo-theme"));
+    setActiveTheme(saved);
+    applyThemeClass(saved);
+    if (localStorage.getItem("kvibo-theme") !== saved) {
+      localStorage.setItem("kvibo-theme", saved);
     }
-
-    // Handle outside clicks
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const changeTheme = (themeId: string) => {
-    // Remove all theme classes
-    THEMES.forEach((t) => {
-      document.documentElement.classList.remove(t.id);
-    });
-    // Add new theme class
-    document.documentElement.classList.add(themeId);
+  const updatePosition = useCallback(() => {
+    const btn = buttonRef.current;
+    if (!btn) return;
+    const rect = btn.getBoundingClientRect();
+    const panelH = panelRef.current?.offsetHeight ?? 360;
+    const gap = 10;
+
+    let left = rect.left;
+    let top = rect.top - panelH - gap;
+
+    // Prefer opening above; if clipped, open below
+    if (top < 8) {
+      top = rect.bottom + gap;
+    }
+    // Keep inside viewport horizontally
+    if (left + PANEL_WIDTH > window.innerWidth - 8) {
+      left = window.innerWidth - PANEL_WIDTH - 8;
+    }
+    if (left < 8) left = 8;
+    // Clamp vertical if still overflowing bottom
+    if (top + panelH > window.innerHeight - 8) {
+      top = Math.max(8, window.innerHeight - panelH - 8);
+    }
+
+    setPos({ top, left });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    updatePosition();
+    const onResize = () => updatePosition();
+    window.addEventListener("resize", onResize);
+    window.addEventListener("scroll", onResize, true);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("scroll", onResize, true);
+    };
+  }, [open, updatePosition]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    function onPointer(e: MouseEvent) {
+      const t = e.target as Node;
+      if (buttonRef.current?.contains(t)) return;
+      if (panelRef.current?.contains(t)) return;
+      setOpen(false);
+    }
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onPointer);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onPointer);
+    };
+  }, [open]);
+
+  const changeTheme = (themeId: ThemeId) => {
+    applyThemeClass(themeId);
     setActiveTheme(themeId);
     localStorage.setItem("kvibo-theme", themeId);
     setOpen(false);
   };
 
+  const active = THEMES.find((t) => t.id === activeTheme) ?? THEMES[0];
+
   return (
-    <div className="relative" ref={dropdownRef}>
+    <>
       <button
-        onClick={() => setOpen(!open)}
-        className="flex h-8 w-8 items-center justify-center rounded-lg border border-input bg-background/40 backdrop-blur transition-all duration-200 hover:bg-accent/40 active:scale-95 cursor-pointer"
-        aria-label="Ubah Tema"
+        ref={buttonRef}
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          "flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--glass-border)]",
+          "bg-[var(--glass-fill)] text-muted-foreground backdrop-blur-md",
+          "transition-all duration-200 hover:border-primary/30 hover:text-foreground",
+          "active:scale-[0.98] cursor-pointer relative",
+          open && "border-primary/40 text-foreground ring-2 ring-primary/15"
+        )}
+        aria-label={`Pilih tema — ${active.label}`}
+        aria-expanded={open}
+        aria-haspopup="dialog"
         type="button"
+        title={`Tema: ${active.label}`}
       >
-        <Palette className="h-4.5 w-4.5 text-muted-foreground hover:text-foreground transition-colors" />
+        <span
+          aria-hidden
+          className="absolute inset-1 rounded-lg opacity-90"
+          style={{ background: active.swatch }}
+        />
+        <Palette className="relative h-3.5 w-3.5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]" />
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute right-0 mt-2 z-50 w-48 rounded-xl border border-border bg-popover/90 p-1.5 shadow-2xl backdrop-blur-xl"
-          >
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-2.5 py-1.5 border-b border-border/40 mb-1">
-              Pilih Tema
-            </p>
-            {THEMES.map((theme) => (
-              <button
-                key={theme.id}
-                onClick={() => changeTheme(theme.id)}
-                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-xs font-medium text-left transition-colors cursor-pointer ${
-                  activeTheme === theme.id
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                }`}
-                type="button"
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                ref={panelRef}
+                role="dialog"
+                aria-label="Pemilih tema"
+                initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                style={{
+                  position: "fixed",
+                  top: pos.top,
+                  left: pos.left,
+                  width: PANEL_WIDTH,
+                  zIndex: 100,
+                }}
+                className={cn(
+                  "overflow-hidden rounded-2xl border border-[var(--glass-border)]",
+                  "bg-[color-mix(in_oklch,var(--popover)_92%,transparent)]",
+                  "shadow-[0_24px_64px_-16px_rgba(0,0,0,0.55),0_0_0_1px_color-mix(in_oklch,var(--primary)_10%,transparent)]",
+                  "backdrop-blur-2xl"
+                )}
               >
-                <div className="flex items-center gap-2">
-                  <span className={`h-2.5 w-2.5 rounded-full ${theme.dot} shadow-sm`} />
-                  <span>{theme.label}</span>
+                <div className="flex items-center justify-between border-b border-[var(--glass-border)] px-3.5 py-3">
+                  <div>
+                    <p className="font-display text-sm tracking-tight text-foreground">
+                      Editions
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      Palet elegan, soft gradient
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+                    aria-label="Tutup"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
                 </div>
-                {activeTheme === theme.id && <Check className="h-3.5 w-3.5" />}
-              </button>
-            ))}
-          </motion.div>
+
+                <div className="grid grid-cols-2 gap-2 p-3">
+                  {THEMES.map((theme) => {
+                    const selected = activeTheme === theme.id;
+                    return (
+                      <button
+                        key={theme.id}
+                        type="button"
+                        onClick={() => changeTheme(theme.id)}
+                        className={cn(
+                          "group relative flex flex-col overflow-hidden rounded-xl border text-left transition-all",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+                          selected
+                            ? "border-primary/50 ring-2 ring-primary/20"
+                            : "border-[var(--glass-border)] hover:border-primary/30"
+                        )}
+                      >
+                        <span
+                          className="block h-14 w-full"
+                          style={{ background: theme.swatch }}
+                        />
+                        <span className="flex items-start justify-between gap-1 px-2.5 py-2">
+                          <span>
+                            <span className="block text-[12px] font-semibold text-foreground">
+                              {theme.label}
+                            </span>
+                            <span className="block text-[10px] text-muted-foreground leading-snug">
+                              {theme.description}
+                            </span>
+                          </span>
+                          {selected && (
+                            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                          )}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>
-    </div>
+    </>
   );
 }

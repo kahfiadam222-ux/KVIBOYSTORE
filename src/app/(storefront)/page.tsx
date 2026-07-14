@@ -72,15 +72,17 @@ export default async function StorefrontPage({
 
       <header id="produk" className="mb-7 scroll-mt-24">
         <span className="section-pill mb-3">Katalog</span>
-        <h2 className="heading-display text-2xl sm:text-3xl mt-2">
+        <h2 className="heading-display text-3xl sm:text-4xl mt-2">
           {q ? (
             <>
               Hasil untuk{" "}
-              <span className="text-premium">&ldquo;{q}&rdquo;</span>
+              <em className="text-premium not-italic sm:italic">
+                &ldquo;{q}&rdquo;
+              </em>
             </>
           ) : (
             <>
-              Produk <span className="text-premium">pilihan</span>
+              Produk <em className="text-premium not-italic sm:italic">pilihan</em>
             </>
           )}
         </h2>
@@ -174,9 +176,11 @@ export default async function StorefrontPage({
                     </p>
                     {!listing.isPlatformOwned &&
                       listing.sellerReputation !== null && (
-                        <p className="mt-0.5 text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-0.5">
-                          <span>⭐</span>
-                          <span>{listing.sellerReputation.toFixed(1)}</span>
+                        <p className="mt-0.5 text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-1">
+                          <span className="font-medium text-primary/90">
+                            {listing.sellerReputation.toFixed(1)}
+                          </span>
+                          <span>rating</span>
                         </p>
                       )}
                   </CardContent>

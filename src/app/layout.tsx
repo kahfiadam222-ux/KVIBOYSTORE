@@ -1,24 +1,31 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Rajdhani } from "next/font/google";
+import {
+  Instrument_Serif,
+  Plus_Jakarta_Sans,
+  JetBrains_Mono,
+} from "next/font/google";
 import { headers } from "next/headers";
 import { SpaceBackground } from "@/components/effects/SpaceBackground";
 import { AmbientOrbs } from "@/components/effects/AmbientOrbs";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const instrument = Instrument_Serif({
+  variable: "--font-instrument",
   subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
 });
 
-const rajdhani = Rajdhani({
-  variable: "--font-qurova",
-  weight: ["500", "600", "700"],
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
@@ -32,14 +39,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // The nonce is generated per-request in src/proxy.ts and forwarded here so the
-  // inline theme bootstrap script can run under the strict Content-Security-Policy.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <html
       lang="id"
-      className={`dark ${geistSans.variable} ${geistMono.variable} ${rajdhani.variable} h-full antialiased`}
+      className={`dark ${jakarta.variable} ${instrument.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <head>
         <script
@@ -47,20 +52,24 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                const valid = ["theme-jetblack", "theme-cosmic", "theme-orchid", "theme-wineash", "theme-turquoise", "theme-candyblue", "theme-lavender", "theme-violet"];
-                const t = localStorage.getItem("kvibo-theme");
-                if (t && valid.indexOf(t) !== -1) {
-                  document.documentElement.classList.add(t);
+                var valid = ["theme-editions","theme-paper","theme-ink","theme-champagne","theme-slate","theme-olive","theme-dusk","theme-rose"];
+                var legacy = {"theme-cosmic":"theme-editions","theme-jetblack":"theme-ink","theme-orchid":"theme-rose","theme-wineash":"theme-champagne","theme-turquoise":"theme-olive","theme-candyblue":"theme-slate","theme-lavender":"theme-dusk","theme-violet":"theme-dusk"};
+                var t = localStorage.getItem("kvibo-theme");
+                if (legacy[t]) t = legacy[t];
+                if (!t || valid.indexOf(t) === -1) t = "theme-editions";
+                localStorage.setItem("kvibo-theme", t);
+                document.documentElement.classList.add(t);
+                if (t === "theme-paper") {
+                  document.documentElement.classList.remove("dark");
                 } else {
-                  localStorage.setItem("kvibo-theme", "theme-cosmic");
-                  document.documentElement.classList.add("theme-cosmic");
+                  document.documentElement.classList.add("dark");
                 }
               } catch (e) {}
             `,
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col font-sans">
         <SpaceBackground />
         <AmbientOrbs />
         {children}

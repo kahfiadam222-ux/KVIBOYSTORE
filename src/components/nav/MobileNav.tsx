@@ -20,6 +20,12 @@ import {
   X,
   Menu,
   LogOut,
+  Tv,
+  Music2,
+  Palette,
+  Bot,
+  Shield,
+  FileText,
 } from "lucide-react";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { Button } from "@/components/ui/button";
@@ -34,17 +40,17 @@ interface UserProfile {
 const mainNavItems = [
   { href: "/", label: "Beranda", icon: Home },
   { href: "/orders", label: "Pesanan Saya", icon: Package },
-  { href: "/wishlist", label: "Wishlist", icon: Heart, badge: "3" },
-  { href: "/cart", label: "Keranjang", icon: ShoppingCart, badge: "2" },
+  { href: "/wishlist", label: "Wishlist", icon: Heart },
+  { href: "/cart", label: "Keranjang", icon: ShoppingCart },
 ];
 
 const categories = [
-  { href: "/?q=netflix", label: "Netflix", icon: "🎬" },
-  { href: "/?q=spotify", label: "Spotify", icon: "🎵" },
-  { href: "/?q=canva", label: "Canva Pro", icon: "🎨" },
-  { href: "/?q=chatgpt", label: "ChatGPT Plus", icon: "🤖" },
-  { href: "/?q=vpn", label: "VPN Premium", icon: "🔒" },
-  { href: "/?q=microsoft", label: "Microsoft 365", icon: "📝" },
+  { href: "/?q=netflix", label: "Netflix", icon: Tv },
+  { href: "/?q=spotify", label: "Spotify", icon: Music2 },
+  { href: "/?q=canva", label: "Canva Pro", icon: Palette },
+  { href: "/?q=chatgpt", label: "ChatGPT Plus", icon: Bot },
+  { href: "/?q=vpn", label: "VPN Premium", icon: Shield },
+  { href: "/?q=microsoft", label: "Microsoft 365", icon: FileText },
 ];
 
 export function MobileNav({ user }: { user: UserProfile | null }) {
@@ -118,18 +124,19 @@ export function MobileNav({ user }: { user: UserProfile | null }) {
               {/* Header Logo & Close button */}
               <div className="flex h-12 items-center justify-between border-b border-glass-border pb-3">
                 <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-[var(--gold)] shadow-md">
-                    <Sparkles className="h-4.5 w-4.5 text-white" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[image:var(--primary-gradient)] shadow-md">
+                    <Sparkles className="h-4 w-4 text-primary-foreground" />
                   </div>
-                  <span className="font-qurova bg-gradient-to-r from-primary via-[var(--gold-soft)] to-foreground bg-clip-text text-xl font-bold tracking-tight text-transparent">
-                    KV
+                  <span className="font-display text-xl tracking-tight text-foreground">
+                    Kviboy
                   </span>
                 </Link>
                 <button
                   onClick={() => setOpen(false)}
+                  type="button"
                   className="flex h-8 w-8 items-center justify-center rounded-lg border border-glass-border bg-background/40 hover:bg-red-500/10 hover:text-red-400 transition-colors"
                 >
-                  <X className="h-4.5 w-4.5" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
 
@@ -166,11 +173,6 @@ export function MobileNav({ user }: { user: UserProfile | null }) {
                           <Icon className="h-4 w-4" />
                         </div>
                         <span className="flex-1">{item.label}</span>
-                        {item.badge && (
-                          <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
-                            {item.badge}
-                          </span>
-                        )}
                       </Link>
                     );
                   })}
@@ -182,17 +184,20 @@ export function MobileNav({ user }: { user: UserProfile | null }) {
                     Kategori Populer
                   </span>
                   <div className="grid grid-cols-2 gap-1.5 px-1">
-                    {categories.map((cat) => (
-                      <Link
-                        key={cat.href}
-                        href={cat.href}
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-2 rounded-lg bg-glass-fill/50 px-2 py-2.5 text-xs font-medium text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary"
-                      >
-                        <span className="text-sm">{cat.icon}</span>
-                        <span className="truncate">{cat.label}</span>
-                      </Link>
-                    ))}
+                    {categories.map((cat) => {
+                      const Icon = cat.icon;
+                      return (
+                        <Link
+                          key={cat.href}
+                          href={cat.href}
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2 rounded-lg bg-glass-fill/50 px-2 py-2.5 text-xs font-medium text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary"
+                        >
+                          <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />
+                          <span className="truncate">{cat.label}</span>
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
 

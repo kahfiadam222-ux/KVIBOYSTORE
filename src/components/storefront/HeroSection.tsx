@@ -18,7 +18,7 @@ const trustPoints = [
   {
     icon: BadgeCheck,
     title: "Produk resmi",
-    desc: "Listing terverifikasi & transparan",
+    desc: "Listing terverifikasi dan transparan",
   },
 ];
 
@@ -31,69 +31,70 @@ export function HeroSection({
 }) {
   return (
     <section className="relative mb-10 overflow-hidden">
-      {/* Subtle 3D plane behind hero copy */}
       <div
         aria-hidden
-        className="hero-depth-plane pointer-events-none absolute -right-8 top-0 hidden h-full w-[55%] md:block"
+        className="hero-depth-plane pointer-events-none absolute -right-8 top-0 hidden h-full w-[52%] md:block"
       />
 
-      <div className="relative glass-hero rounded-3xl border border-[var(--glass-border)] px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
-        <div className="max-w-2xl">
-          <p className="eyebrow mb-3">Digital marketplace · premium</p>
-          <h1 className="heading-display text-3xl sm:text-4xl lg:text-[2.75rem] tracking-tight">
-            Langganan digital{" "}
-            <span className="text-premium">premium</span>
-            <br className="hidden sm:block" />{" "}
-            yang terasa premium juga
+      <div className="relative glass-hero rounded-[1.75rem] border border-[var(--glass-border)] px-5 py-9 sm:px-10 sm:py-12 lg:px-14 lg:py-14">
+        <div className="relative z-[1] max-w-2xl">
+          <p className="eyebrow mb-4">KVIBOYSTORE · Editions</p>
+          <h1 className="heading-display text-[2.15rem] sm:text-5xl lg:text-[3.35rem]">
+            Digital storefront
+            <br />
+            <em className="text-premium not-italic sm:italic">
+              yang terasa premium
+            </em>
           </h1>
-          <p className="mt-3 max-w-xl text-sm sm:text-base text-muted-foreground leading-relaxed">
-            KVIBOYSTORE menghadirkan lisensi & langganan resmi — checkout cepat,
-            pengiriman instan, dan pengalaman belanja setara produk startup modern.
+          <p className="mt-4 max-w-lg text-sm sm:text-[15px] text-muted-foreground leading-relaxed">
+            Marketplace lisensi dan langganan digital — checkout cepat,
+            pengiriman instan, dan pengalaman belanja setara produk startup
+            modern.
           </p>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="mt-7 flex flex-wrap items-center gap-3">
             <Link
               href="#produk"
               className={cn(
                 buttonVariants({ size: "lg" }),
-                "h-10 rounded-xl px-5 text-sm font-semibold gap-2"
+                "h-11 rounded-full px-6 text-sm font-semibold gap-2"
               )}
             >
-              Jelajahi produk
+              Jelajahi katalog
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/promo"
               className={cn(
                 buttonVariants({ variant: "outline", size: "lg" }),
-                "h-10 rounded-xl px-5 text-sm font-semibold border-[var(--glass-border)] bg-[var(--glass-fill)] backdrop-blur"
+                "h-11 rounded-full px-6 text-sm font-semibold border-[var(--glass-border)] bg-[var(--glass-fill)]/80 backdrop-blur"
               )}
             >
               Lihat promo
             </Link>
             {typeof productCount === "number" && productCount > 0 && (
-              <span className="text-xs text-muted-foreground pl-1">
+              <span className="text-xs text-muted-foreground pl-1 tracking-wide">
                 {productCount} produk aktif
               </span>
             )}
           </div>
         </div>
 
-        <div className="mt-8 max-w-2xl">
+        <div className="relative z-[1] mt-9 max-w-xl">
           <SearchBar defaultValue={searchQuery} embedded />
         </div>
 
-        <ul className="mt-8 grid gap-3 sm:grid-cols-3">
+        <ul className="relative z-[1] mt-9 grid gap-3 sm:grid-cols-3">
           {trustPoints.map(({ icon: Icon, title, desc }) => (
             <li
               key={title}
-              className="trust-chip group flex items-start gap-3 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-fill)]/60 px-3.5 py-3 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
+              className="flex items-start gap-3 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-fill)]/50 px-3.5 py-3.5 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary shadow-[var(--shadow-glow)]">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary">
                 <Icon className="h-4 w-4" />
               </span>
               <span>
-                <span className="block text-sm font-semibold text-foreground">
+                <span className="block text-sm font-semibold text-foreground tracking-tight">
                   {title}
                 </span>
                 <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">

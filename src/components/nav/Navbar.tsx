@@ -63,8 +63,8 @@ export async function Navbar() {
               <path d="M12 2 4 5v6.09c0 5.05 3.41 9.76 8 11.91 4.59-2.15 8-6.86 8-11.91V5l-8-3z" />
             </svg>
           </span>
-          <span className="font-qurova bg-gradient-to-r from-primary via-[var(--gold-soft)] to-foreground bg-clip-text text-xl font-bold tracking-tight text-transparent">
-            KV
+          <span className="font-display text-xl tracking-tight text-foreground">
+            Kviboy
           </span>
         </Link>
 
