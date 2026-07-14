@@ -2,7 +2,6 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/(auth)/actions";
 import { MobileNav } from "./MobileNav";
-import { ThemeSwitcher } from "./ThemeSwitcher";
 import { Button, buttonVariants } from "@/components/ui/button";
 
 export async function Navbar() {
@@ -40,11 +39,12 @@ export async function Navbar() {
       ];
 
   return (
-    <header className="glass-panel sticky top-0 z-40 border-x-0 border-t-0 backdrop-blur-xl">
+    <header className="glass-panel sticky top-0 z-40 border-x-0 border-t-0 backdrop-blur-xl lg:border-l-0">
       <nav className="relative mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3.5 sm:px-6 lg:px-8">
+        {/* Mobile Logo - Only show on mobile */}
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight"
+          className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight lg:hidden"
         >
           <span
             aria-hidden
@@ -69,7 +69,8 @@ export async function Navbar() {
           </span>
         </Link>
 
-        <div className="hidden min-w-0 items-center gap-4 sm:flex">
+        {/* Desktop: Search Bar or Page Title */}
+        <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-4">
           {user ? (
             <>
               {links.map((link) => (
@@ -110,8 +111,8 @@ export async function Navbar() {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
-          <ThemeSwitcher />
+        {/* Mobile Navigation */}
+        <div className="flex items-center gap-2 lg:hidden">
           <MobileNav links={links} email={user?.email ?? null} />
         </div>
       </nav>
