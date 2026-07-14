@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Gift, Sparkles, Clock, Percent } from "lucide-react";
+import { Gift, Sparkles, Clock } from "lucide-react";
 
 const promoItems = [
   {
@@ -28,12 +28,15 @@ const promoItems = [
 export default async function PromoPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
-      <div className="mb-8 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--gold)] to-primary">
+      <div className="mb-10 text-center">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--gold)] to-primary shadow-[var(--shadow-glow)]">
           <Gift className="h-7 w-7 text-white" />
         </div>
-        <h1 className="text-2xl font-bold">Promo & Diskon</h1>
-        <p className="text-sm text-muted-foreground">
+        <span className="section-pill mb-3">Offers</span>
+        <h1 className="heading-display text-2xl sm:text-3xl mt-2">
+          Promo & <span className="text-premium">Diskon</span>
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
           Nikmati berbagai penawaran spesial untuk penghematan maksimal
         </p>
       </div>
@@ -42,7 +45,7 @@ export default async function PromoPage() {
         {promoItems.map((promo, index) => (
           <Card
             key={index}
-            className="group relative overflow-hidden border-border bg-card/40 backdrop-blur-xl shadow-xl transition-all hover:shadow-[var(--shadow-gold)]"
+            className="group relative overflow-hidden product-card-shell glass-card border-0 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-gold)]"
           >
             <div className="absolute right-0 top-0 flex h-16 w-16 items-center justify-center rounded-bl-3xl bg-gradient-to-br from-[var(--gold)]/20 to-primary/20">
               <span className="text-lg font-bold text-[var(--gold-soft)]">{promo.discount}</span>

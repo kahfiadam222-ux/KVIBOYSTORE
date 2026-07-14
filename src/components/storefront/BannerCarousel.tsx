@@ -52,8 +52,8 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
 
   return (
     <div
-      className="group relative h-40 xs:h-48 sm:h-56 md:h-64 touch-pan-y overflow-hidden rounded-2xl sm:rounded-3xl border border-[var(--glass-border)] shadow-[var(--shadow-premium)]"
-      style={{ perspective: "1200px" }}
+      className="group relative h-44 xs:h-52 sm:h-60 md:h-72 touch-pan-y overflow-hidden rounded-2xl sm:rounded-3xl border border-[var(--glass-border)] shadow-[var(--shadow-premium)] product-card-shell"
+      style={{ perspective: "1400px" }}
       onMouseEnter={pauseAutoSlide}
       onMouseLeave={() => {
         resetAutoSlide();
@@ -90,8 +90,8 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
             style={{
               opacity: isActive ? 1 : 0,
               transform: isActive
-                ? "rotateY(0deg) translateX(0)"
-                : `rotateY(${offset > 0 ? -18 : 18}deg) translateX(${offset > 0 ? 40 : -40}px)`,
+                ? "rotateY(0deg) translateZ(0) scale(1)"
+                : `rotateY(${offset > 0 ? -10 : 10}deg) translateX(${offset > 0 ? 28 : -28}px) scale(0.96)`,
               transformStyle: "preserve-3d",
               pointerEvents: isActive ? "auto" : "none",
             }}

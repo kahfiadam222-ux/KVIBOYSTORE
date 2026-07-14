@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Rajdhani } from "next/font/google";
 import { headers } from "next/headers";
 import { SpaceBackground } from "@/components/effects/SpaceBackground";
+import { AmbientOrbs } from "@/components/effects/AmbientOrbs";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -21,8 +22,9 @@ const rajdhani = Rajdhani({
 });
 
 export const metadata: Metadata = {
-  title: "KVIBOYSTORE",
-  description: "Marketplace langganan digital premium — terpercaya, terverifikasi.",
+  title: "KVIBOYSTORE — Marketplace Digital Premium",
+  description:
+    "Marketplace langganan digital premium. Instant delivery, escrow aman, produk terverifikasi.",
 };
 
 export default async function RootLayout({
@@ -60,6 +62,7 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <SpaceBackground />
+        <AmbientOrbs />
         {children}
       </body>
     </html>

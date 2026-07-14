@@ -16,11 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  ShieldCheck,
   CreditCard,
   Gift,
-  MessageCircle,
-  Bell,
 } from "lucide-react";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 
@@ -37,8 +34,8 @@ interface SidebarProps {
 const mainNavItems = [
   { href: "/", label: "Beranda", icon: Home },
   { href: "/orders", label: "Pesanan Saya", icon: Package },
-  { href: "/wishlist", label: "Wishlist", icon: Heart, badge: "3" },
-  { href: "/cart", label: "Keranjang", icon: ShoppingCart, badge: "2" },
+  { href: "/wishlist", label: "Wishlist", icon: Heart },
+  { href: "/cart", label: "Keranjang", icon: ShoppingCart },
 ];
 
 const quickActions = [
@@ -71,29 +68,36 @@ export function Sidebar({ user }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 z-30 h-screen border-r border-glass-border backdrop-blur-2xl transition-all duration-300",
+        "fixed left-0 top-0 z-30 h-screen border-r border-[var(--glass-border)] backdrop-blur-2xl transition-all duration-300",
         "bg-gradient-to-b from-[var(--glass-fill)] via-background/95 to-background/90",
+        "shadow-[8px_0_40px_-24px_rgba(0,0,0,0.45)]",
         collapsed ? "w-[72px]" : "w-[260px]"
       )}
     >
       {/* Logo Section */}
-      <div className="flex h-16 items-center justify-between border-b border-glass-border px-4">
+      <div className="flex h-16 items-center justify-between border-b border-[var(--glass-border)] px-4">
         {!collapsed && (
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[var(--gold)] shadow-lg shadow-primary/20">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[var(--gold)] shadow-[var(--shadow-glow)] transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
-            <span className="font-qurova bg-gradient-to-r from-primary via-[var(--gold-soft)] to-foreground bg-clip-text text-2xl font-bold tracking-tight text-transparent">
-              KV
-            </span>
+            <div className="leading-tight">
+              <span className="font-qurova block bg-gradient-to-r from-primary via-[var(--gold-soft)] to-foreground bg-clip-text text-xl font-bold tracking-tight text-transparent">
+                KVIBOY
+              </span>
+              <span className="text-[9px] uppercase tracking-[0.2em] text-muted-foreground/80">
+                Store
+              </span>
+            </div>
           </Link>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-lg border border-glass-border bg-background/50 text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary hover:border-primary/30",
+            "flex h-8 w-8 items-center justify-center rounded-xl border border-[var(--glass-border)] bg-background/50 text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary hover:border-primary/30",
             collapsed && "mx-auto"
           )}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
@@ -133,18 +137,9 @@ export function Sidebar({ user }: SidebarProps) {
                 >
                   <Icon className="h-[18px] w-[18px]" />
                 </div>
-                {!collapsed && (
-                  <>
-                    <span className="flex-1">{item.label}</span>
-                    {item.badge && (
-                      <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
-                        {item.badge}
-                      </span>
-                    )}
-                  </>
-                )}
+                {!collapsed && <span className="flex-1">{item.label}</span>}
                 {isActive && !collapsed && (
-                  <div className="absolute right-2 h-1.5 w-1.5 rounded-full bg-primary shadow-glow" />
+                  <div className="absolute right-2 h-1.5 w-1.5 rounded-full bg-primary shadow-[var(--shadow-glow)]" />
                 )}
               </Link>
             );
@@ -210,7 +205,7 @@ export function Sidebar({ user }: SidebarProps) {
         </div>
 
         {/* User Section (Bottom) */}
-        <div className="mt-auto border-t border-glass-border px-3 pt-4">
+        <div className="mt-auto border-t border-[var(--glass-border)] px-3 pt-4">
           {!collapsed && user && (
             <div className="mb-3 flex items-center gap-3 rounded-xl bg-glass-fill/50 px-3 py-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/20 text-primary">

@@ -4,6 +4,7 @@ import { getActiveBanners } from "@/lib/banners/queries";
 import { createCheckout } from "./checkout/actions";
 import { BannerCarousel } from "@/components/storefront/BannerCarousel";
 import { VerticalBannerCarousel } from "@/components/storefront/VerticalBannerCarousel";
+import { HeroSection } from "@/components/storefront/HeroSection";
 import { SearchBar } from "@/components/storefront/SearchBar";
 import { TiltCard } from "@/components/effects/TiltCard";
 import { Badge } from "@/components/ui/badge";
@@ -39,41 +40,52 @@ export default async function StorefrontPage({
   const verticalBanners = banners.filter((b) => b.layout === "vertical");
 
   return (
-    <main className="mx-auto max-w-7xl px-3 py-10 sm:px-6 lg:px-8">
-      <SearchBar defaultValue={q} />
-
-      {verticalBanners.length > 0 ? (
-        <div className="mb-10 flex flex-col md:flex-row gap-3 sm:gap-4">
-          <div className="min-w-0 w-full md:flex-[2.2]">
-            <BannerCarousel banners={horizontalBanners} />
-          </div>
-          <div className="min-w-0 w-full md:flex-1">
-            <VerticalBannerCarousel banners={verticalBanners} />
-          </div>
-        </div>
+    <main className="mx-auto max-w-7xl px-3 py-6 sm:px-6 sm:py-10 lg:px-8">
+      {!q ? (
+        <HeroSection searchQuery={q} productCount={listings.length} />
       ) : (
-        <div className="mb-10">
-          <BannerCarousel banners={horizontalBanners} />
+        <div className="mb-8 max-w-2xl mx-auto">
+          <SearchBar defaultValue={q} />
         </div>
       )}
 
-      {/* ── Gold line transition between banner and products ── */}
-      <div className="gold-line mb-10 opacity-60" />
+      {!q && (horizontalBanners.length > 0 || verticalBanners.length > 0) && (
+        <>
+          {verticalBanners.length > 0 ? (
+            <div className="mb-10 flex flex-col md:flex-row gap-3 sm:gap-4">
+              <div className="min-w-0 w-full md:flex-[2.2]">
+                <BannerCarousel banners={horizontalBanners} />
+              </div>
+              <div className="min-w-0 w-full md:flex-1">
+                <VerticalBannerCarousel banners={verticalBanners} />
+              </div>
+            </div>
+          ) : (
+            <div className="mb-10">
+              <BannerCarousel banners={horizontalBanners} />
+            </div>
+          )}
+        </>
+      )}
 
-      <header className="mb-8">
-        <p className="eyebrow mb-2">Koleksi Premium</p>
-        <h1 className="heading-display text-3xl sm:text-4xl">
+      <div className="gold-line mb-8 opacity-50" />
+
+      <header id="produk" className="mb-7 scroll-mt-24">
+        <span className="section-pill mb-3">Katalog</span>
+        <h2 className="heading-display text-2xl sm:text-3xl mt-2">
           {q ? (
-            <>Hasil untuk &ldquo;{q}&rdquo;</>
+            <>
+              Hasil untuk{" "}
+              <span className="text-premium">&ldquo;{q}&rdquo;</span>
+            </>
           ) : (
             <>
-              Produk{" "}
-              <span className="text-premium">Pilihan</span>
+              Produk <span className="text-premium">pilihan</span>
             </>
           )}
-        </h1>
-        <p className="mt-2 text-muted-foreground text-sm sm:text-base">
-          Marketplace langganan digital premium — terpercaya, terverifikasi.
+        </h2>
+        <p className="mt-2 text-muted-foreground text-sm sm:text-base max-w-xl">
+          Lisensi & langganan digital premium — terverifikasi, siap pakai.
         </p>
         {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
       </header>
@@ -95,19 +107,25 @@ export default async function StorefrontPage({
               />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-foreground">Produk tidak ditemukan</h3>
+          <h3 className="text-xl font-bold text-foreground">
+            Produk tidak ditemukan
+          </h3>
           <p className="mt-2.5 text-sm text-muted-foreground leading-relaxed">
-            Kami tidak menemukan produk yang cocok dengan pencarian Anda. Coba masukkan kata kunci yang berbeda.
+            Kami tidak menemukan produk yang cocok. Coba kata kunci lain atau
+            jelajahi kategori di sidebar.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {listings.map((listing) => {
             const tier = getDeliveryLabel(listing);
             return (
-              <TiltCard key={listing.listingId} className="relative rounded-xl sm:rounded-2xl">
-                <Card className="h-full glass-card rounded-[inherit] transition-shadow duration-300 hover:shadow-[var(--shadow-glow)]">
-                  <div className="h-20 sm:h-28 w-full overflow-hidden relative rounded-t-[inherit]">
+              <TiltCard
+                key={listing.listingId}
+                className="relative rounded-2xl product-card-shell"
+              >
+                <Card className="h-full glass-card rounded-[inherit] border-0 shadow-none transition-shadow duration-300 hover:shadow-[var(--shadow-glow)]">
+                  <div className="h-24 sm:h-32 w-full overflow-hidden relative rounded-t-[inherit]">
                     <div
                       className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover/card:scale-110"
                       style={{
@@ -116,11 +134,19 @@ export default async function StorefrontPage({
                           : "var(--primary-gradient)",
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-card/95 via-card/30 to-transparent opacity-75" />
-                    <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 flex flex-col gap-1 items-start">
+                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent opacity-80" />
+                    <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
                       {listing.isPlatformOwned && (
                         <Badge className="bg-[var(--glass-fill)] backdrop-blur-lg text-[var(--gold)] border-[var(--glass-border)] text-[8px] sm:text-[9px] font-bold py-0.5 px-1.5 shadow-sm rounded-md flex items-center gap-0.5">
-                          <svg className="h-2 w-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <svg
+                            className="h-2 w-2 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
                             <path d="m9 12 2 2 4-4" />
                             <path d="M12 2 4 5v6.09c0 5.05 3.41 9.76 8 11.91 4.59-2.15 8-6.86 8-11.91V5l-8-3z" />
                           </svg>
@@ -128,31 +154,44 @@ export default async function StorefrontPage({
                         </Badge>
                       )}
                     </div>
-                    <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2">
+                    <div className="absolute top-2 right-2">
                       <Badge className="bg-[var(--glass-fill)] backdrop-blur-lg text-foreground border-[var(--glass-border)] text-[8px] sm:text-[9px] font-semibold py-0.5 px-1.5 shadow-sm rounded-md">
                         {tier.label.replace(" Delivery", "")}
                       </Badge>
                     </div>
                   </div>
-                  <CardHeader className="p-2 sm:p-3 pb-0 space-y-0.5">
-                    <CardTitle className="text-xs sm:text-sm font-bold truncate">{listing.productTypeName}</CardTitle>
-                    <CardDescription className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1">{tier.description}</CardDescription>
+                  <CardHeader className="p-2.5 sm:p-3.5 pb-0 space-y-0.5">
+                    <CardTitle className="text-xs sm:text-sm font-bold truncate">
+                      {listing.productTypeName}
+                    </CardTitle>
+                    <CardDescription className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1">
+                      {tier.description}
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="p-2 sm:p-3 pt-1.5 sm:pt-2 pb-1.5 sm:pb-2 flex-grow">
+                  <CardContent className="p-2.5 sm:p-3.5 pt-2 pb-2 flex-grow">
                     <p className="text-sm sm:text-base font-extrabold text-primary drop-shadow-[0_0_10px_color-mix(in_oklch,var(--gold)_35%,transparent)]">
                       {formatPrice(listing.price, listing.currency)}
                     </p>
-                    {!listing.isPlatformOwned && listing.sellerReputation !== null && (
-                      <p className="mt-0.5 text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-0.5">
-                        <span>⭐</span>
-                        <span>{listing.sellerReputation.toFixed(1)}</span>
-                      </p>
-                    )}
+                    {!listing.isPlatformOwned &&
+                      listing.sellerReputation !== null && (
+                        <p className="mt-0.5 text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-0.5">
+                          <span>⭐</span>
+                          <span>{listing.sellerReputation.toFixed(1)}</span>
+                        </p>
+                      )}
                   </CardContent>
-                  <CardFooter className="p-2 sm:p-3 pt-0 border-t-0 bg-transparent">
+                  <CardFooter className="p-2.5 sm:p-3.5 pt-0 border-t-0 bg-transparent">
                     <form action={createCheckout} className="w-full">
-                      <input type="hidden" name="listingId" value={listing.listingId} />
-                      <Button type="submit" size="xs" className="w-full text-[10px] sm:text-xs font-semibold h-7 sm:h-8 rounded-lg sm:rounded-xl">
+                      <input
+                        type="hidden"
+                        name="listingId"
+                        value={listing.listingId}
+                      />
+                      <Button
+                        type="submit"
+                        size="xs"
+                        className="w-full text-[10px] sm:text-xs font-semibold h-8 sm:h-9 rounded-xl"
+                      >
                         Beli Sekarang
                       </Button>
                     </form>
@@ -163,6 +202,24 @@ export default async function StorefrontPage({
           })}
         </div>
       )}
+
+      <footer className="mt-16 mb-4">
+        <div className="gold-line mb-8 opacity-40" />
+        <div className="glass-panel rounded-2xl px-5 py-6 sm:px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="font-qurova text-lg font-bold tracking-wide text-premium">
+              KVIBOYSTORE
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground max-w-md">
+              Marketplace langganan digital premium. Aman, cepat, dan
+              terverifikasi.
+            </p>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            © {new Date().getFullYear()} KVIBOYSTORE · Built for modern buyers
+          </p>
+        </div>
+      </footer>
     </main>
   );
 }

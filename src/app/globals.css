@@ -500,3 +500,178 @@
   font-family: var(--font-qurova), sans-serif;
   letter-spacing: 0.05em;
 }
+
+/* ── Startup depth layer: soft orbs + film grain ── */
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(64px);
+  opacity: 0.45;
+  will-change: transform;
+  animation: orb-float 22s ease-in-out infinite alternate;
+}
+.ambient-orb-a {
+  width: min(42vw, 420px);
+  height: min(42vw, 420px);
+  top: -8%;
+  left: 8%;
+  background: color-mix(in oklch, var(--primary) 38%, transparent);
+  animation-duration: 24s;
+}
+.ambient-orb-b {
+  width: min(36vw, 360px);
+  height: min(36vw, 360px);
+  top: 35%;
+  right: -6%;
+  background: color-mix(in oklch, var(--gold) 28%, transparent);
+  animation-duration: 28s;
+  animation-delay: -6s;
+}
+.ambient-orb-c {
+  width: min(30vw, 300px);
+  height: min(30vw, 300px);
+  bottom: 5%;
+  left: 30%;
+  background: color-mix(in oklch, #3B82F6 22%, transparent);
+  animation-duration: 26s;
+  animation-delay: -12s;
+}
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+@keyframes orb-float {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(-2%, 2%, 0) scale(0.98);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ambient-orb {
+    animation: none;
+  }
+}
+
+/* Hero glass shell with subtle 3D bevel */
+@utility glass-hero {
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--card) 72%, transparent) 0%,
+      color-mix(in oklch, var(--glass-fill) 88%, transparent) 100%
+    );
+  backdrop-filter: blur(28px) saturate(1.5);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 0.5px color-mix(in oklch, var(--gold) 14%, transparent),
+    0 28px 60px -28px rgba(0, 0, 0, 0.45),
+    0 0 0 1px color-mix(in oklch, var(--primary) 8%, transparent);
+  position: relative;
+  overflow: hidden;
+}
+.glass-hero::before {
+  content: "";
+  position: absolute;
+  inset: -40% auto auto -10%;
+  width: 55%;
+  height: 80%;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in oklch, var(--primary) 16%, transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+.glass-hero::after {
+  content: "";
+  position: absolute;
+  right: -15%;
+  top: 10%;
+  width: 45%;
+  height: 70%;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in oklch, var(--gold) 12%, transparent),
+    transparent 72%
+  );
+  pointer-events: none;
+}
+
+/* Perspective accent plane behind hero (desktop) */
+.hero-depth-plane {
+  transform: perspective(900px) rotateY(-12deg) rotateX(6deg) translateZ(0);
+  border-radius: 2rem;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--primary) 18%, transparent),
+      color-mix(in oklch, var(--gold) 10%, transparent) 55%,
+      transparent
+    );
+  border: 1px solid color-mix(in oklch, var(--glass-border) 80%, transparent);
+  box-shadow: var(--shadow-premium);
+  opacity: 0.55;
+  filter: blur(0.5px);
+}
+
+/* Product card edge sheen for depth */
+@utility product-card-shell {
+  position: relative;
+  isolation: isolate;
+}
+.product-card-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklch, white 22%, transparent),
+    transparent 40%,
+    color-mix(in oklch, var(--primary) 25%, transparent) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.7;
+}
+
+/* Section label pill */
+@utility section-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--gold) 85%, var(--foreground));
+  background: color-mix(in oklch, var(--gold) 10%, transparent);
+  border: 1px solid color-mix(in oklch, var(--gold) 22%, transparent);
+}
+
+/* Smooth scrollbar for sidebar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklch, var(--border) 80%, transparent) transparent;
+}
