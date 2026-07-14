@@ -43,11 +43,11 @@ export default async function StorefrontPage({
       <SearchBar defaultValue={q} />
 
       {verticalBanners.length > 0 ? (
-        <div className="mb-10 flex flex-row gap-3 sm:gap-4">
-          <div className="min-w-0 flex-[2.2]">
+        <div className="mb-10 flex flex-col md:flex-row gap-3 sm:gap-4">
+          <div className="min-w-0 w-full md:flex-[2.2]">
             <BannerCarousel banners={horizontalBanners} />
           </div>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 w-full md:flex-1">
             <VerticalBannerCarousel banners={verticalBanners} />
           </div>
         </div>
@@ -117,20 +117,20 @@ export default async function StorefrontPage({
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-card/95 via-card/30 to-transparent opacity-75" />
-                    {listing.isPlatformOwned && (
-                      <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2">
-                        <Badge className="bg-[var(--glass-fill)] backdrop-blur-lg text-[var(--gold)] border-[var(--glass-border)] text-[9px] sm:text-[10px] font-bold py-0.5 px-1.5 sm:px-2 shadow-sm rounded-full flex items-center gap-0.5">
-                          <svg className="h-2.5 w-2.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 flex flex-col gap-1 items-start">
+                      {listing.isPlatformOwned && (
+                        <Badge className="bg-[var(--glass-fill)] backdrop-blur-lg text-[var(--gold)] border-[var(--glass-border)] text-[8px] sm:text-[9px] font-bold py-0.5 px-1.5 shadow-sm rounded-md flex items-center gap-0.5">
+                          <svg className="h-2 w-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                             <path d="m9 12 2 2 4-4" />
                             <path d="M12 2 4 5v6.09c0 5.05 3.41 9.76 8 11.91 4.59-2.15 8-6.86 8-11.91V5l-8-3z" />
                           </svg>
                           Resmi
                         </Badge>
-                      </div>
-                    )}
+                      )}
+                    </div>
                     <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2">
-                      <Badge className="bg-[var(--glass-fill)] backdrop-blur-lg text-foreground border-[var(--glass-border)] text-[9px] sm:text-[10px] font-semibold py-0.5 px-1.5 sm:px-2 shadow-sm rounded-full">
-                        {tier.label}
+                      <Badge className="bg-[var(--glass-fill)] backdrop-blur-lg text-foreground border-[var(--glass-border)] text-[8px] sm:text-[9px] font-semibold py-0.5 px-1.5 shadow-sm rounded-md">
+                        {tier.label.replace(" Delivery", "")}
                       </Badge>
                     </div>
                   </div>
