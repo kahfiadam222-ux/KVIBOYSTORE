@@ -814,3 +814,26 @@
   scrollbar-width: thin;
   scrollbar-color: color-mix(in oklch, var(--border) 80%, transparent) transparent;
 }
+
+/* Floating 3D banner — glass + soft neumorphism */
+.float-banner-card {
+  background: color-mix(in oklch, var(--card) 55%, transparent);
+  border: 1px solid color-mix(in oklch, white 14%, var(--glass-border));
+  backdrop-filter: blur(18px) saturate(1.35);
+  box-shadow:
+    10px 14px 28px -8px rgba(0, 0, 0, 0.45),
+    -6px -6px 18px -10px color-mix(in oklch, white 12%, transparent),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.15),
+    0 0 0 1px color-mix(in oklch, var(--primary) 8%, transparent);
+  transform: translateZ(0);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.float-banner-card:hover {
+  box-shadow:
+    14px 20px 36px -8px rgba(0, 0, 0, 0.5),
+    -8px -8px 22px -10px color-mix(in oklch, white 14%, transparent),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.16),
+    0 0 40px -12px color-mix(in oklch, var(--primary) 35%, transparent);
+}
+

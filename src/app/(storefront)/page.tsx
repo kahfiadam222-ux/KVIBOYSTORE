@@ -1,9 +1,14 @@
 import { getActiveListings } from "@/lib/catalog/queries";
 import { getDeliveryLabel } from "@/lib/catalog/tierLabels";
 import { getActiveBanners } from "@/lib/banners/queries";
+import {
+  getFloatBanners,
+  getStorefrontHero,
+} from "@/lib/storefront/queries";
 import { createCheckout } from "./checkout/actions";
 import { BannerCarousel } from "@/components/storefront/BannerCarousel";
 import { VerticalBannerCarousel } from "@/components/storefront/VerticalBannerCarousel";
+import { FloatingBanners3D } from "@/components/storefront/FloatingBanners3D";
 import { HeroSection } from "@/components/storefront/HeroSection";
 import { SearchBar } from "@/components/storefront/SearchBar";
 import { TiltCard } from "@/components/effects/TiltCard";
@@ -32,9 +37,11 @@ export default async function StorefrontPage({
   searchParams: Promise<{ error?: string; q?: string }>;
 }) {
   const { error, q } = await searchParams;
-  const [listings, banners] = await Promise.all([
+  const [listings, banners, hero, floatBanners] = await Promise.all([
     getActiveListings(q),
     getActiveBanners(),
+    getStorefrontHero(),
+    getFloatBanners(),
   ]);
   const horizontalBanners = banners.filter((b) => b.layout === "horizontal");
   const verticalBanners = banners.filter((b) => b.layout === "vertical");
@@ -42,11 +49,19 @@ export default async function StorefrontPage({
   return (
     <main className="mx-auto max-w-7xl px-3 py-6 sm:px-6 sm:py-10 lg:px-8">
       {!q ? (
-        <HeroSection searchQuery={q} productCount={listings.length} />
+        <HeroSection
+          searchQuery={q}
+          productCount={listings.length}
+          content={hero}
+        />
       ) : (
         <div className="mb-8 max-w-2xl mx-auto">
           <SearchBar defaultValue={q} />
         </div>
+      )}
+
+      {!q && floatBanners.length > 0 && (
+        <FloatingBanners3D banners={floatBanners} />
       )}
 
       {!q && (horizontalBanners.length > 0 || verticalBanners.length > 0) && (
