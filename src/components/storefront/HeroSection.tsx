@@ -45,7 +45,7 @@ export function HeroSection({
         className="hero-depth-plane pointer-events-none absolute -right-8 top-0 hidden h-full w-[48%] md:block"
       />
 
-      <div className="relative glass-hero rounded-2xl sm:rounded-[1.5rem] border border-[var(--glass-border)] px-4 py-5 sm:px-8 sm:py-8 lg:px-10 lg:py-8.5">
+      <div className="relative glass-hero rounded-[2rem] sm:rounded-[2.5rem] border border-[var(--glass-border)] px-4 py-5 sm:px-8 sm:py-8 lg:px-10 lg:py-8.5">
         <div className="relative z-[1] max-w-2xl">
           <p className="eyebrow mb-2.5 text-[9px] sm:text-[10px]">{content.eyebrow}</p>
           <h1 className="heading-display text-[1.4rem] leading-tight sm:text-3xl lg:text-[2.2rem]">
@@ -70,7 +70,7 @@ export function HeroSection({
             href={content.ctaPrimaryHref || "#produk"}
             className={cn(
               buttonVariants({ size: "lg" }),
-              "group/cta h-9 sm:h-10 w-full sm:w-auto rounded-2xl px-5 sm:px-6 text-xs sm:text-sm font-bold gap-2 justify-center",
+              "group/cta h-9 sm:h-10 w-full sm:w-auto rounded-xl px-5 sm:px-6 text-xs sm:text-sm font-bold gap-2 justify-center",
               "shadow-[0_8px_16px_-6px_color-mix(in_oklch,var(--primary)_45%,transparent)] hover:shadow-[0_12px_24px_-8px_color-mix(in_oklch,var(--primary)_50%,transparent)]",
               "border border-white/10"
             )}
@@ -82,7 +82,7 @@ export function HeroSection({
             href={content.ctaSecondaryHref || "/promo"}
             className={cn(
               buttonVariants({ variant: "outline", size: "lg" }),
-              "h-9 sm:h-10 w-full sm:w-auto rounded-2xl px-5 sm:px-6 text-xs sm:text-sm font-semibold border-[var(--glass-border)] bg-[var(--glass-fill)]/80 backdrop-blur justify-center"
+              "h-9 sm:h-10 w-full sm:w-auto rounded-xl px-5 sm:px-6 text-xs sm:text-sm font-semibold border-[var(--glass-border)] bg-[var(--glass-fill)]/80 backdrop-blur justify-center"
             )}
           >
             {content.ctaSecondaryLabel}
@@ -102,7 +102,7 @@ export function HeroSection({
           {trustPoints.map(({ icon: Icon, title, desc }) => (
             <li
               key={title}
-              className="flex items-start gap-2.5 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-fill)]/50 px-3 py-2.5 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
+              className="flex items-start gap-2.5 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-fill)]/50 px-3 py-2.5 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
             >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <Icon className="h-3.5 w-3.5" />

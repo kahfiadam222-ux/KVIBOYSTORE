@@ -134,7 +134,7 @@ export default async function StorefrontPage({
             return (
               <TiltCard
                 key={listing.listingId}
-                className="group/card relative rounded-2xl product-card-shell"
+                className="group/card relative rounded-xl product-card-shell"
               >
                 <Card className="h-full glass-card rounded-[inherit] border-0 shadow-none transition-shadow duration-300 hover:shadow-[var(--shadow-glow)]">
                   <div className="h-28 sm:h-36 w-full overflow-hidden relative rounded-t-[inherit]">

@@ -50,7 +50,7 @@ export function VerticalBannerCarousel({ banners }: { banners: HomepageBanner[] 
 
   return (
     <div
-      className="group relative h-36 sm:h-44 md:h-52 lg:h-64 touch-pan-x overflow-hidden rounded-xl sm:rounded-2xl md:rounded-3xl border border-border"
+      className="group relative h-36 sm:h-44 md:h-52 lg:h-64 touch-pan-x overflow-hidden rounded-2xl sm:rounded-[2.25rem] border border-border"
       style={{ perspective: "1200px" }}
       onMouseEnter={pauseAutoSlide}
       onMouseLeave={() => {

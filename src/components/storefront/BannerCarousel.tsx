@@ -50,7 +50,7 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
 
   return (
     <div
-      className="group relative h-40 sm:h-52 md:h-60 lg:h-72 touch-pan-y overflow-hidden rounded-xl sm:rounded-2xl md:rounded-3xl border border-[var(--glass-border)] shadow-[var(--shadow-premium)] product-card-shell"
+      className="group relative h-40 sm:h-52 md:h-60 lg:h-72 touch-pan-y overflow-hidden rounded-2xl sm:rounded-[2.25rem] border border-[var(--glass-border)] shadow-[var(--shadow-premium)] product-card-shell"
       style={{ perspective: "1400px" }}
       onMouseEnter={pauseAutoSlide}
       onMouseLeave={() => {
