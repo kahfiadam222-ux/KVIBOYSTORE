@@ -44,12 +44,13 @@ export function HeroSection({
 }) {
   const [slide, setSlide] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const touchStartX = useRef<number | null>(null);
 
   const resetTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setSlide((s) => (s === 0 ? 1 : 0));
-    }, 15000); // Shift every 15 seconds
+    }, 15000); // Auto-slide shift every 15 seconds
   }, []);
 
   useEffect(() => {
@@ -64,6 +65,23 @@ export function HeroSection({
     resetTimer();
   };
 
+  // Touch Swipe Gesture support
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    const SWIPE_THRESHOLD_PX = 50;
+    if (Math.abs(delta) > SWIPE_THRESHOLD_PX) {
+      // Swiping right/left switches the 2 slides
+      setSlide((s) => (s === 0 ? 1 : 0));
+      resetTimer();
+    }
+    touchStartX.current = null;
+  };
+
   return (
     <section className="relative mb-6 select-none">
       {/* Unified Outer Glass-hero Card */}
@@ -73,9 +91,11 @@ export function HeroSection({
           className="hero-depth-plane pointer-events-none absolute -right-8 top-0 hidden h-full w-[48%] md:block"
         />
 
-        {/* 3D Carousel Slider Wrapper (Only wraps copy and CTA area) */}
+        {/* 3D Carousel Slider Wrapper (Fixed Height to prevent vertical stacking and jumps) */}
         <div
-          className="relative w-full overflow-visible"
+          className="relative w-full h-[510px] sm:h-[390px] md:h-[315px] overflow-visible"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           style={{
             perspective: "1500px",
             transformStyle: "preserve-3d",
@@ -83,7 +103,7 @@ export function HeroSection({
         >
           {/* Slide 1: Copy, Floating Banners, and CTA Buttons */}
           <div
-            className="transition-all duration-700 ease-out"
+            className="absolute inset-0 w-full h-full transition-all duration-700 ease-out"
             style={{
               opacity: slide === 0 ? 1 : 0,
               transform: slide === 0
@@ -91,10 +111,8 @@ export function HeroSection({
                 : "rotateY(12deg) translateZ(-120px) scale(0.96) translateX(-100%)",
               transformStyle: "preserve-3d",
               pointerEvents: slide === 0 ? "auto" : "none",
-              position: slide === 0 ? "relative" : "absolute",
-              top: 0,
-              left: 0,
               width: "100%",
+              height: "100%",
               zIndex: slide === 0 ? 10 : 0,
             }}
           >
@@ -147,9 +165,9 @@ export function HeroSection({
             </div>
           </div>
 
-          {/* Slide 2: Sleek UX Mockup Desktop (Glassmorphic) */}
+          {/* Slide 2: Sleek UX Mockup Desktop (Glassmorphic & CMS Editable) */}
           <div
-            className="transition-all duration-700 ease-out"
+            className="absolute inset-0 w-full h-full transition-all duration-700 ease-out"
             style={{
               opacity: slide === 1 ? 1 : 0,
               transform: slide === 1
@@ -157,14 +175,19 @@ export function HeroSection({
                 : "rotateY(-12deg) translateZ(-120px) scale(0.96) translateX(100%)",
               transformStyle: "preserve-3d",
               pointerEvents: slide === 1 ? "auto" : "none",
-              position: slide === 1 ? "relative" : "absolute",
-              top: 0,
-              left: 0,
               width: "100%",
+              height: "100%",
               zIndex: slide === 1 ? 10 : 0,
             }}
           >
-            <MockupSlide floatBanners={floatBanners} />
+            <MockupSlide
+              floatBanners={floatBanners}
+              slide2Title={content.slide2Title}
+              slide2Description={content.slide2Description}
+              slide2CtaLabel={content.slide2CtaLabel}
+              slide2CtaHref={content.slide2CtaHref}
+              slide2PromoText={content.slide2PromoText}
+            />
           </div>
 
           {/* Manual Slide Navigation Dots */}

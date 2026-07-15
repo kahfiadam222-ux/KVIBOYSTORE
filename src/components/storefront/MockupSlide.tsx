@@ -1,13 +1,24 @@
 "use client";
 
 import React from "react";
-import { Shirt, Sparkles, Compass, Eye, Shield, Laptop } from "lucide-react";
+import Link from "next/link";
+import { Shirt, Compass, Shield, Laptop } from "lucide-react";
 import type { FloatBanner } from "@/lib/storefront/defaults";
 
 export function MockupSlide({
   floatBanners = [],
+  slide2Title = "Kviboystore",
+  slide2Description = "Template e-commerce workspace termodulasi dengan komponen yang dapat diperbarui dari CMS.",
+  slide2CtaLabel = "Discover",
+  slide2CtaHref = "#produk",
+  slide2PromoText = "PROMO DISKON 10% KHUSUS PENGGUNA BARU",
 }: {
   floatBanners?: FloatBanner[];
+  slide2Title?: string;
+  slide2Description?: string;
+  slide2CtaLabel?: string;
+  slide2CtaHref?: string;
+  slide2PromoText?: string;
 }) {
   // Use first 4 float banners or fallback mock preview thumbnails
   const thumbnails = floatBanners.slice(0, 4);
@@ -63,7 +74,7 @@ export function MockupSlide({
 
             {/* Techwear Graphic Mock */}
             <div className="relative flex items-center justify-center h-14 w-14 sm:h-18 sm:w-18 rounded-xl bg-purple-500/10 border border-purple-500/20 shadow-[0_0_20px_rgba(168,85,247,0.1)] transition-all group-hover:scale-105 duration-500">
-              <Shirt className="h-7 w-7 sm:h-9 sm:w-9 text-purple-450 drop-shadow-[0_0_5px_rgba(168,85,247,0.4)]" />
+              <Shirt className="h-7 w-7 sm:h-9 sm:w-9 text-purple-400 drop-shadow-[0_0_5px_rgba(168,85,247,0.4)]" />
               <div className="absolute inset-x-0 bottom-0.5 flex justify-center">
                 <span className="text-[6px] font-mono tracking-wider text-purple-300/80 bg-purple-950/60 px-1 rounded uppercase">Techwear</span>
               </div>
@@ -94,10 +105,10 @@ export function MockupSlide({
 
             <div>
               <h3 className="text-[11px] sm:text-xs font-bold text-white tracking-tight">
-                Kviboystore
+                {slide2Title}
               </h3>
               <p className="mt-0.5 text-[8px] sm:text-[9px] text-zinc-400 leading-normal line-clamp-2">
-                Template e-commerce workspace termodulasi dengan komponen yang dapat diperbarui dari CMS.
+                {slide2Description}
               </p>
             </div>
 
@@ -111,8 +122,9 @@ export function MockupSlide({
                 {Array.from({ length: 4 }).map((_, idx) => {
                   const banner = thumbnails[idx];
                   return (
-                    <div
+                    <Link
                       key={idx}
+                      href={banner ? banner.ctaHref || "#produk" : "#produk"}
                       className="group/thumb aspect-[4/3] rounded border border-zinc-800/80 bg-zinc-900/40 hover:border-purple-500/20 hover:bg-purple-950/10 transition-colors p-0.5 flex flex-col items-center justify-center relative overflow-hidden"
                     >
                       {banner && banner.imageUrl ? (
@@ -130,7 +142,7 @@ export function MockupSlide({
                       <div className="absolute inset-x-0 bottom-0 bg-black/80 text-[4.5px] text-center font-mono py-0.5 truncate text-white/90">
                         {banner ? banner.title.slice(0, 7) : `Slot ${idx + 1}`}
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
@@ -141,12 +153,12 @@ export function MockupSlide({
               <span className="text-[7px] text-zinc-600 font-mono italic">
                 Interactive Grid
               </span>
-              <button
-                type="button"
-                className="rounded-full bg-purple-650 hover:bg-purple-700 text-white font-bold text-[8.5px] py-1 px-3 transition-all shadow-md shadow-purple-500/20 flex items-center gap-1 active:scale-95 cursor-pointer"
+              <Link
+                href={slide2CtaHref}
+                className="rounded-full bg-purple-650 hover:bg-purple-750 text-white font-bold text-[8.5px] py-1 px-3 transition-all shadow-md shadow-purple-500/20 flex items-center gap-1 active:scale-95 text-center leading-none"
               >
-                Discover
-              </button>
+                {slide2CtaLabel}
+              </Link>
             </div>
 
           </div>
@@ -159,7 +171,7 @@ export function MockupSlide({
               <Shield className="h-2.5 w-2.5" />
             </span>
             <p className="text-[8px] sm:text-[9px] font-bold text-white leading-none">
-              PROMO DISKON 10% KHUSUS PENGGUNA BARU
+              {slide2PromoText}
             </p>
           </div>
 

@@ -9,15 +9,44 @@ import {
 export async function getStorefrontHero(): Promise<StorefrontHeroContent> {
   try {
     const supabase = await createClient();
+
+    // Try to select with Slide 2 columns
     const { data, error } = await supabase
       .from("storefront_hero")
       .select(
-        "eyebrow, title, title_highlight, description, cta_primary_label, cta_primary_href, cta_secondary_label, cta_secondary_href"
+        "eyebrow, title, title_highlight, description, cta_primary_label, cta_primary_href, cta_secondary_label, cta_secondary_href, slide2_title, slide2_description, slide2_cta_label, slide2_cta_href, slide2_promo_text"
       )
       .eq("id", 1)
       .maybeSingle();
 
-    if (error || !data) return DEFAULT_HERO;
+    if (error || !data) {
+      // Fallback: select only Slide 1 columns if Slide 2 columns don't exist yet in DB
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from("storefront_hero")
+        .select(
+          "eyebrow, title, title_highlight, description, cta_primary_label, cta_primary_href, cta_secondary_label, cta_secondary_href"
+        )
+        .eq("id", 1)
+        .maybeSingle();
+
+      if (fallbackError || !fallbackData) return DEFAULT_HERO;
+
+      return {
+        eyebrow: fallbackData.eyebrow ?? DEFAULT_HERO.eyebrow,
+        title: fallbackData.title ?? DEFAULT_HERO.title,
+        titleHighlight: fallbackData.title_highlight ?? DEFAULT_HERO.titleHighlight,
+        description: fallbackData.description ?? DEFAULT_HERO.description,
+        ctaPrimaryLabel: fallbackData.cta_primary_label ?? DEFAULT_HERO.ctaPrimaryLabel,
+        ctaPrimaryHref: fallbackData.cta_primary_href ?? DEFAULT_HERO.ctaPrimaryHref,
+        ctaSecondaryLabel: fallbackData.cta_secondary_label ?? DEFAULT_HERO.ctaSecondaryLabel,
+        ctaSecondaryHref: fallbackData.cta_secondary_href ?? DEFAULT_HERO.ctaSecondaryHref,
+        slide2Title: DEFAULT_HERO.slide2Title,
+        slide2Description: DEFAULT_HERO.slide2Description,
+        slide2CtaLabel: DEFAULT_HERO.slide2CtaLabel,
+        slide2CtaHref: DEFAULT_HERO.slide2CtaHref,
+        slide2PromoText: DEFAULT_HERO.slide2PromoText,
+      };
+    }
 
     return {
       eyebrow: data.eyebrow ?? DEFAULT_HERO.eyebrow,
@@ -26,10 +55,13 @@ export async function getStorefrontHero(): Promise<StorefrontHeroContent> {
       description: data.description ?? DEFAULT_HERO.description,
       ctaPrimaryLabel: data.cta_primary_label ?? DEFAULT_HERO.ctaPrimaryLabel,
       ctaPrimaryHref: data.cta_primary_href ?? DEFAULT_HERO.ctaPrimaryHref,
-      ctaSecondaryLabel:
-        data.cta_secondary_label ?? DEFAULT_HERO.ctaSecondaryLabel,
-      ctaSecondaryHref:
-        data.cta_secondary_href ?? DEFAULT_HERO.ctaSecondaryHref,
+      ctaSecondaryLabel: data.cta_secondary_label ?? DEFAULT_HERO.ctaSecondaryLabel,
+      ctaSecondaryHref: data.cta_secondary_href ?? DEFAULT_HERO.ctaSecondaryHref,
+      slide2Title: data.slide2_title ?? DEFAULT_HERO.slide2Title,
+      slide2Description: data.slide2_description ?? DEFAULT_HERO.slide2Description,
+      slide2CtaLabel: data.slide2_cta_label ?? DEFAULT_HERO.slide2CtaLabel,
+      slide2CtaHref: data.slide2_cta_href ?? DEFAULT_HERO.slide2CtaHref,
+      slide2PromoText: data.slide2_promo_text ?? DEFAULT_HERO.slide2PromoText,
     };
   } catch {
     return DEFAULT_HERO;

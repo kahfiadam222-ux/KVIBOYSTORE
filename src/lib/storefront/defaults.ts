@@ -7,6 +7,12 @@ export type StorefrontHeroContent = {
   ctaPrimaryHref: string;
   ctaSecondaryLabel: string;
   ctaSecondaryHref: string;
+  // Slide 2 CMS editable fields
+  slide2Title: string;
+  slide2Description: string;
+  slide2CtaLabel: string;
+  slide2CtaHref: string;
+  slide2PromoText: string;
 };
 
 export type FloatBanner = {
@@ -29,6 +35,13 @@ export const DEFAULT_HERO: StorefrontHeroContent = {
   ctaPrimaryHref: "#produk",
   ctaSecondaryLabel: "Lihat promo",
   ctaSecondaryHref: "/promo",
+  // Slide 2 CMS defaults
+  slide2Title: "Kviboystore",
+  slide2Description:
+    "Template e-commerce workspace termodulasi dengan komponen yang dapat diperbarui dari CMS.",
+  slide2CtaLabel: "Discover",
+  slide2CtaHref: "#produk",
+  slide2PromoText: "PROMO DISKON 10% KHUSUS PENGGUNA BARU",
 };
 
 export const DEFAULT_FLOAT_BANNERS: FloatBanner[] = [

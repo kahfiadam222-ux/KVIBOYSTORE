@@ -31,6 +31,19 @@ export async function updateStorefrontHero(
       String(formData.get("ctaSecondaryLabel") ?? "").trim() || "Lihat promo",
     cta_secondary_href:
       String(formData.get("ctaSecondaryHref") ?? "").trim() || "/promo",
+    // Slide 2 fields
+    slide2_title:
+      String(formData.get("slide2Title") ?? "").trim() || "Kviboystore",
+    slide2_description:
+      String(formData.get("slide2Description") ?? "").trim() ||
+      "Template e-commerce workspace termodulasi.",
+    slide2_cta_label:
+      String(formData.get("slide2CtaLabel") ?? "").trim() || "Discover",
+    slide2_cta_href:
+      String(formData.get("slide2CtaHref") ?? "").trim() || "#produk",
+    slide2_promo_text:
+      String(formData.get("slide2PromoText") ?? "").trim() ||
+      "PROMO DISKON 10% KHUSUS PENGGUNA BARU",
     updated_at: new Date().toISOString(),
   };
 
@@ -41,7 +54,7 @@ export async function updateStorefrontHero(
       ok: false,
       error:
         error.message +
-        " — pastikan migration 0013_storefront_cms.sql sudah dijalankan di Supabase.",
+        " — pastikan migration 0015_storefront_cms_slide2.sql sudah dijalankan di Supabase.",
     };
   }
 
