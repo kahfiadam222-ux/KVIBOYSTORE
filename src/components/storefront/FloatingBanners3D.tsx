@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import type { FloatBanner } from "@/lib/storefront/defaults";
 import { cn } from "@/lib/utils";
 import { X, ExternalLink } from "lucide-react";
@@ -10,7 +11,7 @@ import { buttonVariants } from "@/components/ui/button";
 /**
  * 4-slot circular glossy carousel.
  * Rotation + depth are applied via rAF/DOM only (no React re-renders per frame).
- * Click to Zoom-in Modal feature is integrated elegantly.
+ * Click to Zoom-in Modal feature with React Portal for absolute z-index isolation.
  */
 export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
   const items = banners.slice(0, 4);
@@ -19,20 +20,26 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const rotRef = useRef(0);
   const velRef = useRef(0);
-  const dragRef = useRef({ active: false, lastX: 0, moved: false });
+  const dragRef = useRef({ active: false, startX: 0, startY: 0, lastX: 0, moved: false });
   const pausedRef = useRef(false);
   const reducedRef = useRef(false);
   const radiusRef = useRef(150);
 
-  // State untuk banner yang sedang dizoom
+  // Mounted status untuk React Portal
+  const [mounted, setMounted] = useState(false);
   const [zoomedBanner, setZoomedBanner] = useState<FloatBanner | null>(null);
   const [modalStage, setModalStage] = useState<"enter" | "exit">("exit");
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // Handle open/close modal zoom
   const handleOpenZoom = (banner: FloatBanner) => {
     setZoomedBanner(banner);
     setModalStage("enter");
-    document.body.style.overflow = "hidden"; // Kunci scroll di belakang
+    document.body.style.overflow = "hidden"; // Kunci scroll
   };
 
   const handleCloseZoom = () => {
@@ -40,7 +47,7 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
     setTimeout(() => {
       setZoomedBanner(null);
       document.body.style.overflow = "";
-    }, 180); // Sesuai durasi fade-out cepat
+    }, 200); // Durasi fade-out cepat
   };
 
   useEffect(() => {
@@ -88,8 +95,8 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
         el.style.zIndex = String(Math.round(10 + t * 90));
         el.style.filter = `brightness(${0.72 + t * 0.38}) saturate(${0.85 + t * 0.2})`;
 
-        // Hanya izinkan interaksi mouse/klik pada banner depan
-        el.style.pointerEvents = facing > 0.15 ? "auto" : "none";
+        // Di PC, pastikan card depan (facing > 0) bisa merespon pointer secara andal
+        el.style.pointerEvents = facing > -0.1 ? "auto" : "none";
       }
     };
 
@@ -98,7 +105,6 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
       last = now;
       const sec = dt / 1000;
 
-      // Hentikan putaran otomatis jika modal sedang terbuka
       const isModalActive = zoomedBanner !== null || modalStage === "enter";
 
       if (!dragRef.current.active && !pausedRef.current && !reducedRef.current && !isModalActive) {
@@ -139,7 +145,13 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
     const onPointerDown = (e: PointerEvent) => {
       if (zoomedBanner) return;
       if (e.button !== 0 && e.pointerType === "mouse") return;
-      dragRef.current = { active: true, lastX: e.clientX, moved: false };
+      dragRef.current = {
+        active: true,
+        startX: e.clientX,
+        startY: e.clientY,
+        lastX: e.clientX,
+        moved: false,
+      };
       velRef.current = 0;
       root.setPointerCapture(e.pointerId);
       root.classList.add("is-dragging");
@@ -148,7 +160,16 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
     const onPointerMove = (e: PointerEvent) => {
       if (!dragRef.current.active || zoomedBanner) return;
       const dx = e.clientX - dragRef.current.lastX;
-      if (Math.abs(dx) > 2) dragRef.current.moved = true;
+
+      // Deteksi gerakan jika melampaui toleransi 4px (menghindari micro-movements saat klik murni)
+      const dist = Math.sqrt(
+        Math.pow(e.clientX - dragRef.current.startX, 2) +
+        Math.pow(e.clientY - dragRef.current.startY, 2)
+      );
+      if (dist > 4) {
+        dragRef.current.moved = true;
+      }
+
       dragRef.current.lastX = e.clientX;
       rotRef.current += dx * 0.28;
       velRef.current = Math.max(-MAX_VEL, Math.min(MAX_VEL, dx * 0.09));
@@ -197,6 +218,103 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
 
   if (items.length === 0) return null;
 
+  // React Portal untuk merender modal di tingkat root (di atas semua z-index)
+  const renderModalPortal = () => {
+    if (!mounted || !zoomedBanner) return null;
+
+    return createPortal(
+      <div
+        className={cn(
+          "fixed inset-0 z-[9999] flex items-center justify-center p-4",
+          "bg-black/45 backdrop-blur-[8px] transition-all duration-200 ease-out",
+          modalStage === "enter" ? "opacity-100" : "opacity-0 pointer-events-none"
+        )}
+        onClick={handleCloseZoom}
+      >
+        {/* Main Modal Box - Vertically Oriented Card (aspect-[3/4.2]) */}
+        <div
+          className={cn(
+            "relative w-full max-w-[280px] sm:max-w-[300px] aspect-[3/4.2] overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-b from-[var(--glass-fill)] via-background/98 to-background/96 shadow-2xl backdrop-blur-2xl",
+            "transition-all duration-200 cubic-bezier(0.16, 1, 0.3, 1)",
+            modalStage === "enter" ? "scale-100 opacity-100 translate-y-0" : "scale-[0.88] opacity-0 translate-y-4"
+          )}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Close Button */}
+          <button
+            onClick={handleCloseZoom}
+            className="absolute right-3 top-3 z-20 flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-background/60 text-muted-foreground backdrop-blur-md transition-all hover:bg-white/10 hover:text-foreground active:scale-90 cursor-pointer"
+            aria-label="Tutup zoom"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+
+          {/* Glossy layers */}
+          <span aria-hidden className="float-banner-sheen opacity-40" />
+          <span aria-hidden className="float-banner-rim" />
+
+          {/* Vertical Image */}
+          {zoomedBanner.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={zoomedBanner.imageUrl}
+              alt={zoomedBanner.title}
+              className="absolute inset-0 h-full w-full object-cover object-center select-none"
+              draggable={false}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/35 flex items-center justify-center">
+              <span className="brand-wordmark text-2xl text-premium opacity-50">kviboystore</span>
+            </div>
+          )}
+
+          {/* Dark Scrim overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/45 to-black/85 z-[1]" />
+
+          {/* Content Area */}
+          <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 z-[2] flex flex-col justify-end">
+            <span className="eyebrow block text-primary text-[9px] mb-1 tracking-[0.2em] font-bold">
+              PROMO PILIHAN
+            </span>
+            <h3 className="heading-display text-[14px] sm:text-[15px] font-bold text-white leading-snug drop-shadow-sm">
+              {zoomedBanner.title}
+            </h3>
+            {zoomedBanner.subtitle && (
+              <p className="mt-1.5 text-[10px] sm:text-[11px] text-white/80 leading-normal line-clamp-3">
+                {zoomedBanner.subtitle}
+              </p>
+            )}
+
+            {/* Action Button */}
+            <div className="mt-4 flex gap-2">
+              <Link
+                href={zoomedBanner.ctaHref || "#produk"}
+                onClick={handleCloseZoom}
+                className={cn(
+                  buttonVariants({ variant: "default" }),
+                  "h-8.5 rounded-xl w-full text-[11px] font-bold gap-1.5 justify-center border border-white/10 shadow-[var(--shadow-glow)]"
+                )}
+              >
+                {zoomedBanner.ctaLabel || "Beli Sekarang"}
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+              <button
+                onClick={handleCloseZoom}
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "h-8.5 rounded-xl px-3 text-[11px] font-semibold border-white/15 bg-white/5 text-white backdrop-blur hover:bg-white/10"
+                )}
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>,
+      document.body
+    );
+  };
+
   return (
     <section className="mb-5 select-none" aria-label="Banner">
       <div
@@ -236,6 +354,7 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
                   className="float-banner-card block outline-none text-left focus-visible:ring-2 focus-visible:ring-ring cursor-zoom-in"
                   draggable={false}
                   onClick={(e) => {
+                    // Cek jika ini geseran drag nyata di mouse/touch, abaikan trigger klik
                     if (dragRef.current.moved) {
                       e.preventDefault();
                       dragRef.current.moved = false;
@@ -290,100 +409,8 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
         </div>
       </div>
 
-      {/* Lightbox / Modal Zoom Banner */}
-      {zoomedBanner && (
-        <div
-          className={cn(
-            "fixed inset-0 z-[120] flex items-center justify-center p-4",
-            "bg-black/35 backdrop-blur-[6px] transition-all duration-200 ease-out",
-            modalStage === "enter" ? "opacity-100" : "opacity-0 pointer-events-none"
-          )}
-          onClick={handleCloseZoom}
-        >
-          {/* Main Modal Box - Vertically Oriented Card (aspect-[3/4]) like original banner card */}
-          <div
-            className={cn(
-              "relative w-full max-w-[280px] sm:max-w-[310px] aspect-[3/4.2] overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-b from-[var(--glass-fill)] via-background/98 to-background/96 shadow-2xl backdrop-blur-2xl",
-              "transition-all duration-200 cubic-bezier(0.16, 1, 0.3, 1)",
-              modalStage === "enter" ? "scale-100 opacity-100 translate-z-0" : "scale-[0.88] opacity-0 -translate-z-10"
-            )}
-            style={{
-              transformStyle: "preserve-3d",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button */}
-            <button
-              onClick={handleCloseZoom}
-              className="absolute right-3 top-3 z-20 flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-background/60 text-muted-foreground backdrop-blur-md transition-all hover:bg-white/10 hover:text-foreground active:scale-90 cursor-pointer"
-              aria-label="Tutup zoom"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-
-            {/* Glossy layers */}
-            <span aria-hidden className="float-banner-sheen opacity-40" />
-            <span aria-hidden className="float-banner-rim" />
-
-            {/* Vertical Image */}
-            {zoomedBanner.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={zoomedBanner.imageUrl}
-                alt={zoomedBanner.title}
-                className="absolute inset-0 h-full w-full object-cover object-center select-none"
-                draggable={false}
-              />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/35 flex items-center justify-center">
-                <span className="brand-wordmark text-2xl text-premium opacity-50">kviboystore</span>
-              </div>
-            )}
-
-            {/* Dark Scrim overlay to ensure readable text */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/45 to-black/85 z-[1]" />
-
-            {/* Content Area - Absolute positioned at the bottom of the card */}
-            <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 z-[2] flex flex-col justify-end">
-              <span className="eyebrow block text-primary text-[9px] mb-1 tracking-[0.2em] font-bold">
-                PROMO PILIHAN
-              </span>
-              <h3 className="heading-display text-[14px] sm:text-[15px] font-bold text-white leading-snug drop-shadow-sm">
-                {zoomedBanner.title}
-              </h3>
-              {zoomedBanner.subtitle && (
-                <p className="mt-1.5 text-[10px] sm:text-[11px] text-white/80 leading-normal line-clamp-3">
-                  {zoomedBanner.subtitle}
-                </p>
-              )}
-
-              {/* Action Button */}
-              <div className="mt-4 flex gap-2">
-                <Link
-                  href={zoomedBanner.ctaHref || "#produk"}
-                  onClick={handleCloseZoom}
-                  className={cn(
-                    buttonVariants({ variant: "default" }),
-                    "h-8.5 rounded-xl w-full text-[11px] font-bold gap-1.5 justify-center border border-white/10 shadow-[var(--shadow-glow)]"
-                  )}
-                >
-                  {zoomedBanner.ctaLabel || "Beli Sekarang"}
-                  <ExternalLink className="h-3 w-3" />
-                </Link>
-                <button
-                  onClick={handleCloseZoom}
-                  className={cn(
-                    buttonVariants({ variant: "outline" }),
-                    "h-8.5 rounded-xl px-3 text-[11px] font-semibold border-white/15 bg-white/5 text-white backdrop-blur hover:bg-white/10"
-                  )}
-                >
-                  Tutup
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Render Modal via Portal */}
+      {renderModalPortal()}
     </section>
   );
 }
