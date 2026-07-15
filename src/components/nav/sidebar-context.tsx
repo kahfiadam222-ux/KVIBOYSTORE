@@ -55,7 +55,7 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
     // Hapus kelas preload untuk mengaktifkan transisi setelah render pertama selesai
     const timer = setTimeout(() => {
       document.documentElement.classList.remove("preload");
-    }, 250);
+    }, 600);
 
     // Update layout saat ukuran layar berubah
     const handleResize = () => {
