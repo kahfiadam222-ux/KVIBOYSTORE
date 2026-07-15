@@ -44,20 +44,20 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                var valid = ["theme-daylight","theme-sakura"];
+                var valid = ["theme-daylight","theme-sakura","theme-saffron"];
                 var legacy = {
-                  "theme-editions":"theme-sakura","theme-paper":"theme-daylight","theme-ink":"theme-sakura",
-                  "theme-champagne":"theme-sakura","theme-slate":"theme-sakura","theme-olive":"theme-sakura",
-                  "theme-dusk":"theme-sakura","theme-rose":"theme-sakura","theme-cosmic":"theme-sakura",
-                  "theme-jetblack":"theme-sakura","theme-orchid":"theme-sakura","theme-wineash":"theme-sakura",
-                  "theme-turquoise":"theme-sakura","theme-candyblue":"theme-sakura","theme-lavender":"theme-sakura",
-                  "theme-violet":"theme-sakura","theme-midnight":"theme-sakura","theme-mono":"theme-sakura",
-                  "theme-ocean":"theme-sakura","theme-forest":"theme-sakura","theme-aether":"theme-sakura",
-                  "theme-ember":"theme-sakura"
+                  "theme-editions":"theme-saffron","theme-paper":"theme-daylight","theme-ink":"theme-saffron",
+                  "theme-champagne":"theme-saffron","theme-slate":"theme-saffron","theme-olive":"theme-saffron",
+                  "theme-dusk":"theme-saffron","theme-rose":"theme-saffron","theme-cosmic":"theme-saffron",
+                  "theme-jetblack":"theme-saffron","theme-orchid":"theme-saffron","theme-wineash":"theme-saffron",
+                  "theme-turquoise":"theme-saffron","theme-candyblue":"theme-saffron","theme-lavender":"theme-saffron",
+                  "theme-violet":"theme-saffron","theme-midnight":"theme-saffron","theme-mono":"theme-saffron",
+                  "theme-ocean":"theme-saffron","theme-forest":"theme-saffron","theme-aether":"theme-saffron",
+                  "theme-ember":"theme-saffron"
                 };
                 var t = localStorage.getItem("kvibo-theme");
                 if (legacy[t]) t = legacy[t];
-                if (!t || valid.indexOf(t) === -1) t = "theme-sakura";
+                if (!t || valid.indexOf(t) === -1) t = "theme-saffron";
                 localStorage.setItem("kvibo-theme", t);
                 document.documentElement.classList.add(t);
                 if (t === "theme-daylight") {
