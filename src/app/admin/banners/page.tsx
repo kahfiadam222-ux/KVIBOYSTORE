@@ -67,29 +67,30 @@ export default async function AdminBannersPage() {
 
   const cmsReady = !floatErr;
 
-  const hero: StorefrontHeroContent = heroRow
+  const row = heroRow as any;
+  const hero: StorefrontHeroContent = row
     ? {
-        eyebrow: heroRow.eyebrow ?? DEFAULT_HERO.eyebrow,
-        title: heroRow.title ?? DEFAULT_HERO.title,
-        titleHighlight: heroRow.title_highlight ?? DEFAULT_HERO.titleHighlight,
-        description: heroRow.description ?? DEFAULT_HERO.description,
+        eyebrow: row.eyebrow ?? DEFAULT_HERO.eyebrow,
+        title: row.title ?? DEFAULT_HERO.title,
+        titleHighlight: row.title_highlight ?? DEFAULT_HERO.titleHighlight,
+        description: row.description ?? DEFAULT_HERO.description,
         ctaPrimaryLabel:
-          heroRow.cta_primary_label ?? DEFAULT_HERO.ctaPrimaryLabel,
+          row.cta_primary_label ?? DEFAULT_HERO.ctaPrimaryLabel,
         ctaPrimaryHref:
-          heroRow.cta_primary_href ?? DEFAULT_HERO.ctaPrimaryHref,
+          row.cta_primary_href ?? DEFAULT_HERO.ctaPrimaryHref,
         ctaSecondaryLabel:
-          heroRow.cta_secondary_label ?? DEFAULT_HERO.ctaSecondaryLabel,
+          row.cta_secondary_label ?? DEFAULT_HERO.ctaSecondaryLabel,
         ctaSecondaryHref:
-          heroRow.cta_secondary_href ?? DEFAULT_HERO.ctaSecondaryHref,
-        slide2Title: heroRow.slide2_title ?? DEFAULT_HERO.slide2Title,
+          row.cta_secondary_href ?? DEFAULT_HERO.ctaSecondaryHref,
+        slide2Title: row.slide2_title ?? DEFAULT_HERO.slide2Title,
         slide2Description:
-          heroRow.slide2_description ?? DEFAULT_HERO.slide2Description,
+          row.slide2_description ?? DEFAULT_HERO.slide2Description,
         slide2CtaLabel:
-          heroRow.slide2_cta_label ?? DEFAULT_HERO.slide2CtaLabel,
+          row.slide2_cta_label ?? DEFAULT_HERO.slide2CtaLabel,
         slide2CtaHref:
-          heroRow.slide2_cta_href ?? DEFAULT_HERO.slide2CtaHref,
+          row.slide2_cta_href ?? DEFAULT_HERO.slide2CtaHref,
         slide2PromoText:
-          heroRow.slide2_promo_text ?? DEFAULT_HERO.slide2PromoText,
+          row.slide2_promo_text ?? DEFAULT_HERO.slide2PromoText,
       }
     : DEFAULT_HERO;
 
