@@ -6,7 +6,7 @@ import { SearchBar } from "@/components/storefront/SearchBar";
 import { FloatingBanners3D } from "@/components/storefront/FloatingBanners3D";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ShieldCheck, Zap, BadgeCheck, ArrowRight } from "lucide-react";
+import { ShieldCheck, Zap, BadgeCheck, ArrowRight, ShoppingBag, Monitor } from "lucide-react";
 import type {
   FloatBanner,
   StorefrontHeroContent,
@@ -45,7 +45,6 @@ export function HeroSection({
   const [slide, setSlide] = useState(0);
   const [mounted, setMounted] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const touchStartX = useRef<number | null>(null);
 
   const resetTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -67,22 +66,6 @@ export function HeroSection({
     resetTimer();
   };
 
-  // Touch Swipe gestures on mobile
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return;
-    const delta = e.changedTouches[0].clientX - touchStartX.current;
-    const SWIPE_THRESHOLD_PX = 50;
-    if (Math.abs(delta) > SWIPE_THRESHOLD_PX) {
-      setSlide((s) => (s === 0 ? 1 : 0));
-      resetTimer();
-    }
-    touchStartX.current = null;
-  };
-
   return (
     <section className="relative mb-6 select-none">
       {/* Unified Outer Glass-hero Card */}
@@ -92,11 +75,9 @@ export function HeroSection({
           className="hero-depth-plane pointer-events-none absolute -right-8 top-0 hidden h-full w-[48%] md:block"
         />
 
-        {/* 3D Carousel Slider Wrapper (Fixed Height to prevent vertical stacking and jumps) */}
+        {/* 3D Carousel Slider Wrapper (Fixed Height to prevent vertical stacking and jumps - Manual swipe/drag disabled) */}
         <div
           className="relative w-full h-[510px] sm:h-[390px] md:h-[315px] overflow-visible"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
           style={{
             perspective: "1500px",
             transformStyle: "preserve-3d",
@@ -117,14 +98,15 @@ export function HeroSection({
               zIndex: slide === 0 ? 10 : 0,
             }}
           >
-            <div className="relative z-[1] max-w-2xl">
-              <p className="eyebrow mb-2 text-[9px] sm:text-[10px]">{content.eyebrow}</p>
-              <h1 className="heading-display text-[1.25rem] leading-tight sm:text-2xl lg:text-[1.9rem]">
+            {/* Slide 1 copy with compact fonts for PC to prevent text collisions */}
+            <div className="relative z-[1] max-w-xl md:max-w-2xl">
+              <p className="eyebrow mb-1.5 text-[9px] sm:text-[10px]">{content.eyebrow}</p>
+              <h1 className="heading-display text-[1.2rem] leading-tight sm:text-2xl lg:text-[1.55rem] tracking-tight">
                 {content.title}
                 <br />
                 <span className="text-premium">{content.titleHighlight}</span>
               </h1>
-              <p className="mt-2 max-w-lg text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
+              <p className="mt-1.5 max-w-lg text-[10.5px] sm:text-xs text-muted-foreground leading-relaxed">
                 {content.description}
               </p>
             </div>
@@ -194,30 +176,34 @@ export function HeroSection({
           )}
         </div>
 
-        {/* Circular Manual Slide Navigation Dots (Centered underneath track) */}
-        <div className="flex justify-center gap-2.5 mt-4 z-20">
+        {/* Circular Icon Manual Slide Navigation Buttons (Centered and Intuitive) */}
+        <div className="flex justify-center gap-3 mt-4 z-20">
           <button
             type="button"
             onClick={() => handleNav(0)}
-            aria-label="Slide 1"
+            aria-label="Tampilan Utama/Katalog"
             className={cn(
-              "h-2.5 w-2.5 rounded-full transition-all duration-350 touch-manipulation cursor-pointer border border-white/5",
+              "h-8 w-8 rounded-full border flex items-center justify-center transition-all duration-350 touch-manipulation cursor-pointer backdrop-blur-md",
               slide === 0
-                ? "bg-[var(--gold)] scale-110 shadow-md shadow-amber-500/20"
-                : "bg-white/20 hover:bg-white/45"
+                ? "bg-[var(--gold)]/20 border-[var(--gold)] text-[var(--gold)] scale-110 shadow-lg shadow-amber-500/10"
+                : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
             )}
-          />
+          >
+            <ShoppingBag className="h-4 w-4" />
+          </button>
           <button
             type="button"
             onClick={() => handleNav(1)}
-            aria-label="Slide 2"
+            aria-label="Tampilan Mockup Dashboard"
             className={cn(
-              "h-2.5 w-2.5 rounded-full transition-all duration-350 touch-manipulation cursor-pointer border border-white/5",
+              "h-8 w-8 rounded-full border flex items-center justify-center transition-all duration-350 touch-manipulation cursor-pointer backdrop-blur-md",
               slide === 1
-                ? "bg-[var(--gold)] scale-110 shadow-md shadow-amber-500/20"
-                : "bg-white/20 hover:bg-white/45"
+                ? "bg-[var(--gold)]/20 border-[var(--gold)] text-[var(--gold)] scale-110 shadow-lg shadow-amber-500/10"
+                : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
             )}
-          />
+          >
+            <Monitor className="h-4 w-4" />
+          </button>
         </div>
 
         {/* Divider line separating the slider from static bottom block */}
