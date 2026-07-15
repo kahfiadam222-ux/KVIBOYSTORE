@@ -25,7 +25,9 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
   const reducedRef = useRef(false);
   const radiusRef = useRef(150);
 
-  // Mounted status untuk React Portal
+  // Merekam waktu dan koordinat koordinat pointerdown pada tombol card untuk membedakan klik vs drag
+  const clickStartRef = useRef<{ [key: string]: { x: number; y: number; time: number } }>({});
+
   const [mounted, setMounted] = useState(false);
   const [zoomedBanner, setZoomedBanner] = useState<FloatBanner | null>(null);
   const [modalStage, setModalStage] = useState<"enter" | "exit">("exit");
@@ -35,7 +37,6 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
     return () => setMounted(false);
   }, []);
 
-  // Handle open/close modal zoom
   const handleOpenZoom = (banner: FloatBanner) => {
     setZoomedBanner(banner);
     setModalStage("enter");
@@ -95,8 +96,8 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
         el.style.zIndex = String(Math.round(10 + t * 90));
         el.style.filter = `brightness(${0.72 + t * 0.38}) saturate(${0.85 + t * 0.2})`;
 
-        // Di PC, pastikan card depan (facing > 0) bisa merespon pointer secara andal
-        el.style.pointerEvents = facing > -0.1 ? "auto" : "none";
+        // Di PC & HP, berikan pointerEvents "auto" ke semua card depan untuk interaksi klik yang andal
+        el.style.pointerEvents = facing > -0.05 ? "auto" : "none";
       }
     };
 
@@ -161,7 +162,6 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
       if (!dragRef.current.active || zoomedBanner) return;
       const dx = e.clientX - dragRef.current.lastX;
 
-      // Deteksi gerakan jika melampaui toleransi 4px (menghindari micro-movements saat klik murni)
       const dist = Math.sqrt(
         Math.pow(e.clientX - dragRef.current.startX, 2) +
         Math.pow(e.clientY - dragRef.current.startY, 2)
@@ -218,7 +218,6 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
 
   if (items.length === 0) return null;
 
-  // React Portal untuk merender modal di tingkat root (di atas semua z-index)
   const renderModalPortal = () => {
     if (!mounted || !zoomedBanner) return null;
 
@@ -226,8 +225,8 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
       <div
         className={cn(
           "fixed inset-0 z-[9999] flex items-center justify-center p-4",
-          "bg-black/45 backdrop-blur-[8px] transition-all duration-200 ease-out",
-          modalStage === "enter" ? "opacity-100" : "opacity-0 pointer-events-none"
+          "bg-black/35 backdrop-blur-[6px] transition-all duration-200 ease-out",
+          modalStage === "enter" ? "opacity-100 animate-fade-in-quick" : "opacity-0 pointer-events-none"
         )}
         onClick={handleCloseZoom}
       >
@@ -340,9 +339,10 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
           }}
         >
           {items.map((banner, i) => {
+            const key = banner.slot;
             return (
               <div
-                key={banner.slot}
+                key={key}
                 ref={(node) => {
                   cardRefs.current[i] = node;
                 }}
@@ -353,14 +353,27 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
                   type="button"
                   className="float-banner-card block outline-none text-left focus-visible:ring-2 focus-visible:ring-ring cursor-zoom-in"
                   draggable={false}
-                  onClick={(e) => {
-                    // Cek jika ini geseran drag nyata di mouse/touch, abaikan trigger klik
-                    if (dragRef.current.moved) {
+                  onPointerDown={(e) => {
+                    // Simpan koordinat awal saat pointer ditekan di card
+                    clickStartRef.current[key] = {
+                      x: e.clientX,
+                      y: e.clientY,
+                      time: Date.now(),
+                    };
+                  }}
+                  onPointerUp={(e) => {
+                    const start = clickStartRef.current[key];
+                    if (!start) return;
+                    const dx = e.clientX - start.x;
+                    const dy = e.clientY - start.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const duration = Date.now() - start.time;
+
+                    // Jika pointer hanya tertekan sebentar (<250ms) dan hampir tidak bergerak (<6px), itu adalah klik nyata!
+                    if (dist < 6 && duration < 250) {
                       e.preventDefault();
-                      dragRef.current.moved = false;
-                      return;
+                      handleOpenZoom(banner);
                     }
-                    handleOpenZoom(banner);
                   }}
                 >
                   {/* Glossy layers */}
