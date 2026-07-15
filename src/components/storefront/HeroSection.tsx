@@ -43,6 +43,7 @@ export function HeroSection({
   floatBanners?: FloatBanner[];
 }) {
   const [slide, setSlide] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const touchStartX = useRef<number | null>(null);
 
@@ -50,10 +51,11 @@ export function HeroSection({
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setSlide((s) => (s === 0 ? 1 : 0));
-    }, 15000); // Auto-slide shift every 15 seconds
+    }, 15000); // Shift every 15 seconds
   }, []);
 
   useEffect(() => {
+    setMounted(true);
     resetTimer();
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -65,7 +67,7 @@ export function HeroSection({
     resetTimer();
   };
 
-  // Touch Swipe Gesture support
+  // Touch Swipe gestures on mobile
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -75,7 +77,6 @@ export function HeroSection({
     const delta = e.changedTouches[0].clientX - touchStartX.current;
     const SWIPE_THRESHOLD_PX = 50;
     if (Math.abs(delta) > SWIPE_THRESHOLD_PX) {
-      // Swiping right/left switches the 2 slides
       setSlide((s) => (s === 0 ? 1 : 0));
       resetTimer();
     }
@@ -165,52 +166,58 @@ export function HeroSection({
             </div>
           </div>
 
-          {/* Slide 2: Sleek UX Mockup Desktop (Glassmorphic & CMS Editable) */}
-          <div
-            className="absolute inset-0 w-full h-full transition-all duration-700 ease-out"
-            style={{
-              opacity: slide === 1 ? 1 : 0,
-              transform: slide === 1
-                ? "rotateY(0deg) translateZ(0) scale(1) translateX(0)"
-                : "rotateY(-12deg) translateZ(-120px) scale(0.96) translateX(100%)",
-              transformStyle: "preserve-3d",
-              pointerEvents: slide === 1 ? "auto" : "none",
-              width: "100%",
-              height: "100%",
-              zIndex: slide === 1 ? 10 : 0,
-            }}
-          >
-            <MockupSlide
-              floatBanners={floatBanners}
-              slide2Title={content.slide2Title}
-              slide2Description={content.slide2Description}
-              slide2CtaLabel={content.slide2CtaLabel}
-              slide2CtaHref={content.slide2CtaHref}
-              slide2PromoText={content.slide2PromoText}
-            />
-          </div>
+          {/* Slide 2: Sleek UX Mockup Desktop (Client-Only Render to resolve initial overlap bug) */}
+          {mounted && (
+            <div
+              className="absolute inset-0 w-full h-full transition-all duration-700 ease-out"
+              style={{
+                opacity: slide === 1 ? 1 : 0,
+                transform: slide === 1
+                  ? "rotateY(0deg) translateZ(0) scale(1) translateX(0)"
+                  : "rotateY(-12deg) translateZ(-120px) scale(0.96) translateX(100%)",
+                transformStyle: "preserve-3d",
+                pointerEvents: slide === 1 ? "auto" : "none",
+                width: "100%",
+                height: "100%",
+                zIndex: slide === 1 ? 10 : 0,
+              }}
+            >
+              <MockupSlide
+                floatBanners={floatBanners}
+                slide2Title={content.slide2Title}
+                slide2Description={content.slide2Description}
+                slide2CtaLabel={content.slide2CtaLabel}
+                slide2CtaHref={content.slide2CtaHref}
+                slide2PromoText={content.slide2PromoText}
+              />
+            </div>
+          )}
+        </div>
 
-          {/* Manual Slide Navigation Dots */}
-          <div className="absolute bottom-1 right-2 z-20 flex gap-2 sm:right-3">
-            <button
-              type="button"
-              onClick={() => handleNav(0)}
-              aria-label="Slide 1"
-              className={cn(
-                "h-1.5 rounded-full transition-all duration-300 touch-manipulation cursor-pointer",
-                slide === 0 ? "w-5.5 bg-[var(--gold)]" : "w-1.5 bg-white/40 hover:bg-white/60"
-              )}
-            />
-            <button
-              type="button"
-              onClick={() => handleNav(1)}
-              aria-label="Slide 2"
-              className={cn(
-                "h-1.5 rounded-full transition-all duration-300 touch-manipulation cursor-pointer",
-                slide === 1 ? "w-5.5 bg-[var(--gold)]" : "w-1.5 bg-white/40 hover:bg-white/60"
-              )}
-            />
-          </div>
+        {/* Circular Manual Slide Navigation Dots (Centered underneath track) */}
+        <div className="flex justify-center gap-2.5 mt-4 z-20">
+          <button
+            type="button"
+            onClick={() => handleNav(0)}
+            aria-label="Slide 1"
+            className={cn(
+              "h-2.5 w-2.5 rounded-full transition-all duration-350 touch-manipulation cursor-pointer border border-white/5",
+              slide === 0
+                ? "bg-[var(--gold)] scale-110 shadow-md shadow-amber-500/20"
+                : "bg-white/20 hover:bg-white/45"
+            )}
+          />
+          <button
+            type="button"
+            onClick={() => handleNav(1)}
+            aria-label="Slide 2"
+            className={cn(
+              "h-2.5 w-2.5 rounded-full transition-all duration-350 touch-manipulation cursor-pointer border border-white/5",
+              slide === 1
+                ? "bg-[var(--gold)] scale-110 shadow-md shadow-amber-500/20"
+                : "bg-white/20 hover:bg-white/45"
+            )}
+          />
         </div>
 
         {/* Divider line separating the slider from static bottom block */}
