@@ -63,9 +63,10 @@ export default async function RootLayout({
                 var sc = localStorage.getItem("kvibo-sidebar-collapsed");
                 var mobile = window.innerWidth <= 767;
                 var collapsed = sc !== null ? sc === "true" : mobile;
-                var sw = (!mobile && !collapsed) ? "260px" : "72px";
+                var sw = mobile ? "0px" : (collapsed ? "72px" : "260px");
                 document.documentElement.style.setProperty("--sidebar-width", sw);
                 document.documentElement.dataset.sidebarCollapsed = collapsed ? "true" : "false";
+                document.documentElement.dataset.sidebarMobile = mobile ? "true" : "false";
               } catch (e) {}
             `,
           }}

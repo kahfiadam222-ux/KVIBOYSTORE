@@ -45,10 +45,10 @@ export function HeroSection({
         className="hero-depth-plane pointer-events-none absolute -right-8 top-0 hidden h-full w-[52%] md:block"
       />
 
-      <div className="relative glass-hero rounded-[1.75rem] border border-[var(--glass-border)] px-5 py-8 sm:px-10 sm:py-11 lg:px-14 lg:py-12">
+      <div className="relative glass-hero rounded-2xl sm:rounded-[1.75rem] border border-[var(--glass-border)] px-4 py-6 sm:px-10 sm:py-11 lg:px-14 lg:py-12">
         <div className="relative z-[1] max-w-2xl">
           <p className="eyebrow mb-4">{content.eyebrow}</p>
-          <h1 className="heading-display text-[2rem] sm:text-4xl lg:text-[2.75rem]">
+          <h1 className="heading-display text-[1.65rem] leading-tight sm:text-4xl lg:text-[2.75rem]">
             {content.title}
             <br />
             <span className="text-premium">{content.titleHighlight}</span>
@@ -65,12 +65,12 @@ export function HeroSection({
           </div>
         )}
 
-        <div className="relative z-[1] mt-2 flex flex-wrap items-center gap-3">
+        <div className="relative z-[1] mt-2 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
           <Link
             href={content.ctaPrimaryHref || "#produk"}
             className={cn(
               buttonVariants({ size: "lg" }),
-              "h-11 rounded-full px-6 text-sm font-semibold gap-2"
+              "h-10 sm:h-11 w-full sm:w-auto rounded-full px-5 sm:px-6 text-sm font-semibold gap-2 justify-center"
             )}
           >
             {content.ctaPrimaryLabel}
@@ -80,13 +80,13 @@ export function HeroSection({
             href={content.ctaSecondaryHref || "/promo"}
             className={cn(
               buttonVariants({ variant: "outline", size: "lg" }),
-              "h-11 rounded-full px-6 text-sm font-semibold border-[var(--glass-border)] bg-[var(--glass-fill)]/80 backdrop-blur"
+              "h-10 sm:h-11 w-full sm:w-auto rounded-full px-5 sm:px-6 text-sm font-semibold border-[var(--glass-border)] bg-[var(--glass-fill)]/80 backdrop-blur justify-center"
             )}
           >
             {content.ctaSecondaryLabel}
           </Link>
           {typeof productCount === "number" && productCount > 0 && (
-            <span className="text-xs text-muted-foreground pl-1 tracking-wide">
+            <span className="text-xs text-muted-foreground sm:pl-1 tracking-wide text-center sm:text-left">
               {productCount} produk aktif
             </span>
           )}

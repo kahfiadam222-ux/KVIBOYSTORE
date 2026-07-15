@@ -12,14 +12,15 @@ import {
 
 export const SIDEBAR_WIDTH_COLLAPSED = 72;
 export const SIDEBAR_WIDTH_EXPANDED = 260;
-const MOBILE_MAX = 767;
+export const MOBILE_MAX = 767;
 
 type SidebarContextValue = {
   collapsed: boolean;
   toggle: () => void;
   close: () => void;
   width: number;
-  /** Mobile: expanded sidebar floats over content instead of squishing it. */
+  isMobile: boolean;
+  /** Mobile: menu drawer terbuka di atas konten penuh lebar. */
   isOverlay: boolean;
 };
 
@@ -32,9 +33,10 @@ function readInitialCollapsed(): boolean {
   return window.innerWidth <= MOBILE_MAX;
 }
 
-function applySidebarLayout(width: number, collapsed: boolean) {
+function applySidebarLayout(width: number, collapsed: boolean, isMobile: boolean) {
   document.documentElement.style.setProperty("--sidebar-width", `${width}px`);
   document.documentElement.dataset.sidebarCollapsed = collapsed ? "true" : "false";
+  document.documentElement.dataset.sidebarMobile = isMobile ? "true" : "false";
 }
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
@@ -46,7 +48,11 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
     setCollapsed(initial);
 
     const mq = window.matchMedia(`(max-width: ${MOBILE_MAX}px)`);
-    const syncMobile = () => setIsMobile(mq.matches);
+    const syncMobile = () => {
+      const mobile = mq.matches;
+      setIsMobile(mobile);
+      if (!mobile) setCollapsed((c) => c);
+    };
     syncMobile();
     mq.addEventListener("change", syncMobile);
 
@@ -54,16 +60,27 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const isOverlay = isMobile && !collapsed;
-  const width = isOverlay
-    ? SIDEBAR_WIDTH_COLLAPSED
+  const width = isMobile
+    ? 0
     : collapsed
       ? SIDEBAR_WIDTH_COLLAPSED
       : SIDEBAR_WIDTH_EXPANDED;
 
   useLayoutEffect(() => {
-    applySidebarLayout(width, collapsed);
+    applySidebarLayout(width, collapsed, isMobile);
     localStorage.setItem("kvibo-sidebar-collapsed", String(collapsed));
-  }, [width, collapsed]);
+  }, [width, collapsed, isMobile]);
+
+  useLayoutEffect(() => {
+    if (isOverlay) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOverlay]);
 
   const toggle = useCallback(() => {
     setCollapsed((prev) => !prev);
@@ -79,9 +96,10 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
       toggle,
       close,
       width,
+      isMobile,
       isOverlay,
     }),
-    [collapsed, toggle, close, width, isOverlay]
+    [collapsed, toggle, close, width, isMobile, isOverlay]
   );
 
   return (

@@ -4,6 +4,7 @@ import { logout } from "@/app/(auth)/actions";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Shield } from "lucide-react";
 import { NavbarMobileBrand } from "./NavbarMobileBrand";
+import { NavbarMenuButton } from "./NavbarMenuButton";
 
 export async function Navbar() {
   const supabase = await createClient();
@@ -23,7 +24,8 @@ export async function Navbar() {
   return (
     <header className="navbar-topbar sticky top-0 z-30 h-16 shrink-0 border-b border-[var(--glass-border)] bg-[var(--glass-fill)]/92 backdrop-blur-2xl supports-[backdrop-filter]:bg-[var(--glass-fill)]/78">
       <nav className="flex h-full w-full items-center justify-between gap-2 px-3 sm:px-6 lg:px-8">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+          <NavbarMenuButton />
           <NavbarMobileBrand />
           <div className="hidden lg:flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80 font-semibold">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
@@ -31,7 +33,7 @@ export async function Navbar() {
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center justify-end gap-1.5 sm:gap-2">
+        <div className="flex shrink-0 items-center justify-end gap-1 sm:gap-2">
           {user ? (
             <>
               <div className="hidden sm:flex items-center gap-0.5">
@@ -82,7 +84,7 @@ export async function Navbar() {
                   type="submit"
                   variant="outline"
                   size="sm"
-                  className="h-8 rounded-xl text-xs font-semibold px-3 border-[var(--glass-border)] bg-transparent"
+                  className="h-8 rounded-xl text-[11px] sm:text-xs font-semibold px-2.5 sm:px-3 border-[var(--glass-border)] bg-transparent"
                 >
                   Keluar
                 </Button>

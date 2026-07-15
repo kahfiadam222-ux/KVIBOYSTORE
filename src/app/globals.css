@@ -909,16 +909,29 @@ img.float-banner-media {
     );
 }
 
-/* App shell: sidebar + konten bergeser bersama via grid */
+/* App shell: sidebar + konten (desktop grid push) */
 .kvibo-app-shell {
   width: 100%;
+  max-width: 100vw;
   transition: grid-template-columns 300ms ease-in-out;
-  will-change: grid-template-columns;
 }
 
 .storefront-main {
   width: 100%;
   min-width: 0;
+  max-width: 100vw;
+}
+
+/* HP: konten full-width, tanpa rail sidebar */
+@media (max-width: 767px) {
+  .storefront-main {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .navbar-topbar nav {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
 }
 
 .sidebar-slot {
@@ -954,17 +967,11 @@ img.float-banner-media {
   flex-shrink: 0;
 }
 
-/* Touch-friendly controls on phones */
+/* Touch-friendly carousel on phones */
 @media (pointer: coarse) {
   .carousel-nav-btn {
     min-height: 44px;
     min-width: 44px;
-  }
-
-  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
-  select,
-  textarea {
-    min-height: 44px;
   }
 }
 

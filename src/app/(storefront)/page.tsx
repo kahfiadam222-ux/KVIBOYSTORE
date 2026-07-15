@@ -47,7 +47,7 @@ export default async function StorefrontPage({
   const verticalBanners = banners.filter((b) => b.layout === "vertical");
 
   return (
-    <main className="mx-auto max-w-7xl px-3 py-6 sm:px-6 sm:py-10 lg:px-8">
+    <main className="mx-auto max-w-7xl w-full px-2.5 py-5 sm:px-6 sm:py-10 lg:px-8">
       {!q ? (
         <HeroSection
           searchQuery={q}
@@ -128,7 +128,7 @@ export default async function StorefrontPage({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {listings.map((listing, listingIndex) => {
             const tier = getDeliveryLabel(listing);
             return (
@@ -201,8 +201,8 @@ export default async function StorefrontPage({
                       />
                       <Button
                         type="submit"
-                        size="touch"
-                        className="w-full rounded-xl font-semibold shadow-md"
+                        size="sm"
+                        className="w-full h-9 sm:h-10 rounded-xl text-xs font-semibold shadow-md"
                       >
                         Beli Sekarang
                       </Button>

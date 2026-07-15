@@ -3,9 +3,10 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "./sidebar-context";
-import { SIDEBAR_WIDTH_EXPANDED } from "./sidebar-context";
+
 import {
   Home,
   ShoppingCart,
@@ -377,43 +378,47 @@ function SidebarPanel({
 }
 
 export function Sidebar({ user }: SidebarProps) {
-  const { collapsed, toggle, close, isOverlay } = useSidebar();
-  const railCollapsed = isOverlay || collapsed;
+  const pathname = usePathname();
+  const { collapsed, toggle, close, isOverlay, isMobile } = useSidebar();
+
+  useEffect(() => {
+    if (isMobile) close();
+  }, [pathname, isMobile, close]);
+
+  if (isMobile) {
+    if (!isOverlay) return null;
+
+    return (
+      <aside
+        className="sidebar-drawer fixed inset-y-0 left-0 z-50 flex h-[100dvh] w-[min(280px,88vw)] flex-col overflow-hidden border-r border-[var(--glass-border)] bg-gradient-to-b from-[var(--glass-fill)] via-background/96 to-background/92 shadow-2xl backdrop-blur-2xl"
+        aria-hidden={false}
+      >
+        <SidebarPanel
+          user={user}
+          collapsed={false}
+          toggle={toggle}
+          onNavigate={close}
+        />
+      </aside>
+    );
+  }
 
   return (
     <div className="sidebar-slot sticky top-0 z-20 h-screen min-w-0">
-      {/* Rail di dalam grid — lebar mengikuti kolom grid */}
       <aside
         className={cn(
           "sidebar-rail flex h-full w-full flex-col overflow-hidden border-r border-[var(--glass-border)] backdrop-blur-2xl",
           "bg-gradient-to-b from-[var(--glass-fill)] via-background/96 to-background/92",
           "shadow-[8px_0_40px_-28px_rgba(0,0,0,0.4)]"
         )}
-        aria-expanded={!railCollapsed}
+        aria-expanded={!collapsed}
       >
         <SidebarPanel
           user={user}
-          collapsed={railCollapsed}
+          collapsed={collapsed}
           toggle={toggle}
         />
       </aside>
-
-      {/* Mobile: panel penuh melayang di atas konten saat dibuka */}
-      {isOverlay && (
-        <aside
-          className="sidebar-drawer fixed left-0 top-0 z-50 flex h-screen flex-col overflow-hidden border-r border-[var(--glass-border)] backdrop-blur-2xl shadow-2xl"
-          style={{ width: SIDEBAR_WIDTH_EXPANDED }}
-        >
-          <div className="flex h-full w-full flex-col bg-gradient-to-b from-[var(--glass-fill)] via-background/96 to-background/92">
-            <SidebarPanel
-              user={user}
-              collapsed={false}
-              toggle={toggle}
-              onNavigate={close}
-            />
-          </div>
-        </aside>
-      )}
     </div>
   );
 }
