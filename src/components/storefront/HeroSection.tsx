@@ -49,7 +49,7 @@ export function HeroSection({
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setSlide((s) => (s === 0 ? 1 : 0));
-    }, 5000);
+    }, 15000); // Shift every 15 seconds
   }, []);
 
   useEffect(() => {
@@ -65,38 +65,39 @@ export function HeroSection({
   };
 
   return (
-    <section className="relative mb-6 select-none" style={{ perspective: "1500px" }}>
-      {/* 3D Slide Track Wrapper */}
-      <div
-        className="relative w-full"
-        style={{
-          transformStyle: "preserve-3d",
-          transition: "height 0.3s ease-in-out",
-        }}
-      >
-        {/* Slide 1: Current Compact Hero Section */}
+    <section className="relative mb-6 select-none">
+      {/* Unified Outer Glass-hero Card */}
+      <div className="relative glass-hero rounded-[2rem] sm:rounded-[2.5rem] border border-[var(--glass-border)] px-4 py-5 sm:px-8 sm:py-7 lg:px-9 lg:py-7.5">
         <div
-          className="transition-all duration-700 ease-out"
+          aria-hidden
+          className="hero-depth-plane pointer-events-none absolute -right-8 top-0 hidden h-full w-[48%] md:block"
+        />
+
+        {/* 3D Carousel Slider Wrapper (Only wraps copy and CTA area) */}
+        <div
+          className="relative w-full overflow-visible"
           style={{
-            opacity: slide === 0 ? 1 : 0,
-            transform: slide === 0
-              ? "rotateY(0deg) translateZ(0) scale(1) translateX(0)"
-              : "rotateY(12deg) translateZ(-120px) scale(0.96) translateX(-100%)",
+            perspective: "1500px",
             transformStyle: "preserve-3d",
-            pointerEvents: slide === 0 ? "auto" : "none",
-            position: slide === 0 ? "relative" : "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            zIndex: slide === 0 ? 10 : 0,
           }}
         >
+          {/* Slide 1: Copy, Floating Banners, and CTA Buttons */}
           <div
-            aria-hidden
-            className="hero-depth-plane pointer-events-none absolute -right-8 top-0 hidden h-full w-[48%] md:block"
-          />
-
-          <div className="relative glass-hero rounded-[1.75rem] sm:rounded-[2.25rem] border border-[var(--glass-border)] px-4 py-5 sm:px-7 sm:py-6 lg:px-8 lg:py-6.5">
+            className="transition-all duration-700 ease-out"
+            style={{
+              opacity: slide === 0 ? 1 : 0,
+              transform: slide === 0
+                ? "rotateY(0deg) translateZ(0) scale(1) translateX(0)"
+                : "rotateY(12deg) translateZ(-120px) scale(0.96) translateX(-100%)",
+              transformStyle: "preserve-3d",
+              pointerEvents: slide === 0 ? "auto" : "none",
+              position: slide === 0 ? "relative" : "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              zIndex: slide === 0 ? 10 : 0,
+            }}
+          >
             <div className="relative z-[1] max-w-2xl">
               <p className="eyebrow mb-2 text-[9px] sm:text-[10px]">{content.eyebrow}</p>
               <h1 className="heading-display text-[1.25rem] leading-tight sm:text-2xl lg:text-[1.9rem]">
@@ -144,75 +145,79 @@ export function HeroSection({
                 </span>
               )}
             </div>
+          </div>
 
-            <div className="relative z-[1] mt-4 max-w-xl">
-              <SearchBar defaultValue={searchQuery} embedded />
-            </div>
+          {/* Slide 2: Sleek UX Mockup Desktop (Glassmorphic) */}
+          <div
+            className="transition-all duration-700 ease-out"
+            style={{
+              opacity: slide === 1 ? 1 : 0,
+              transform: slide === 1
+                ? "rotateY(0deg) translateZ(0) scale(1) translateX(0)"
+                : "rotateY(-12deg) translateZ(-120px) scale(0.96) translateX(100%)",
+              transformStyle: "preserve-3d",
+              pointerEvents: slide === 1 ? "auto" : "none",
+              position: slide === 1 ? "relative" : "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              zIndex: slide === 1 ? 10 : 0,
+            }}
+          >
+            <MockupSlide floatBanners={floatBanners} />
+          </div>
 
-            <ul className="relative z-[1] mt-4 grid gap-2.5 sm:grid-cols-3">
-              {trustPoints.map(({ icon: Icon, title, desc }) => (
-                <li
-                  key={title}
-                  className="flex items-start gap-2 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-fill)]/50 px-2.5 py-2 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
-                >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <Icon className="h-3.5 w-3.5" />
-                  </span>
-                  <span>
-                    <span className="block text-[11px] font-bold text-foreground tracking-tight">
-                      {title}
-                    </span>
-                    <span className="mt-0.5 block text-[9px] leading-tight text-muted-foreground">
-                      {desc}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
+          {/* Manual Slide Navigation Dots */}
+          <div className="absolute bottom-1 right-2 z-20 flex gap-2 sm:right-3">
+            <button
+              type="button"
+              onClick={() => handleNav(0)}
+              aria-label="Slide 1"
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-300 touch-manipulation cursor-pointer",
+                slide === 0 ? "w-5.5 bg-[var(--gold)]" : "w-1.5 bg-white/40 hover:bg-white/60"
+              )}
+            />
+            <button
+              type="button"
+              onClick={() => handleNav(1)}
+              aria-label="Slide 2"
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-300 touch-manipulation cursor-pointer",
+                slide === 1 ? "w-5.5 bg-[var(--gold)]" : "w-1.5 bg-white/40 hover:bg-white/60"
+              )}
+            />
           </div>
         </div>
 
-        {/* Slide 2: Sleek UI/UX Mockup Desktop */}
-        <div
-          className="transition-all duration-700 ease-out"
-          style={{
-            opacity: slide === 1 ? 1 : 0,
-            transform: slide === 1
-              ? "rotateY(0deg) translateZ(0) scale(1) translateX(0)"
-              : "rotateY(-12deg) translateZ(-120px) scale(0.96) translateX(100%)",
-            transformStyle: "preserve-3d",
-            pointerEvents: slide === 1 ? "auto" : "none",
-            position: slide === 1 ? "relative" : "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            zIndex: slide === 1 ? 10 : 0,
-          }}
-        >
-          <MockupSlide floatBanners={floatBanners} />
-        </div>
-      </div>
+        {/* Divider line separating the slider from static bottom block */}
+        <div className="gold-line my-4.5 opacity-30" />
 
-      {/* Slide Navigation Dots */}
-      <div className="absolute bottom-2.5 right-4 z-20 flex gap-2">
-        <button
-          type="button"
-          onClick={() => handleNav(0)}
-          aria-label="Slide 1"
-          className={cn(
-            "h-1.5 rounded-full transition-all duration-300 touch-manipulation cursor-pointer",
-            slide === 0 ? "w-5.5 bg-[var(--gold)]" : "w-1.5 bg-white/40 hover:bg-white/60"
-          )}
-        />
-        <button
-          type="button"
-          onClick={() => handleNav(1)}
-          aria-label="Slide 2"
-          className={cn(
-            "h-1.5 rounded-full transition-all duration-300 touch-manipulation cursor-pointer",
-            slide === 1 ? "w-5.5 bg-[var(--gold)]" : "w-1.5 bg-white/40 hover:bg-white/60"
-          )}
-        />
+        {/* Static Bottom Area (Always visible on all slides) */}
+        <div className="relative z-[1] max-w-xl">
+          <SearchBar defaultValue={searchQuery} embedded />
+        </div>
+
+        <ul className="relative z-[1] mt-4 grid gap-2.5 sm:grid-cols-3">
+          {trustPoints.map(({ icon: Icon, title, desc }) => (
+            <li
+              key={title}
+              className="flex items-start gap-2.5 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-fill)]/50 px-3 py-2 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
+            >
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Icon className="h-3.5 w-3.5" />
+              </span>
+              <span>
+                <span className="block text-[11px] font-bold text-foreground tracking-tight">
+                  {title}
+                </span>
+                <span className="mt-0.5 block text-[9px] leading-tight text-muted-foreground">
+                  {desc}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
