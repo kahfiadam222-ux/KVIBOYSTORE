@@ -24,7 +24,34 @@ export default async function AdminBannersPage() {
   await requireAdmin();
   const admin = createAdminClient();
 
-  const [{ data: banners }, { data: heroRow }, { data: floatRows, error: floatErr }] =
+  // Safely fetch storefront_hero with Slide 2 columns fallback
+  let heroRow = null;
+  try {
+    const { data: heroWithSlide2 } = await admin
+      .from("storefront_hero")
+      .select(
+        "eyebrow, title, title_highlight, description, cta_primary_label, cta_primary_href, cta_secondary_label, cta_secondary_href, slide2_title, slide2_description, slide2_cta_label, slide2_cta_href, slide2_promo_text"
+      )
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (heroWithSlide2) {
+      heroRow = heroWithSlide2;
+    } else {
+      const { data: fallbackHero } = await admin
+        .from("storefront_hero")
+        .select(
+          "eyebrow, title, title_highlight, description, cta_primary_label, cta_primary_href, cta_secondary_label, cta_secondary_href"
+        )
+        .eq("id", 1)
+        .maybeSingle();
+      heroRow = fallbackHero;
+    }
+  } catch {
+    // Ignore error
+  }
+
+  const [{ data: banners }, { data: floatRows, error: floatErr }] =
     await Promise.all([
       admin
         .from("homepage_banners")
@@ -32,13 +59,6 @@ export default async function AdminBannersPage() {
           "id, title, subtitle, image_url, cta_label, cta_href, is_active, sort_order, layout"
         )
         .order("sort_order", { ascending: true }),
-      admin
-        .from("storefront_hero")
-        .select(
-          "eyebrow, title, title_highlight, description, cta_primary_label, cta_primary_href, cta_secondary_label, cta_secondary_href"
-        )
-        .eq("id", 1)
-        .maybeSingle(),
       admin
         .from("float_banners")
         .select("slot, title, subtitle, image_url, cta_label, cta_href, is_active")
@@ -61,6 +81,15 @@ export default async function AdminBannersPage() {
           heroRow.cta_secondary_label ?? DEFAULT_HERO.ctaSecondaryLabel,
         ctaSecondaryHref:
           heroRow.cta_secondary_href ?? DEFAULT_HERO.ctaSecondaryHref,
+        slide2Title: heroRow.slide2_title ?? DEFAULT_HERO.slide2Title,
+        slide2Description:
+          heroRow.slide2_description ?? DEFAULT_HERO.slide2Description,
+        slide2CtaLabel:
+          heroRow.slide2_cta_label ?? DEFAULT_HERO.slide2CtaLabel,
+        slide2CtaHref:
+          heroRow.slide2_cta_href ?? DEFAULT_HERO.slide2CtaHref,
+        slide2PromoText:
+          heroRow.slide2_promo_text ?? DEFAULT_HERO.slide2PromoText,
       }
     : DEFAULT_HERO;
 
