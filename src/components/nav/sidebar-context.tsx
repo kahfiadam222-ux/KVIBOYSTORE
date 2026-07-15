@@ -6,6 +6,7 @@ import {
   useContext,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -40,22 +41,49 @@ function applySidebarLayout(width: number, collapsed: boolean, isMobile: boolean
 }
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
-  const [collapsed, setCollapsed] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
+  // Baca initial state dari DOM yang sudah di-set oleh blocking script di <head>
+  // Ini mencegah hydration mismatch dan layout shift
+  const getInitialCollapsed = () => {
+    if (typeof window === "undefined") return true;
+    const domCollapsed = document.documentElement.dataset.sidebarCollapsed;
+    if (domCollapsed !== undefined) {
+      return domCollapsed === "true";
+    }
+    return readInitialCollapsed();
+  };
+
+  const getInitialMobile = () => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth <= MOBILE_MAX;
+  };
+
+  const [collapsed, setCollapsed] = useState(getInitialCollapsed);
+  const [isMobile, setIsMobile] = useState(getInitialMobile);
+
+  // Track apakah ini first render untuk skip redundant state update
+  const isFirstRender = useRef(true);
 
   useLayoutEffect(() => {
-    const initial = readInitialCollapsed();
-    setCollapsed(initial);
-
     const mq = window.matchMedia(`(max-width: ${MOBILE_MAX}px)`);
+
     const syncMobile = () => {
       const mobile = mq.matches;
-      setIsMobile(mobile);
-      if (!mobile) setCollapsed((c) => c);
+      setIsMobile((prevMobile) => {
+        // Only update jika berubah
+        if (prevMobile === mobile) return prevMobile;
+        return mobile;
+      });
     };
-    syncMobile();
-    mq.addEventListener("change", syncMobile);
 
+    // Sync awal - tapi skip jika sudah sama dengan blocking script
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      const initialCollapsed = readInitialCollapsed();
+      setCollapsed((prev) => (prev === initialCollapsed ? prev : initialCollapsed));
+      syncMobile();
+    }
+
+    mq.addEventListener("change", syncMobile);
     return () => mq.removeEventListener("change", syncMobile);
   }, []);
 
