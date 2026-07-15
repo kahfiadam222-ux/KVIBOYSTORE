@@ -24,7 +24,7 @@ export function MockupSlide({
   const thumbnails = floatBanners.slice(0, 4);
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border border-purple-500/15 bg-zinc-950/45 p-2.5 sm:p-3.5 text-zinc-355 font-sans shadow-2xl min-h-[450px] sm:min-h-[340px] md:min-h-[285px] flex flex-col transition-all duration-300 select-none backdrop-blur-md">
+    <div className="relative w-full overflow-hidden rounded-2xl border border-purple-500/15 bg-zinc-950/45 p-2.5 sm:p-3.5 text-zinc-350 font-sans shadow-2xl min-h-[460px] sm:min-h-[400px] md:min-h-[380px] flex flex-col transition-all duration-300 select-none backdrop-blur-md">
       {/* Ambient background glows for Slide 2 */}
       <div className="pointer-events-none absolute -left-12 -top-12 h-36 w-36 rounded-full bg-purple-600/10 blur-[50px]" />
       <div className="pointer-events-none absolute -right-12 -bottom-12 h-36 w-36 rounded-full bg-indigo-600/10 blur-[50px]" />
@@ -67,14 +67,14 @@ export function MockupSlide({
 
         {/* Central Focus: Product Screenshot Placeholder (Techwear Hoodie) */}
         <div className="sm:col-span-7 mt-6 sm:mt-3 flex flex-col justify-center relative z-10">
-          <div className="group relative w-full h-[145px] sm:h-[155px] md:h-[175px] rounded-lg border border-purple-500/15 bg-gradient-to-br from-purple-950/15 to-zinc-950 shadow-[0_0_15px_rgba(168,85,247,0.03),inset_0_1px_1px_rgba(255,255,255,0.01)] overflow-hidden flex flex-col items-center justify-center p-2.5">
+          <div className="group relative w-full h-[145px] sm:h-[230px] md:h-[250px] rounded-lg border border-purple-500/15 bg-gradient-to-br from-purple-950/15 to-zinc-950 shadow-[0_0_15px_rgba(168,85,247,0.03),inset_0_1px_1px_rgba(255,255,255,0.01)] overflow-hidden flex flex-col items-center justify-center p-2.5">
 
             {/* Glossy sheen overlay */}
             <span className="absolute inset-0 bg-gradient-to-tr from-white/[0.01] via-white/[0.03] to-transparent pointer-events-none" />
 
             {/* Techwear Graphic Mock */}
             <div className="relative flex items-center justify-center h-14 w-14 sm:h-18 sm:w-18 rounded-xl bg-purple-500/10 border border-purple-500/20 shadow-[0_0_20px_rgba(168,85,247,0.1)] transition-all group-hover:scale-105 duration-500">
-              <Shirt className="h-7 w-7 sm:h-9 sm:w-9 text-purple-450 drop-shadow-[0_0_5px_rgba(168,85,247,0.4)]" />
+              <Shirt className="h-7 w-7 sm:h-9 sm:w-9 text-purple-400 drop-shadow-[0_0_5px_rgba(168,85,247,0.4)]" />
               <div className="absolute inset-x-0 bottom-0.5 flex justify-center">
                 <span className="text-[6px] font-mono tracking-wider text-purple-300/80 bg-purple-950/60 px-1 rounded uppercase">Techwear</span>
               </div>
@@ -101,13 +101,13 @@ export function MockupSlide({
 
         {/* Right Side: Frosted Glass Panel with Description, CTA, and Thumbnail Grid INSIDE */}
         <div className="sm:col-span-5 flex flex-col justify-center mt-1.5 sm:mt-3 relative z-10">
-          <div className="rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md p-2.5 shadow-lg flex flex-col justify-between h-[145px] sm:h-[155px] md:h-[175px]">
+          <div className="rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md p-2.5 shadow-lg flex flex-col justify-between h-[145px] sm:h-[230px] md:h-[250px]">
 
             <div>
               <h3 className="text-[11px] sm:text-xs font-bold text-white tracking-tight">
                 {slide2Title}
               </h3>
-              <p className="mt-0.5 text-[8px] sm:text-[9px] text-zinc-400 leading-normal line-clamp-2">
+              <p className="mt-1 text-[8px] sm:text-[9px] text-zinc-400 leading-normal line-clamp-3">
                 {slide2Description}
               </p>
             </div>
@@ -149,7 +149,7 @@ export function MockupSlide({
             </div>
 
             {/* CTA Discover Button */}
-            <div className="flex items-center justify-between mt-0.5">
+            <div className="flex items-center justify-between mt-1">
               <span className="text-[7px] text-zinc-600 font-mono italic">
                 Interactive Grid
               </span>

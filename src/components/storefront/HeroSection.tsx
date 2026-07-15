@@ -77,7 +77,7 @@ export function HeroSection({
 
         {/* 3D Carousel Slider Wrapper (Fixed Height to prevent vertical stacking and jumps - Manual swipe/drag disabled) */}
         <div
-          className="relative w-full h-[480px] sm:h-[390px] md:h-[315px] overflow-visible"
+          className="relative w-full h-[500px] sm:h-[440px] md:h-[400px] overflow-visible"
           style={{
             perspective: "1500px",
             transformStyle: "preserve-3d",
