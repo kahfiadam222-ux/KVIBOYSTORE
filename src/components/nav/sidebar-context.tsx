@@ -4,9 +4,8 @@ import {
   createContext,
   useCallback,
   useContext,
-  useLayoutEffect,
+  useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -19,10 +18,8 @@ type SidebarContextValue = {
   collapsed: boolean;
   toggle: () => void;
   close: () => void;
-  width: number;
+  open: () => void;
   isMobile: boolean;
-  /** Mobile: menu drawer terbuka di atas konten penuh lebar. */
-  isOverlay: boolean;
 };
 
 export const SidebarContext = createContext<SidebarContextValue | null>(null);
@@ -34,81 +31,51 @@ function readInitialCollapsed(): boolean {
   return window.innerWidth <= MOBILE_MAX;
 }
 
-function applySidebarLayout(width: number, collapsed: boolean, isMobile: boolean) {
+function applySidebarLayout(collapsed: boolean) {
+  const mobile = window.innerWidth <= MOBILE_MAX;
+  const width = mobile ? 0 : (collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED);
+
   document.documentElement.style.setProperty("--sidebar-width", `${width}px`);
   document.documentElement.dataset.sidebarCollapsed = collapsed ? "true" : "false";
-  document.documentElement.dataset.sidebarMobile = isMobile ? "true" : "false";
+  document.documentElement.dataset.sidebarMobile = mobile ? "true" : "false";
 }
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
-  // Baca initial state dari DOM yang sudah di-set oleh blocking script di <head>
-  // Ini mencegah hydration mismatch dan layout shift
-  const getInitialCollapsed = () => {
-    if (typeof window === "undefined") return true;
-    const domCollapsed = document.documentElement.dataset.sidebarCollapsed;
-    if (domCollapsed !== undefined) {
-      return domCollapsed === "true";
-    }
-    return readInitialCollapsed();
-  };
+  const [collapsed, setCollapsed] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const getInitialMobile = () => {
-    if (typeof window === "undefined") return false;
-    return window.innerWidth <= MOBILE_MAX;
-  };
+  // Sync state dengan DOM setelah mount
+  useEffect(() => {
+    const initial = readInitialCollapsed();
+    const mobile = window.innerWidth <= MOBILE_MAX;
+    setCollapsed(initial);
+    setIsMobile(mobile);
+    applySidebarLayout(initial);
 
-  const [collapsed, setCollapsed] = useState(getInitialCollapsed);
-  const [isMobile, setIsMobile] = useState(getInitialMobile);
-
-  // Track apakah ini first render untuk skip redundant state update
-  const isFirstRender = useRef(true);
-
-  useLayoutEffect(() => {
-    const mq = window.matchMedia(`(max-width: ${MOBILE_MAX}px)`);
-
-    const syncMobile = () => {
-      const mobile = mq.matches;
-      setIsMobile((prevMobile) => {
-        // Only update jika berubah
-        if (prevMobile === mobile) return prevMobile;
-        return mobile;
-      });
+    // Update layout saat ukuran layar berubah
+    const handleResize = () => {
+      const currentMobile = window.innerWidth <= MOBILE_MAX;
+      setIsMobile(currentMobile);
+      if (currentMobile) {
+        setCollapsed(true);
+        applySidebarLayout(true);
+      } else {
+        const stored = localStorage.getItem("kvibo-sidebar-collapsed");
+        const currentCollapsed = stored !== null ? stored === "true" : false;
+        setCollapsed(currentCollapsed);
+        applySidebarLayout(currentCollapsed);
+      }
     };
 
-    // Sync awal - tapi skip jika sudah sama dengan blocking script
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      const initialCollapsed = readInitialCollapsed();
-      setCollapsed((prev) => (prev === initialCollapsed ? prev : initialCollapsed));
-      syncMobile();
-    }
-
-    mq.addEventListener("change", syncMobile);
-    return () => mq.removeEventListener("change", syncMobile);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const isOverlay = isMobile && !collapsed;
-  const width = isMobile
-    ? 0
-    : collapsed
-      ? SIDEBAR_WIDTH_COLLAPSED
-      : SIDEBAR_WIDTH_EXPANDED;
-
-  useLayoutEffect(() => {
-    applySidebarLayout(width, collapsed, isMobile);
+  // Update DOM saat state collapsed berubah
+  useEffect(() => {
+    applySidebarLayout(collapsed);
     localStorage.setItem("kvibo-sidebar-collapsed", String(collapsed));
-  }, [width, collapsed, isMobile]);
-
-  useLayoutEffect(() => {
-    if (isOverlay) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOverlay]);
+  }, [collapsed]);
 
   const toggle = useCallback(() => {
     setCollapsed((prev) => !prev);
@@ -118,16 +85,19 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
     setCollapsed(true);
   }, []);
 
+  const open = useCallback(() => {
+    setCollapsed(false);
+  }, []);
+
   const value = useMemo(
     () => ({
       collapsed,
       toggle,
       close,
-      width,
+      open,
       isMobile,
-      isOverlay,
     }),
-    [collapsed, toggle, close, width, isMobile, isOverlay]
+    [collapsed, toggle, close, open, isMobile]
   );
 
   return (

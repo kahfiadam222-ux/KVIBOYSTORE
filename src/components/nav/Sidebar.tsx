@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { useSidebar } from "./sidebar-context";
+import { useSidebar, MOBILE_MAX } from "./sidebar-context";
 
 import {
   Home,
@@ -153,7 +153,7 @@ function SidebarPanel({
         </Link>
         <button
           onClick={toggle}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--glass-border)] bg-background/40 text-muted-foreground transition-all hover:border-primary/25 hover:bg-primary/10 hover:text-primary touch-manipulation"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--glass-border)] bg-background/40 text-muted-foreground transition-all hover:border-primary/25 hover:bg-primary/10 hover:text-primary touch-manipulation sidebar-toggle-btn"
           aria-label={collapsed ? "Perluas sidebar" : "Ciutkan sidebar"}
           type="button"
         >
@@ -379,38 +379,17 @@ function SidebarPanel({
 
 export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
-  const { collapsed, toggle, close, isOverlay, isMobile } = useSidebar();
+  const { collapsed, toggle, close } = useSidebar();
 
   useEffect(() => {
-    if (isMobile) close();
-  }, [pathname, isMobile, close]);
-
-  if (isMobile) {
-    if (!isOverlay) return null;
-
-    return (
-      <aside
-        className="sidebar-drawer fixed inset-y-0 left-0 z-50 flex h-[100dvh] w-[min(280px,88vw)] flex-col overflow-hidden border-r border-[var(--glass-border)] bg-gradient-to-b from-[var(--glass-fill)] via-background/96 to-background/92 shadow-2xl backdrop-blur-2xl"
-        aria-hidden={false}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Menu navigasi"
-      >
-        <SidebarPanel
-          user={user}
-          collapsed={false}
-          toggle={toggle}
-          onNavigate={close}
-        />
-      </aside>
-    );
-  }
+    // Tutup sidebar drawer jika berpindah halaman di mobile
+    if (window.innerWidth <= MOBILE_MAX) {
+      close();
+    }
+  }, [pathname, close]);
 
   return (
-    <div
-      className="sidebar-slot sticky top-0 z-20 min-w-0"
-      style={{ width: collapsed ? "72px" : "260px" }}
-    >
+    <div className="sidebar-slot">
       <aside
         className={cn(
           "sidebar-rail flex h-full h-[100dvh] w-full flex-col overflow-hidden border-r border-[var(--glass-border)] backdrop-blur-2xl",
@@ -423,6 +402,7 @@ export function Sidebar({ user }: SidebarProps) {
           user={user}
           collapsed={collapsed}
           toggle={toggle}
+          onNavigate={close}
         />
       </aside>
     </div>
