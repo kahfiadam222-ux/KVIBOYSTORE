@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { SpaceBackground } from "@/components/effects/SpaceBackground";
 import { AmbientOrbs } from "@/components/effects/AmbientOrbs";
 import { WelcomeScreen } from "@/components/effects/WelcomeScreen";
+import { InteractiveBackground } from "@/components/effects/InteractiveBackground";
 import "./globals.css";
 
 const inter = Inter({
@@ -61,23 +62,15 @@ export default async function RootLayout({
                 } else {
                   document.documentElement.classList.add("dark");
                 }
-                document.documentElement.classList.add("preload");
-                var sc = localStorage.getItem("kvibo-sidebar-collapsed");
-                var mobile = window.innerWidth <= 767;
-                var collapsed = sc !== null ? sc === "true" : mobile;
-                var sw = mobile ? "0px" : (collapsed ? "72px" : "260px");
-                document.documentElement.style.setProperty("--sidebar-width", sw);
-                document.documentElement.dataset.sidebarCollapsed = collapsed ? "true" : "false";
-                document.documentElement.dataset.sidebarMobile = mobile ? "true" : "false";
               } catch (e) {}
             `,
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col font-sans">
-        <WelcomeScreen />
-        <SpaceBackground />
+      <body className="h-full">
         <AmbientOrbs />
+        <InteractiveBackground />
+        <WelcomeScreen />
         {children}
       </body>
     </html>
