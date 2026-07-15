@@ -50,6 +50,7 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --animate-fade-in-quick: fade-in-quick 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* ── Base (Paper-ready light) ── */
@@ -1115,6 +1116,15 @@ img.float-banner-media {
   }
   50% {
     transform: translateX(12%) rotate(0.001deg);
+  }
+}
+
+@keyframes fade-in-quick {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 

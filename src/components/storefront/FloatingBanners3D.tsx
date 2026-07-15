@@ -361,19 +361,25 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
                       time: Date.now(),
                     };
                   }}
-                  onPointerUp={(e) => {
+                  onClick={(e) => {
                     const start = clickStartRef.current[key];
-                    if (!start) return;
+                    // Jika trigger lewat keyboard (Space/Enter), `start` akan bernilai undefined
+                    if (!start) {
+                      handleOpenZoom(banner);
+                      return;
+                    }
+
                     const dx = e.clientX - start.x;
                     const dy = e.clientY - start.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
-                    const duration = Date.now() - start.time;
 
-                    // Jika pointer hanya tertekan sebentar (<250ms) dan hampir tidak bergerak (<6px), itu adalah klik nyata!
-                    if (dist < 6 && duration < 250) {
-                      e.preventDefault();
+                    // Jika pointer hampir tidak bergerak, anggap sebagai click nyata
+                    if (dist < 6) {
                       handleOpenZoom(banner);
                     }
+
+                    // Hapus data koordinat
+                    delete clickStartRef.current[key];
                   }}
                 >
                   {/* Glossy layers */}
