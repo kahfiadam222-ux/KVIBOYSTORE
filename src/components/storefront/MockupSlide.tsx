@@ -24,7 +24,7 @@ export function MockupSlide({
   const thumbnails = floatBanners.slice(0, 4);
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border border-purple-500/15 bg-zinc-950/45 p-2.5 sm:p-3.5 text-zinc-350 font-sans shadow-2xl min-h-[460px] sm:min-h-[380px] md:min-h-[315px] flex flex-col transition-all duration-300 select-none backdrop-blur-md">
+    <div className="relative w-full overflow-hidden rounded-2xl border border-purple-500/15 bg-zinc-950/45 p-2.5 sm:p-3.5 text-zinc-355 font-sans shadow-2xl min-h-[450px] sm:min-h-[340px] md:min-h-[285px] flex flex-col transition-all duration-300 select-none backdrop-blur-md">
       {/* Ambient background glows for Slide 2 */}
       <div className="pointer-events-none absolute -left-12 -top-12 h-36 w-36 rounded-full bg-purple-600/10 blur-[50px]" />
       <div className="pointer-events-none absolute -right-12 -bottom-12 h-36 w-36 rounded-full bg-indigo-600/10 blur-[50px]" />
@@ -44,11 +44,11 @@ export function MockupSlide({
       </div>
 
       {/* Main Mock Website Body */}
-      <div className="relative flex-grow mt-2.5 rounded-xl bg-zinc-950/20 p-2.5 overflow-hidden grid grid-cols-1 md:grid-cols-12 gap-3.5">
+      <div className="relative flex-grow mt-2.5 rounded-xl bg-zinc-950/20 p-2.5 overflow-hidden grid grid-cols-1 sm:grid-cols-12 gap-3.5">
 
         {/* Outline Giant KV Text in background on the left */}
         <div
-          className="absolute left-6 top-1/2 -translate-y-1/2 text-[7.5rem] sm:text-[9.5rem] font-black leading-none pointer-events-none select-none tracking-tighter z-0"
+          className="absolute left-6 top-1/2 -translate-y-1/2 text-[6.5rem] xs:text-[8rem] sm:text-[9.5rem] font-black leading-none pointer-events-none select-none tracking-tighter z-0"
           style={{
             WebkitTextStroke: "1px rgba(168, 85, 247, 0.06)",
             color: "transparent"
@@ -66,7 +66,7 @@ export function MockupSlide({
         </div>
 
         {/* Central Focus: Product Screenshot Placeholder (Techwear Hoodie) */}
-        <div className="md:col-span-7 mt-6 md:mt-3 flex flex-col justify-center relative z-10">
+        <div className="sm:col-span-7 mt-6 sm:mt-3 flex flex-col justify-center relative z-10">
           <div className="group relative w-full h-[145px] sm:h-[155px] md:h-[175px] rounded-lg border border-purple-500/15 bg-gradient-to-br from-purple-950/15 to-zinc-950 shadow-[0_0_15px_rgba(168,85,247,0.03),inset_0_1px_1px_rgba(255,255,255,0.01)] overflow-hidden flex flex-col items-center justify-center p-2.5">
 
             {/* Glossy sheen overlay */}
@@ -74,7 +74,7 @@ export function MockupSlide({
 
             {/* Techwear Graphic Mock */}
             <div className="relative flex items-center justify-center h-14 w-14 sm:h-18 sm:w-18 rounded-xl bg-purple-500/10 border border-purple-500/20 shadow-[0_0_20px_rgba(168,85,247,0.1)] transition-all group-hover:scale-105 duration-500">
-              <Shirt className="h-7 w-7 sm:h-9 sm:w-9 text-purple-400 drop-shadow-[0_0_5px_rgba(168,85,247,0.4)]" />
+              <Shirt className="h-7 w-7 sm:h-9 sm:w-9 text-purple-450 drop-shadow-[0_0_5px_rgba(168,85,247,0.4)]" />
               <div className="absolute inset-x-0 bottom-0.5 flex justify-center">
                 <span className="text-[6px] font-mono tracking-wider text-purple-300/80 bg-purple-950/60 px-1 rounded uppercase">Techwear</span>
               </div>
@@ -100,7 +100,7 @@ export function MockupSlide({
         </div>
 
         {/* Right Side: Frosted Glass Panel with Description, CTA, and Thumbnail Grid INSIDE */}
-        <div className="md:col-span-5 flex flex-col justify-center mt-1.5 md:mt-3 relative z-10">
+        <div className="sm:col-span-5 flex flex-col justify-center mt-1.5 sm:mt-3 relative z-10">
           <div className="rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md p-2.5 shadow-lg flex flex-col justify-between h-[145px] sm:h-[155px] md:h-[175px]">
 
             <div>
@@ -135,7 +135,7 @@ export function MockupSlide({
                           className="absolute inset-0 h-full w-full object-cover opacity-60 group-hover/thumb:scale-105 transition-transform duration-300"
                         />
                       ) : (
-                        <div className="flex flex-col items-center text-zinc-650 group-hover/thumb:text-purple-400 transition-colors">
+                        <div className="flex flex-col items-center text-zinc-655 group-hover/thumb:text-purple-400 transition-colors">
                           <span className="text-[6px] font-mono leading-none">S{idx + 1}</span>
                         </div>
                       )}
@@ -164,7 +164,7 @@ export function MockupSlide({
           </div>
         </div>
 
-        {/* Bottom: Horizontal Promo Banner with Screenshot Placeholder */}
+        {/* Bottom: Horizontal Promo Banner with Screenshot Placeholder (Hidden on Mobile for cleaner responsive height) */}
         <div className="col-span-full mt-1.5 flex items-center justify-between p-1.5 rounded-lg border border-purple-500/10 bg-purple-950/5 shadow-sm relative overflow-hidden z-10">
           <div className="flex items-center gap-1.5">
             <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded bg-purple-500/10 border border-purple-500/20 text-purple-400">
@@ -175,7 +175,7 @@ export function MockupSlide({
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2">
             <div className="w-[100px] h-5 rounded border border-zinc-800 bg-zinc-900/60 flex items-center justify-center text-[6px] font-mono text-zinc-600 leading-none">
               [ additional_screenshot.png ]
             </div>
