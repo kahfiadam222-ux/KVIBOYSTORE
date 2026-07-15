@@ -1,8 +1,9 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, useEffect, useCallback, type ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { useSidebar } from "./sidebar-context";
+import { cn } from "@/lib/utils";
 
 type StorefrontFrameProps = {
   user: {
@@ -15,15 +16,42 @@ type StorefrontFrameProps = {
 
 export function StorefrontFrame({ user, children }: StorefrontFrameProps) {
   const { width, isOverlay, close, isMobile } = useSidebar();
+  const [isClosing, setIsClosing] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
+
+  // Handle overlay animation
+  useEffect(() => {
+    if (isOverlay) {
+      setIsClosing(false);
+      setShowOverlay(true);
+    } else if (showOverlay) {
+      setIsClosing(true);
+      const timer = setTimeout(() => {
+        setShowOverlay(false);
+        setIsClosing(false);
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [isOverlay, showOverlay]);
+
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      close();
+    }, 150);
+  }, [close]);
 
   return (
     <div className="relative min-h-screen w-full max-w-[100vw] overflow-x-hidden">
-      {isOverlay && (
+      {showOverlay && (
         <button
           type="button"
           aria-label="Tutup menu navigasi"
-          className="fixed inset-0 z-40 bg-black/55 backdrop-blur-[2px]"
-          onClick={close}
+          className={cn(
+            "sidebar-overlay fixed inset-0 z-40 bg-black/55 backdrop-blur-[2px]",
+            isClosing && "closing"
+          )}
+          onClick={handleClose}
         />
       )}
 

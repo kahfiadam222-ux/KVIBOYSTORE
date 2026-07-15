@@ -392,6 +392,9 @@ export function Sidebar({ user }: SidebarProps) {
       <aside
         className="sidebar-drawer fixed inset-y-0 left-0 z-50 flex h-[100dvh] w-[min(280px,88vw)] flex-col overflow-hidden border-r border-[var(--glass-border)] bg-gradient-to-b from-[var(--glass-fill)] via-background/96 to-background/92 shadow-2xl backdrop-blur-2xl"
         aria-hidden={false}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu navigasi"
       >
         <SidebarPanel
           user={user}
@@ -404,10 +407,13 @@ export function Sidebar({ user }: SidebarProps) {
   }
 
   return (
-    <div className="sidebar-slot sticky top-0 z-20 h-screen min-w-0">
+    <div
+      className="sidebar-slot sticky top-0 z-20 min-w-0"
+      style={{ width: collapsed ? "72px" : "260px" }}
+    >
       <aside
         className={cn(
-          "sidebar-rail flex h-full w-full flex-col overflow-hidden border-r border-[var(--glass-border)] backdrop-blur-2xl",
+          "sidebar-rail flex h-full h-[100dvh] w-full flex-col overflow-hidden border-r border-[var(--glass-border)] backdrop-blur-2xl",
           "bg-gradient-to-b from-[var(--glass-fill)] via-background/96 to-background/92",
           "shadow-[8px_0_40px_-28px_rgba(0,0,0,0.4)]"
         )}
