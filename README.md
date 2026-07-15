@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# kviboystore
 
-## Getting Started
+Kviboystore adalah platform creative workspace dan digital asset management premium yang dibangun dengan arsitektur modern Next.js 16 + React 19, Tailwind CSS v4, dan Supabase. Platform ini dirancang untuk mempermudah penjualan, pembelian, serta pengelolaan lisensi aset digital dengan alur kerja yang elegan dan aman.
 
-First, run the development server:
+## Fitur Utama
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- 🎨 **Glassmorphic UI/UX**: Tampilan premium dengan tema kustom yang elegan, space background, ambient orbs, dan banner 3D interaktif.
+- 🔐 **Autentikasi & Otorisasi**: Proteksi halaman dashboard admin, seller, dan profile terintegrasi dengan Supabase Auth & Row Level Security (RLS).
+- 🛒 **Storefront Terpadu**: Fitur keranjang belanja (Cart), Wishlist, pencarian cepat (SearchBar), serta dashboard seller untuk mengelola produk.
+- 💳 **Integrasi Pembayaran**: Sistem checkout yang terhubung dengan **Xendit payment gateway** untuk pembayaran instan, top up saldo, payout, dan pengembalian dana (refund).
+- 📦 **Automasi Transaksi**: Cron job auto-confirm dan webhook handler untuk pembaruan status pemesanan secara real-time.
+- 🗃️ **Database Migrations**: Skema database yang lengkap untuk escrow ledger, manajemen stok, ulasan produk, dispute resolution, dan CMS banner dinamis.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Stack Teknologi
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Library UI**: React 19, Framer Motion, Lucide React, Shadcn/ui, Base UI
+- **Styling**: Tailwind CSS v4 + PostCSS
+- **Backend & Database**: Supabase (Auth, Storage, PostgreSQL)
+- **Payment Gateway**: Xendit
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Persiapan Instalasi
 
-## Learn More
+1. **Clone repository**:
+   ```bash
+   git clone https://github.com/kahfiadam222-ux/KVIBOYSTORE.git
+   cd KVIBOYSTORE
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Instal dependensi**:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Konfigurasi Environment Variables**:
+   Salin berkas `.env.local.example` menjadi `.env.local` lalu isi dengan kredensial API Supabase dan Xendit Anda:
+   ```bash
+   cp .env.local.example .env.local
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Jalankan server development**:
+   ```bash
+   npm run dev
+   ```
+   Buka [http://localhost:3000](http://localhost:3000) di peramban Anda.
 
-## Deploy on Vercel
+## Deploy ke Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Proyek ini telah dikonfigurasi untuk dapat dideploy langsung ke Vercel. Pastikan Anda telah mengatur semua environment variables yang terdaftar di `.env.local.example` pada bagian Settings → Environment Variables di dasbor Vercel Anda sebelum melakukan build.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Co-Authored-By: Claude <noreply@anthropic.com>
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
