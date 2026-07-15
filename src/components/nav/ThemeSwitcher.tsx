@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 const PANEL_WIDTH = 288;
 
 export function ThemeSwitcher() {
-  const [activeTheme, setActiveTheme] = useState<ThemeId>("theme-midnight");
+  const [activeTheme, setActiveTheme] = useState<ThemeId>("theme-sakura");
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });

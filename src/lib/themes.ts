@@ -1,38 +1,38 @@
-export const DEFAULT_THEME = "theme-midnight" as const;
+export const DEFAULT_THEME = "theme-sakura" as const;
 
 export const THEME_IDS = [
-  "theme-midnight",
   "theme-daylight",
-  "theme-mono",
-  "theme-ocean",
-  "theme-forest",
   "theme-sakura",
-  "theme-aether",
-  "theme-ember",
 ] as const;
 
 export type ThemeId = (typeof THEME_IDS)[number];
 
 const LIGHT_THEMES = new Set<ThemeId>(["theme-daylight"]);
 
-/** Map legacy theme ids → current set */
+/** Map legacy theme ids → current set (only Daylight and Sumi-e remain) */
 export const LEGACY_THEME_MAP: Record<string, ThemeId> = {
-  "theme-editions": "theme-midnight",
+  "theme-editions": "theme-sakura",
   "theme-paper": "theme-daylight",
-  "theme-ink": "theme-mono",
-  "theme-champagne": "theme-ember",
-  "theme-slate": "theme-ocean",
-  "theme-olive": "theme-forest",
-  "theme-dusk": "theme-aether",
+  "theme-ink": "theme-sakura",
+  "theme-champagne": "theme-sakura",
+  "theme-slate": "theme-sakura",
+  "theme-olive": "theme-sakura",
+  "theme-dusk": "theme-sakura",
   "theme-rose": "theme-sakura",
-  "theme-cosmic": "theme-aether",
-  "theme-jetblack": "theme-mono",
+  "theme-cosmic": "theme-sakura",
+  "theme-jetblack": "theme-sakura",
   "theme-orchid": "theme-sakura",
-  "theme-wineash": "theme-ember",
-  "theme-turquoise": "theme-forest",
-  "theme-candyblue": "theme-ocean",
-  "theme-lavender": "theme-aether",
-  "theme-violet": "theme-aether",
+  "theme-wineash": "theme-sakura",
+  "theme-turquoise": "theme-sakura",
+  "theme-candyblue": "theme-sakura",
+  "theme-lavender": "theme-sakura",
+  "theme-violet": "theme-sakura",
+  "theme-midnight": "theme-sakura",
+  "theme-mono": "theme-sakura",
+  "theme-ocean": "theme-sakura",
+  "theme-forest": "theme-sakura",
+  "theme-aether": "theme-sakura",
+  "theme-ember": "theme-sakura",
 };
 
 export const THEMES: Array<{
@@ -43,13 +43,6 @@ export const THEMES: Array<{
   mode: "dark" | "light";
 }> = [
   {
-    id: "theme-midnight",
-    label: "Midnight",
-    description: "Netral gelap modern",
-    swatch: "linear-gradient(135deg, #0C0D10 0%, #1A1C22 50%, #4F6D8A 100%)",
-    mode: "dark",
-  },
-  {
     id: "theme-daylight",
     label: "Daylight",
     description: "Terang bersih",
@@ -57,45 +50,10 @@ export const THEMES: Array<{
     mode: "light",
   },
   {
-    id: "theme-mono",
-    label: "Mono",
-    description: "Hitam putih tegas",
-    swatch: "linear-gradient(135deg, #09090B 0%, #18181B 55%, #FAFAFA 100%)",
-    mode: "dark",
-  },
-  {
-    id: "theme-ocean",
-    label: "Ocean",
-    description: "Biru laut tenang",
-    swatch: "linear-gradient(135deg, #0A121A 0%, #152433 50%, #3D8ABF 100%)",
-    mode: "dark",
-  },
-  {
-    id: "theme-forest",
-    label: "Forest",
-    description: "Hijau sage soft",
-    swatch: "linear-gradient(135deg, #0C120E 0%, #1A241C 50%, #4A8A62 100%)",
-    mode: "dark",
-  },
-  {
     id: "theme-sakura",
     label: "Sumi-e",
     description: "Tinta kuas & merah Jepang",
     swatch: "linear-gradient(135deg, #101012 0%, #222226 50%, #BC2026 100%)",
-    mode: "dark",
-  },
-  {
-    id: "theme-aether",
-    label: "Aether",
-    description: "Anime soft cyber",
-    swatch: "linear-gradient(135deg, #10101A 0%, #2A2440 45%, #8B7CF0 70%, #5EC8E8 100%)",
-    mode: "dark",
-  },
-  {
-    id: "theme-ember",
-    label: "Aizome",
-    description: "Kuas nila & bambu Jepang",
-    swatch: "linear-gradient(135deg, #090C12 0%, #171E2B 50%, #3B5E91 100%)",
     mode: "dark",
   },
 ];
