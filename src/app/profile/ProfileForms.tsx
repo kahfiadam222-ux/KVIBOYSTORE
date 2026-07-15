@@ -2,7 +2,8 @@
 
 import { useState, useRef } from "react";
 import { updateProfile, updatePassword } from "./actions";
-import { compressImage } from "@/lib/image";
+import { compressImageDetailed } from "@/lib/image";
+import { IMAGE_PRESETS } from "@/lib/image-presets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,7 +49,7 @@ export function ProfileForms({
 
     setUploadingAvatar(true);
     try {
-      const base64Data = await compressImage(file, 200, 200, 0.85);
+      const { dataUrl: base64Data } = await compressImageDetailed(file, IMAGE_PRESETS.avatar);
       setAvatarPreview(base64Data);
     } catch (err) {
       console.error("Gagal mengompresi gambar:", err);
@@ -65,8 +66,7 @@ export function ProfileForms({
 
     setUploadingCover(true);
     try {
-      // Compress cover banner image (wider aspect ratio)
-      const base64Data = await compressImage(file, 1200, 300, 0.75);
+      const { dataUrl: base64Data } = await compressImageDetailed(file, IMAGE_PRESETS.cover);
       setCoverPreview(base64Data);
     } catch (err) {
       console.error("Gagal mengompresi gambar sampul:", err);

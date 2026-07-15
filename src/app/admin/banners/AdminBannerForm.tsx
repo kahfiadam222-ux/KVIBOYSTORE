@@ -2,7 +2,8 @@
 
 import { useState, useRef } from "react";
 import { createBanner } from "./actions";
-import { compressImage } from "@/lib/image";
+import { compressImageDetailed } from "@/lib/image";
+import { IMAGE_PRESETS } from "@/lib/image-presets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,12 +21,11 @@ export function AdminBannerForm() {
 
     setCompressing(true);
     try {
-      // Compress banner image
-      const base64 = await compressImage(file, 1200, 600, 0.75);
-      setImagePreview(base64);
+      const { dataUrl } = await compressImageDetailed(file, IMAGE_PRESETS.bannerHorizontal);
+      setImagePreview(dataUrl);
     } catch (err) {
       console.error(err);
-      alert("Gagal mengompresi gambar banner.");
+      alert(err instanceof Error ? err.message : "Gagal mengompresi gambar banner.");
     } finally {
       setCompressing(false);
     }
@@ -119,7 +119,7 @@ export function AdminBannerForm() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="ctaLabel">Label Tombol</Label>
           <Input id="ctaLabel" name="ctaLabel" placeholder="Lihat Produk" className="h-10 rounded-xl" />
@@ -130,7 +130,7 @@ export function AdminBannerForm() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="sortOrder">Urutan Tampil</Label>
           <Input id="sortOrder" name="sortOrder" type="number" defaultValue={0} className="h-10 rounded-xl" />
@@ -151,8 +151,9 @@ export function AdminBannerForm() {
 
       <Button
         type="submit"
+        size="touch"
         disabled={compressing}
-        className="h-11 rounded-xl font-bold mt-2 shadow-lg shadow-primary/20 hover:shadow-primary/30 cursor-pointer"
+        className="rounded-xl font-bold mt-2 shadow-lg shadow-primary/20 hover:shadow-primary/30 cursor-pointer w-full sm:w-auto"
       >
         {compressing ? "Mengompresi..." : "Tambah Banner"}
       </Button>

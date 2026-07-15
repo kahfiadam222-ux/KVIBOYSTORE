@@ -2,7 +2,8 @@
 
 import { useState, useRef } from "react";
 import { createListing } from "@/app/seller/dashboard/actions";
-import { compressImage } from "@/lib/image";
+import { compressImageDetailed } from "@/lib/image";
+import { IMAGE_PRESETS } from "@/lib/image-presets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,12 +31,11 @@ export function CreateListingForm({
 
     setCompressing(true);
     try {
-      // Compress product image to a square format (400x400)
-      const base64 = await compressImage(file, 400, 400, 0.85);
-      setImagePreview(base64);
+      const { dataUrl } = await compressImageDetailed(file, IMAGE_PRESETS.product);
+      setImagePreview(dataUrl);
     } catch (err) {
       console.error(err);
-      alert("Gagal mengompresi foto produk.");
+      alert(err instanceof Error ? err.message : "Gagal mengompresi foto produk.");
     } finally {
       setCompressing(false);
     }
@@ -230,8 +230,9 @@ export function CreateListingForm({
 
           <Button
             type="submit"
+            size="touch"
             disabled={compressing || submitting}
-            className="h-11 rounded-xl font-bold mt-2 shadow-lg shadow-primary/20 hover:shadow-primary/30 cursor-pointer"
+            className="rounded-xl font-bold mt-2 shadow-lg shadow-primary/20 hover:shadow-primary/30 cursor-pointer w-full sm:w-auto"
           >
             {compressing ? "Mengompresi..." : submitting ? "Membuat..." : "Buat Listing"}
           </Button>

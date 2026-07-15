@@ -2,7 +2,8 @@
 
 import { useState, useRef } from "react";
 import { updateListing } from "@/app/seller/dashboard/actions";
-import { compressImage } from "@/lib/image";
+import { compressImageDetailed } from "@/lib/image";
+import { IMAGE_PRESETS } from "@/lib/image-presets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,12 +58,11 @@ export function SellerListingCard({
 
     setUploadingProductImage(true);
     try {
-      // Compress product image to a square format (400x400)
-      const base64 = await compressImage(file, 400, 400, 0.85);
-      setProductImagePreview(base64);
+      const { dataUrl } = await compressImageDetailed(file, IMAGE_PRESETS.product);
+      setProductImagePreview(dataUrl);
     } catch (err) {
       console.error(err);
-      alert("Gagal mengompresi foto produk.");
+      alert(err instanceof Error ? err.message : "Gagal mengompresi foto produk.");
     } finally {
       setUploadingProductImage(false);
     }
@@ -114,8 +114,8 @@ export function SellerListingCard({
             <Button
               onClick={() => setIsEditing(true)}
               variant="outline"
-              size="sm"
-              className="h-9 rounded-xl font-semibold gap-1.5 px-3 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
+              size="touch"
+              className="rounded-xl font-semibold gap-1.5 px-3 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer w-full sm:w-auto"
               type="button"
             >
               <Edit2 className="h-3.5 w-3.5" />
@@ -272,13 +272,15 @@ export function SellerListingCard({
                 type="button"
                 onClick={() => setIsEditing(false)}
                 variant="outline"
-                className="h-9 rounded-xl font-semibold px-4 cursor-pointer"
+                size="touch"
+                className="rounded-xl font-semibold px-4 cursor-pointer flex-1 sm:flex-none"
               >
                 Batal
               </Button>
               <Button
                 type="submit"
-                className="h-9 rounded-xl font-semibold px-4 shadow-lg shadow-primary/20 hover:shadow-primary/35 gap-1 cursor-pointer"
+                size="touch"
+                className="rounded-xl font-semibold px-4 shadow-lg shadow-primary/20 hover:shadow-primary/35 gap-1 cursor-pointer flex-1 sm:flex-none"
               >
                 <Check className="h-4 w-4" /> Simpan Perubahan
               </Button>

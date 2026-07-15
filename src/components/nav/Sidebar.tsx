@@ -1,9 +1,11 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useSidebar } from "./sidebar-context";
+import { SIDEBAR_WIDTH_EXPANDED } from "./sidebar-context";
 import {
   Home,
   ShoppingCart,
@@ -60,6 +62,50 @@ const quickActions = [
   { href: "/support", label: "Bantuan", icon: HelpCircle },
 ];
 
+function SidebarNavLabel({
+  collapsed,
+  children,
+  className,
+}: {
+  collapsed: boolean;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        "truncate whitespace-nowrap transition-all duration-300 ease-in-out",
+        collapsed ? "max-w-0 opacity-0" : "max-w-full flex-1 opacity-100",
+        className
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
+function SidebarSectionLabel({
+  collapsed,
+  children,
+  className,
+}: {
+  collapsed: boolean;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        "mb-2 block overflow-hidden px-3 text-[10px] font-semibold uppercase tracking-[0.18em] transition-all duration-300",
+        collapsed ? "max-h-0 opacity-0" : "max-h-6 opacity-100",
+        className
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
 const categories = [
   { href: "/?q=netflix", label: "Netflix", icon: Tv },
   { href: "/?q=spotify", label: "Spotify", icon: Music2 },
@@ -69,40 +115,44 @@ const categories = [
   { href: "/?q=microsoft", label: "Microsoft 365", icon: FileText },
 ];
 
-export function Sidebar({ user }: SidebarProps) {
+function SidebarPanel({
+  user,
+  collapsed,
+  toggle,
+  onNavigate,
+}: {
+  user: SidebarProps["user"];
+  collapsed: boolean;
+  toggle: () => void;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(true);
-
-  useEffect(() => {
-    if (window.innerWidth >= 1024) {
-      setCollapsed(false);
-    }
-  }, []);
 
   return (
-    <aside
-      className={cn(
-        "fixed left-0 top-0 z-30 h-screen border-r border-[var(--glass-border)] backdrop-blur-2xl transition-all duration-300",
-        "bg-gradient-to-b from-[var(--glass-fill)] via-background/96 to-background/92",
-        "shadow-[8px_0_40px_-28px_rgba(0,0,0,0.4)]",
-        collapsed ? "w-[72px]" : "w-[260px]"
-      )}
-    >
-      <div className="flex h-16 items-center justify-between border-b border-[var(--glass-border)] px-3 gap-2">
-        {!collapsed && (
-          <Link
-            href="/"
-            className="brand-wordmark min-w-0 truncate px-1 text-[1.05rem] text-foreground hover:text-primary transition-colors"
-          >
-            kviboystore
-          </Link>
+    <>
+      <div
+        className={cn(
+          "sidebar-topbar flex h-16 shrink-0 items-center gap-2 overflow-hidden border-b border-[var(--glass-border)] px-3",
+          collapsed ? "justify-center" : "justify-between"
         )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
+      >
+        <Link
+          href="/"
+          onClick={onNavigate}
           className={cn(
-            "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-[var(--glass-border)] bg-background/40 text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary hover:border-primary/25",
-            collapsed && "mx-auto"
+            "brand-wordmark min-w-0 truncate text-[1.05rem] text-foreground transition-all duration-300 ease-in-out hover:text-primary",
+            collapsed
+              ? "pointer-events-none max-w-0 opacity-0"
+              : "max-w-[170px] flex-1 px-1 opacity-100"
           )}
+          tabIndex={collapsed ? -1 : 0}
+          aria-hidden={collapsed}
+        >
+          kviboystore
+        </Link>
+        <button
+          onClick={toggle}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--glass-border)] bg-background/40 text-muted-foreground transition-all hover:border-primary/25 hover:bg-primary/10 hover:text-primary touch-manipulation"
           aria-label={collapsed ? "Perluas sidebar" : "Ciutkan sidebar"}
           type="button"
         >
@@ -114,13 +164,11 @@ export function Sidebar({ user }: SidebarProps) {
         </button>
       </div>
 
-      <div className="flex h-[calc(100vh-4rem)] flex-col overflow-y-auto overflow-x-hidden py-4 scrollbar-thin">
+      <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto py-4 scrollbar-thin">
         <nav className="space-y-1 px-3">
-          {!collapsed && (
-            <span className="mb-2 block px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
-              Menu
-            </span>
-          )}
+          <SidebarSectionLabel collapsed={collapsed} className="text-muted-foreground/70">
+            Menu
+          </SidebarSectionLabel>
           {mainNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -128,6 +176,7 @@ export function Sidebar({ user }: SidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={onNavigate}
                 className={cn(
                   "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   isActive
@@ -146,45 +195,51 @@ export function Sidebar({ user }: SidebarProps) {
                 >
                   <Icon className="h-[18px] w-[18px]" />
                 </div>
-                {!collapsed && <span className="flex-1">{item.label}</span>}
-                {isActive && !collapsed && (
-                  <div className="absolute right-2 h-1.5 w-1.5 rounded-full bg-primary" />
-                )}
+                <SidebarNavLabel collapsed={collapsed}>{item.label}</SidebarNavLabel>
+                <div
+                  className={cn(
+                    "absolute right-2 h-1.5 w-1.5 rounded-full bg-primary transition-opacity duration-300",
+                    isActive && !collapsed ? "opacity-100" : "opacity-0"
+                  )}
+                />
               </Link>
             );
           })}
         </nav>
 
-        {!collapsed && (
-          <div className="mt-6 px-3">
-            <span className="mb-2 block px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
-              Kategori
-            </span>
-            <div className="grid grid-cols-2 gap-1.5">
-              {categories.map((cat) => {
-                const Icon = cat.icon;
-                return (
-                  <Link
-                    key={cat.href}
-                    href={cat.href}
-                    className="flex items-center gap-2 rounded-lg bg-[var(--glass-fill)]/60 px-2.5 py-2 text-xs font-medium text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary"
-                  >
-                    <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />
-                    <span className="truncate">{cat.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
+        <div
+          className={cn(
+            "mt-6 overflow-hidden px-3 transition-all duration-300 ease-in-out",
+            collapsed ? "pointer-events-none max-h-0 opacity-0" : "max-h-[420px] opacity-100"
+          )}
+        >
+          <SidebarSectionLabel collapsed={collapsed} className="text-muted-foreground/70">
+            Kategori
+          </SidebarSectionLabel>
+          <div className="grid grid-cols-2 gap-1.5">
+            {categories.map((cat) => {
+              const Icon = cat.icon;
+              return (
+                <Link
+                  key={cat.href}
+                  href={cat.href}
+                  onClick={onNavigate}
+                  tabIndex={collapsed ? -1 : 0}
+                  className="flex items-center gap-2 rounded-lg bg-[var(--glass-fill)]/60 px-2.5 py-2 text-xs font-medium text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary"
+                >
+                  <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />
+                  <span className="truncate">{cat.label}</span>
+                </Link>
+              );
+            })}
           </div>
-        )}
+        </div>
 
         {user?.role === "admin" && (
           <div className="mt-6 space-y-1 px-3">
-            {!collapsed && (
-              <span className="mb-2 block px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary/80">
-                Admin
-              </span>
-            )}
+            <SidebarSectionLabel collapsed={collapsed} className="text-primary/80">
+              Admin
+            </SidebarSectionLabel>
             {adminNavItems.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -193,6 +248,7 @@ export function Sidebar({ user }: SidebarProps) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={onNavigate}
                   className={cn(
                     "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                     isActive
@@ -211,34 +267,38 @@ export function Sidebar({ user }: SidebarProps) {
                   >
                     <Icon className="h-[18px] w-[18px]" />
                   </div>
-                  {!collapsed && <span className="flex-1">{item.label}</span>}
+                  <SidebarNavLabel collapsed={collapsed}>{item.label}</SidebarNavLabel>
                 </Link>
               );
             })}
-            {!collapsed && (
-              <Link
-                href="/admin/banners"
-                className="mt-1 flex items-center gap-2 rounded-xl bg-[image:var(--primary-gradient)] px-3 py-2.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)]"
-              >
-                <LayoutDashboard className="h-4 w-4" />
-                Panel konten
-              </Link>
-            )}
+            <Link
+              href="/admin/banners"
+              onClick={onNavigate}
+              tabIndex={collapsed ? -1 : 0}
+              className={cn(
+                "mt-1 flex items-center gap-2 overflow-hidden rounded-xl bg-[image:var(--primary-gradient)] px-3 py-2.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-all duration-300",
+                collapsed
+                  ? "pointer-events-none max-h-0 opacity-0 py-0"
+                  : "max-h-12 opacity-100"
+              )}
+            >
+              <LayoutDashboard className="h-4 w-4 shrink-0" />
+              <span className="truncate">Panel konten</span>
+            </Link>
           </div>
         )}
 
         <div className="mt-6 space-y-1 px-3">
-          {!collapsed && (
-            <span className="mb-2 block px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
-              Aksi
-            </span>
-          )}
+          <SidebarSectionLabel collapsed={collapsed} className="text-muted-foreground/70">
+            Aksi
+          </SidebarSectionLabel>
           {quickActions.map((item) => {
             const Icon = item.icon;
             return (
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={onNavigate}
                 className={cn(
                   "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   item.highlight
@@ -257,16 +317,23 @@ export function Sidebar({ user }: SidebarProps) {
                 >
                   <Icon className="h-[18px] w-[18px]" />
                 </div>
-                {!collapsed && <span>{item.label}</span>}
+                <SidebarNavLabel collapsed={collapsed}>{item.label}</SidebarNavLabel>
               </Link>
             );
           })}
         </div>
 
         <div className="mt-auto border-t border-[var(--glass-border)] px-3 pt-4">
-          {!collapsed && user && (
-            <div className="mb-3 flex items-center gap-3 rounded-xl bg-[var(--glass-fill)]/60 px-3 py-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 text-primary">
+          {user && (
+            <div
+              className={cn(
+                "mb-3 flex items-center gap-3 overflow-hidden rounded-xl bg-[var(--glass-fill)]/60 px-3 transition-all duration-300",
+                collapsed
+                  ? "pointer-events-none max-h-0 opacity-0 py-0"
+                  : "max-h-20 opacity-100 py-2.5"
+              )}
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
                 <User className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
@@ -287,10 +354,17 @@ export function Sidebar({ user }: SidebarProps) {
             )}
           >
             <ThemeSwitcher />
-            {user && !collapsed && (
+            {user && (
               <Link
                 href="/profile"
-                className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-all hover:bg-[var(--glass-fill)] hover:text-foreground"
+                onClick={onNavigate}
+                tabIndex={collapsed ? -1 : 0}
+                className={cn(
+                  "flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-all duration-300 hover:bg-[var(--glass-fill)] hover:text-foreground",
+                  collapsed
+                    ? "pointer-events-none max-h-0 max-w-0 opacity-0"
+                    : "opacity-100"
+                )}
               >
                 <Settings className="h-4 w-4" />
               </Link>
@@ -298,6 +372,48 @@ export function Sidebar({ user }: SidebarProps) {
           </div>
         </div>
       </div>
-    </aside>
+    </>
+  );
+}
+
+export function Sidebar({ user }: SidebarProps) {
+  const { collapsed, toggle, close, isOverlay } = useSidebar();
+  const railCollapsed = isOverlay || collapsed;
+
+  return (
+    <div className="sidebar-slot sticky top-0 z-20 h-screen min-w-0">
+      {/* Rail di dalam grid — lebar mengikuti kolom grid */}
+      <aside
+        className={cn(
+          "sidebar-rail flex h-full w-full flex-col overflow-hidden border-r border-[var(--glass-border)] backdrop-blur-2xl",
+          "bg-gradient-to-b from-[var(--glass-fill)] via-background/96 to-background/92",
+          "shadow-[8px_0_40px_-28px_rgba(0,0,0,0.4)]"
+        )}
+        aria-expanded={!railCollapsed}
+      >
+        <SidebarPanel
+          user={user}
+          collapsed={railCollapsed}
+          toggle={toggle}
+        />
+      </aside>
+
+      {/* Mobile: panel penuh melayang di atas konten saat dibuka */}
+      {isOverlay && (
+        <aside
+          className="sidebar-drawer fixed left-0 top-0 z-50 flex h-screen flex-col overflow-hidden border-r border-[var(--glass-border)] backdrop-blur-2xl shadow-2xl"
+          style={{ width: SIDEBAR_WIDTH_EXPANDED }}
+        >
+          <div className="flex h-full w-full flex-col bg-gradient-to-b from-[var(--glass-fill)] via-background/96 to-background/92">
+            <SidebarPanel
+              user={user}
+              collapsed={false}
+              toggle={toggle}
+              onNavigate={close}
+            />
+          </div>
+        </aside>
+      )}
+    </div>
   );
 }

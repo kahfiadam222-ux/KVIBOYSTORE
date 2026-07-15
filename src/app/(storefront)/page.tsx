@@ -21,6 +21,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { StorefrontImage } from "@/components/ui/StorefrontImage";
 
 function formatPrice(amount: number, currency: string) {
   return new Intl.NumberFormat("id-ID", {
@@ -128,24 +129,22 @@ export default async function StorefrontPage({
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {listings.map((listing) => {
+          {listings.map((listing, listingIndex) => {
             const tier = getDeliveryLabel(listing);
             return (
               <TiltCard
                 key={listing.listingId}
-                className="relative rounded-2xl product-card-shell"
+                className="group/card relative rounded-2xl product-card-shell"
               >
                 <Card className="h-full glass-card rounded-[inherit] border-0 shadow-none transition-shadow duration-300 hover:shadow-[var(--shadow-glow)]">
-                  <div className="h-24 sm:h-32 w-full overflow-hidden relative rounded-t-[inherit]">
-                    <div
-                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover/card:scale-110"
-                      style={{
-                        backgroundImage: listing.imageUrl
-                          ? `url(${listing.imageUrl})`
-                          : "var(--primary-gradient)",
-                      }}
+                  <div className="h-28 sm:h-36 w-full overflow-hidden relative rounded-t-[inherit]">
+                    <StorefrontImage
+                      src={listing.imageUrl}
+                      alt={listing.productTypeName}
+                      priority={listingIndex < 6}
+                      overlay="product"
+                      className="absolute inset-0"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent opacity-80" />
                     <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
                       {listing.isPlatformOwned && (
                         <Badge className="bg-[var(--glass-fill)] backdrop-blur-lg text-[var(--gold)] border-[var(--glass-border)] text-[8px] sm:text-[9px] font-bold py-0.5 px-1.5 shadow-sm rounded-md flex items-center gap-0.5">
@@ -202,8 +201,8 @@ export default async function StorefrontPage({
                       />
                       <Button
                         type="submit"
-                        size="xs"
-                        className="w-full text-[10px] sm:text-xs font-semibold h-8 sm:h-9 rounded-xl"
+                        size="touch"
+                        className="w-full rounded-xl font-semibold shadow-md"
                       >
                         Beli Sekarang
                       </Button>

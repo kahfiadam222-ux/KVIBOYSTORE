@@ -226,15 +226,24 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
                   <span aria-hidden className="float-banner-sheen" />
                   <span aria-hidden className="float-banner-rim" />
 
-                  <span
-                    className="float-banner-media absolute inset-0"
-                    style={{
-                      backgroundImage: banner.imageUrl
-                        ? `url(${banner.imageUrl})`
-                        : undefined,
-                    }}
-                    data-has-image={banner.imageUrl ? "1" : "0"}
-                  />
+                  {banner.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={banner.imageUrl}
+                      alt=""
+                      className="float-banner-media absolute inset-0 h-full w-full object-cover object-center"
+                      loading="eager"
+                      decoding="async"
+                      fetchPriority="high"
+                      draggable={false}
+                      aria-hidden
+                    />
+                  ) : (
+                    <span
+                      className="float-banner-media absolute inset-0"
+                      data-has-image="0"
+                    />
+                  )}
                   <span className="float-banner-scrim absolute inset-0" />
 
                   <span className="relative z-[2] flex h-full flex-col justify-end p-3 sm:p-3.5">

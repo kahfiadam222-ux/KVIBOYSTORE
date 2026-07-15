@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { HomepageBanner } from "@/lib/banners/queries";
 import { Button } from "@/components/ui/button";
+import { StorefrontImage } from "@/components/ui/StorefrontImage";
 
 const AUTO_SLIDE_MS = 5000;
 const SWIPE_THRESHOLD_PX = 50;
@@ -21,9 +22,6 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
     [banners.length],
   );
 
-  // Restarts the 5s countdown from zero — a manual slide (dot, arrow, or
-  // swipe) counts as the user "taking the wheel," so auto-advance shouldn't
-  // fire a moment later on the old schedule.
   const resetAutoSlide = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     if (banners.length <= 1) return;
@@ -96,30 +94,28 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
               pointerEvents: isActive ? "auto" : "none",
             }}
           >
-            <div
-              className="flex h-full w-full flex-col justify-center gap-2 px-4 sm:gap-3 sm:px-8 lg:px-12"
-              style={{
-                backgroundImage: banner.imageUrl
-                  ? `linear-gradient(120deg, color-mix(in oklch, var(--background) 55%, transparent), color-mix(in oklch, var(--background) 15%, transparent)), url(${banner.imageUrl})`
-                  : "var(--primary-gradient)",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
+            <StorefrontImage
+              src={banner.imageUrl}
+              alt={banner.title}
+              priority={i === 0}
+              overlay="banner"
+              className="absolute inset-0"
+            />
+            <div className="relative z-10 flex h-full w-full flex-col justify-center gap-2 px-4 sm:gap-3 sm:px-8 lg:px-12">
               <h2 className="max-w-md heading-display text-xl font-bold text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)] sm:text-2xl lg:text-3xl">
                 {banner.title}
               </h2>
               {banner.subtitle && (
-                <p className="max-w-md text-xs text-white/85 sm:text-sm lg:text-base">
+                <p className="max-w-md text-xs text-white/90 sm:text-sm lg:text-base">
                   {banner.subtitle}
                 </p>
               )}
               {banner.ctaLabel && banner.ctaHref && (
                 <Link href={banner.ctaHref} className="w-fit">
-                  <Button size="sm" className="mt-1 sm:hidden">
-                    {banner.ctaLabel}
-                  </Button>
-                  <Button size="lg" className="mt-2 hidden sm:inline-flex">
+                  <Button
+                    size="touch"
+                    className="mt-1 sm:mt-2 rounded-xl font-semibold shadow-lg"
+                  >
                     {banner.ctaLabel}
                   </Button>
                 </Link>
@@ -136,7 +132,7 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
           <button
             aria-label="Sebelumnya"
             onClick={() => handleManualNav(index - 1)}
-            className="absolute top-1/2 left-3 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white opacity-0 backdrop-blur transition-opacity group-hover:opacity-100"
+            className="carousel-nav-btn absolute top-1/2 left-2 sm:left-3 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity touch-manipulation"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M15 18l-6-6 6-6" />
@@ -145,21 +141,21 @@ export function BannerCarousel({ banners }: { banners: HomepageBanner[] }) {
           <button
             aria-label="Berikutnya"
             onClick={() => handleManualNav(index + 1)}
-            className="absolute top-1/2 right-3 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white opacity-0 backdrop-blur transition-opacity group-hover:opacity-100"
+            className="carousel-nav-btn absolute top-1/2 right-2 sm:right-3 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity touch-manipulation"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M9 18l6-6-6-6" />
             </svg>
           </button>
 
-          <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5">
+          <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
             {banners.map((banner, i) => (
               <button
                 key={banner.id}
                 aria-label={`Slide ${i + 1}`}
                 onClick={() => handleManualNav(i)}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === index ? "w-6 bg-[var(--gold)]" : "w-1.5 bg-white/40"
+                className={`min-h-[10px] min-w-[10px] rounded-full transition-all touch-manipulation ${
+                  i === index ? "h-2.5 w-7 bg-[var(--gold)]" : "h-2.5 w-2.5 bg-white/50"
                 }`}
               />
             ))}

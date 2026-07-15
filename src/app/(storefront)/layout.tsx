@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/nav/Navbar";
-import { Sidebar } from "@/components/nav/Sidebar";
+import { SidebarProvider } from "@/components/nav/sidebar-context";
+import { StorefrontFrame } from "@/components/nav/StorefrontFrame";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function StorefrontLayout({
@@ -27,15 +28,11 @@ export default async function StorefrontLayout({
   }
 
   return (
-    <div className="flex min-h-screen w-full overflow-x-hidden">
-      {/* Sidebar - Always visible on left for both mobile and desktop */}
-      <Sidebar user={userWithRole} />
-
-      {/* Main Content Area - shifts to make space for sidebar */}
-      <div className="flex flex-1 flex-col pl-[72px] lg:pl-[260px] transition-all duration-300 w-full min-w-0">
+    <SidebarProvider>
+      <StorefrontFrame user={userWithRole}>
         <Navbar />
         <main className="flex-1 w-full">{children}</main>
-      </div>
-    </div>
+      </StorefrontFrame>
+    </SidebarProvider>
   );
 }

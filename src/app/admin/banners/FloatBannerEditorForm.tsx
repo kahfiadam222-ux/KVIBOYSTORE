@@ -2,7 +2,8 @@
 
 import { useActionState, useRef, useState } from "react";
 import { updateFloatBanner, type CmsActionState } from "./cms-actions";
-import { compressImage } from "@/lib/image";
+import { compressImageDetailed } from "@/lib/image";
+import { IMAGE_PRESETS } from "@/lib/image-presets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,11 +26,11 @@ export function FloatBannerEditorForm({ banner }: { banner: FloatBanner }) {
     if (!file) return;
     setCompressing(true);
     try {
-      const base64 = await compressImage(file, 900, 1200, 0.78);
-      setImagePreview(base64);
+      const { dataUrl } = await compressImageDetailed(file, IMAGE_PRESETS.floatBanner);
+      setImagePreview(dataUrl);
       setClearImage(false);
-    } catch {
-      alert("Gagal mengompresi gambar.");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Gagal mengompresi gambar.");
     } finally {
       setCompressing(false);
     }
@@ -78,7 +79,7 @@ export function FloatBannerEditorForm({ banner }: { banner: FloatBanner }) {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor={`ctaLabel-${banner.slot}`}>Label tombol</Label>
           <Input
@@ -151,9 +152,9 @@ export function FloatBannerEditorForm({ banner }: { banner: FloatBanner }) {
 
       <Button
         type="submit"
-        size="sm"
+        size="touch"
         disabled={pending || compressing}
-        className="rounded-xl font-semibold w-fit"
+        className="rounded-xl font-semibold w-full sm:w-fit"
       >
         {compressing
           ? "Mengompresi..."
