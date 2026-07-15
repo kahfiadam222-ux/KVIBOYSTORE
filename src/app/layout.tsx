@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { headers } from "next/headers";
 import { SpaceBackground } from "@/components/effects/SpaceBackground";
 import { AmbientOrbs } from "@/components/effects/AmbientOrbs";
+import { WelcomeScreen } from "@/components/effects/WelcomeScreen";
 import "./globals.css";
 
 const inter = Inter({
@@ -74,6 +75,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col font-sans">
+        <WelcomeScreen />
         <SpaceBackground />
         <AmbientOrbs />
         {children}
