@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { FloatBanner } from "@/lib/storefront/defaults";
 import { cn } from "@/lib/utils";
-import { X, ArrowRight, ExternalLink } from "lucide-react";
+import { X, ExternalLink } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 
 /**
@@ -40,7 +40,7 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
     setTimeout(() => {
       setZoomedBanner(null);
       document.body.style.overflow = "";
-    }, 250); // Sesuai durasi fade-out
+    }, 180); // Sesuai durasi fade-out cepat
   };
 
   useEffect(() => {
@@ -124,7 +124,7 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
     };
 
     const onWheel = (e: WheelEvent) => {
-      if (zoomedBanner) return; // Nonaktifkan scroll wheel manipulasi jika dizoom
+      if (zoomedBanner) return;
       if (Math.abs(e.deltaX) < 1 && Math.abs(e.deltaY) < 1) return;
       e.preventDefault();
       const delta = e.deltaY * 0.65 + e.deltaX * 0.85;
@@ -241,7 +241,6 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
                       dragRef.current.moved = false;
                       return;
                     }
-                    // Klik memicu Zoom-in modal
                     handleOpenZoom(banner);
                   }}
                 >
@@ -295,84 +294,90 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
       {zoomedBanner && (
         <div
           className={cn(
-            "fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6",
-            "bg-black/55 backdrop-blur-[12px] transition-all duration-300 ease-out",
+            "fixed inset-0 z-[120] flex items-center justify-center p-4",
+            "bg-black/35 backdrop-blur-[6px] transition-all duration-200 ease-out",
             modalStage === "enter" ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
           onClick={handleCloseZoom}
         >
-          {/* Main Modal Box */}
+          {/* Main Modal Box - Vertically Oriented Card (aspect-[3/4]) like original banner card */}
           <div
             className={cn(
-              "relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[var(--glass-fill)] via-background/96 to-background/92 shadow-2xl backdrop-blur-2xl",
-              "transition-all duration-300 cubic-bezier(0.34, 1.56, 0.64, 1)",
-              modalStage === "enter" ? "scale-100 opacity-100 translate-y-0" : "scale-95 opacity-0 translate-y-4"
+              "relative w-full max-w-[280px] sm:max-w-[310px] aspect-[3/4.2] overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-b from-[var(--glass-fill)] via-background/98 to-background/96 shadow-2xl backdrop-blur-2xl",
+              "transition-all duration-200 cubic-bezier(0.16, 1, 0.3, 1)",
+              modalStage === "enter" ? "scale-100 opacity-100 translate-z-0" : "scale-[0.88] opacity-0 -translate-z-10"
             )}
-            onClick={(e) => e.stopPropagation()} // Cegah penutupan saat mengklik di dalam boks
+            style={{
+              transformStyle: "preserve-3d",
+            }}
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={handleCloseZoom}
-              className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-background/50 text-muted-foreground backdrop-blur-md transition-all hover:bg-white/10 hover:text-foreground active:scale-95 cursor-pointer"
+              className="absolute right-3 top-3 z-20 flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-background/60 text-muted-foreground backdrop-blur-md transition-all hover:bg-white/10 hover:text-foreground active:scale-90 cursor-pointer"
               aria-label="Tutup zoom"
             >
-              <X className="h-4.5 w-4.5" />
+              <X className="h-3.5 w-3.5" />
             </button>
 
-            {/* Media/Image Area */}
-            <div className="relative aspect-video w-full overflow-hidden bg-muted">
-              {zoomedBanner.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={zoomedBanner.imageUrl}
-                  alt={zoomedBanner.title}
-                  className="h-full w-full object-cover object-center select-none"
-                  draggable={false}
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/35 flex items-center justify-center">
-                  <span className="brand-wordmark text-2xl text-premium opacity-50">kviboystore</span>
-                </div>
-              )}
-              {/* Glossy gradient bottom to text readability */}
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
-            </div>
+            {/* Glossy layers */}
+            <span aria-hidden className="float-banner-sheen opacity-40" />
+            <span aria-hidden className="float-banner-rim" />
 
-            {/* Contents / Description Area */}
-            <div className="p-5 sm:p-6">
-              <span className="eyebrow block text-primary/95 text-[10px] sm:text-[11px] mb-1.5">
-                Detail Promo & Konten
+            {/* Vertical Image */}
+            {zoomedBanner.imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={zoomedBanner.imageUrl}
+                alt={zoomedBanner.title}
+                className="absolute inset-0 h-full w-full object-cover object-center select-none"
+                draggable={false}
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/35 flex items-center justify-center">
+                <span className="brand-wordmark text-2xl text-premium opacity-50">kviboystore</span>
+              </div>
+            )}
+
+            {/* Dark Scrim overlay to ensure readable text */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/45 to-black/85 z-[1]" />
+
+            {/* Content Area - Absolute positioned at the bottom of the card */}
+            <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 z-[2] flex flex-col justify-end">
+              <span className="eyebrow block text-primary text-[9px] mb-1 tracking-[0.2em] font-bold">
+                PROMO PILIHAN
               </span>
-              <h3 className="heading-display text-lg sm:text-xl font-bold text-foreground">
+              <h3 className="heading-display text-[14px] sm:text-[15px] font-bold text-white leading-snug drop-shadow-sm">
                 {zoomedBanner.title}
               </h3>
               {zoomedBanner.subtitle && (
-                <p className="mt-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                <p className="mt-1.5 text-[10px] sm:text-[11px] text-white/80 leading-normal line-clamp-3">
                   {zoomedBanner.subtitle}
                 </p>
               )}
 
               {/* Action Button */}
-              <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <div className="mt-4 flex gap-2">
                 <Link
                   href={zoomedBanner.ctaHref || "#produk"}
                   onClick={handleCloseZoom}
                   className={cn(
                     buttonVariants({ variant: "default" }),
-                    "h-10.5 rounded-2xl w-full text-xs font-bold gap-2 justify-center border border-white/10 shadow-[var(--shadow-glow)]"
+                    "h-8.5 rounded-xl w-full text-[11px] font-bold gap-1.5 justify-center border border-white/10 shadow-[var(--shadow-glow)]"
                   )}
                 >
                   {zoomedBanner.ctaLabel || "Beli Sekarang"}
-                  <ExternalLink className="h-3.5 w-3.5" />
+                  <ExternalLink className="h-3 w-3" />
                 </Link>
                 <button
                   onClick={handleCloseZoom}
                   className={cn(
                     buttonVariants({ variant: "outline" }),
-                    "h-10.5 rounded-2xl w-full sm:w-1/3 text-xs font-semibold border-[var(--glass-border)] bg-transparent hover:bg-muted"
+                    "h-8.5 rounded-xl px-3 text-[11px] font-semibold border-white/15 bg-white/5 text-white backdrop-blur hover:bg-white/10"
                   )}
                 >
-                  Kembali
+                  Tutup
                 </button>
               </div>
             </div>
