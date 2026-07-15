@@ -380,50 +380,50 @@
     linear-gradient(165deg, #08120B 0%, #0E2416 50%, #030805 100%);
 }
 
-/* Anime night sakura — soft pink, not neon */
+/* Sumi Ink & Lacquer Red brush stroke concept (Sumi-e) */
 .theme-sakura {
-  --background: #150D16;
-  --foreground: #F6EDF3;
-  --card: #201321;
-  --card-foreground: #F6EDF3;
-  --popover: #29182A;
-  --popover-foreground: #F6EDF3;
-  --primary: #E289A6;
-  --primary-foreground: #180910;
-  --primary-gradient: linear-gradient(135deg, #F5A9C1 0%, #CD7190 48%, #97405E 100%);
-  --secondary: #29182A;
-  --secondary-foreground: #F6EDF3;
-  --muted: #29182A;
-  --muted-foreground: #C899AC;
-  --accent: #372039;
-  --accent-foreground: #F6EDF3;
-  --destructive: #EF4444;
-  --border: rgba(226, 137, 166, 0.14);
-  --input: rgba(226, 137, 166, 0.18);
-  --ring: #E289A6;
-  --gold: #E2B2C1;
-  --gold-soft: #F0CBD5;
-  --gold-deep: #AA7384;
-  --gold-gradient: linear-gradient(135deg, #F0CBD5 0%, #D498AC 55%, #9B5E72 100%);
-  --gold-line: linear-gradient(to right, transparent 0%, rgba(226, 137, 166, 0.4) 50%, transparent 100%);
-  --glass-fill: rgba(32, 19, 33, 0.74);
-  --glass-border: rgba(226, 137, 166, 0.16);
+  --background: #101012;
+  --foreground: #F3EFE9;
+  --card: #19191D;
+  --card-foreground: #F3EFE9;
+  --popover: #1E1E24;
+  --popover-foreground: #F3EFE9;
+  --primary: #BC2026;
+  --primary-foreground: #FAF8F5;
+  --primary-gradient: linear-gradient(135deg, #D32F2F 0%, #A81B21 55%, #7A0C11 100%);
+  --secondary: #24242B;
+  --secondary-foreground: #F3EFE9;
+  --muted: #24242B;
+  --muted-foreground: #A59E92;
+  --accent: #2C2C35;
+  --accent-foreground: #F3EFE9;
+  --destructive: #E53935;
+  --border: rgba(188, 32, 38, 0.14);
+  --input: rgba(188, 32, 38, 0.18);
+  --ring: #BC2026;
+  --gold: #C8A261;
+  --gold-soft: #D9C39E;
+  --gold-deep: #96743B;
+  --gold-gradient: linear-gradient(135deg, #D9C39E 0%, #C8A261 60%, #8A652E 100%);
+  --gold-line: linear-gradient(to right, transparent 0%, rgba(188, 32, 38, 0.4) 50%, transparent 100%);
+  --glass-fill: rgba(25, 25, 29, 0.76);
+  --glass-border: rgba(188, 32, 38, 0.12);
   --shadow-premium: 0 24px 48px -20px rgba(0, 0, 0, 0.6);
   --shadow-card: 0 10px 28px -14px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 36px -12px rgba(226, 137, 166, 0.35);
-  --sidebar: #201321;
-  --sidebar-foreground: #F6EDF3;
-  --sidebar-primary: #E289A6;
-  --sidebar-primary-foreground: #180910;
-  --sidebar-accent: #372039;
-  --sidebar-accent-foreground: #F6EDF3;
-  --sidebar-border: rgba(226, 137, 166, 0.14);
-  --sidebar-ring: #E289A6;
+  --shadow-glow: 0 0 36px -12px rgba(188, 32, 38, 0.35);
+  --sidebar: #19191D;
+  --sidebar-foreground: #F3EFE9;
+  --sidebar-primary: #BC2026;
+  --sidebar-primary-foreground: #FAF8F5;
+  --sidebar-accent: #2C2C35;
+  --sidebar-accent-foreground: #F3EFE9;
+  --sidebar-border: rgba(188, 32, 38, 0.14);
+  --sidebar-ring: #BC2026;
   --body-gradient:
-    radial-gradient(600px 450px at 10% -8%, rgba(226, 137, 166, 0.18), transparent 60%),
-    radial-gradient(480px 360px at 92% 8%, rgba(205, 113, 144, 0.12), transparent 58%),
-    radial-gradient(400px 300px at 50% 100%, rgba(151, 64, 94, 0.08), transparent 55%),
-    linear-gradient(165deg, #150D16 0%, #241427 48%, #0E070F 100%);
+    radial-gradient(600px 450px at 10% -8%, rgba(188, 32, 38, 0.12), transparent 60%),
+    radial-gradient(480px 360px at 92% 8%, rgba(200, 162, 97, 0.08), transparent 58%),
+    radial-gradient(400px 300px at 50% 100%, rgba(122, 12, 17, 0.05), transparent 55%),
+    linear-gradient(165deg, #101012 0%, #19191D 50%, #08080A 100%);
 }
 
 /* Anime soft cyber — indigo + soft cyan */
@@ -471,48 +471,50 @@
     linear-gradient(165deg, #09080E 0%, #100E1D 48%, #040308 100%);
 }
 
+/* Japanese Indigo Dye & Bamboo wash stroke concept (Aizome) */
 .theme-ember {
-  --background: #110E0C;
-  --foreground: #E5DDD3;
-  --card: #181512;
-  --card-foreground: #E5DDD3;
-  --popover: #201B17;
-  --popover-foreground: #E5DDD3;
-  --primary: #A86D3F;
-  --primary-foreground: #140804;
-  --primary-gradient: linear-gradient(135deg, #BD855A 0%, #9C5F35 50%, #6E3F1F 100%);
-  --secondary: #201B17;
-  --secondary-foreground: #E5DDD3;
-  --muted: #201B17;
-  --muted-foreground: #948272;
-  --accent: #2A2420;
-  --accent-foreground: #E5DDD3;
+  --background: #090C12;
+  --foreground: #E7EAEF;
+  --card: #111621;
+  --card-foreground: #E7EAEF;
+  --popover: #161C2A;
+  --popover-foreground: #E7EAEF;
+  --primary: #4A72A8;
+  --primary-foreground: #FAFBFD;
+  --primary-gradient: linear-gradient(135deg, #5B8BC7 0%, #3B5E91 50%, #233D63 100%);
+  --secondary: #1B2233;
+  --secondary-foreground: #E7EAEF;
+  --muted: #1B2233;
+  --muted-foreground: #8A96AB;
+  --accent: #232B40;
+  --accent-foreground: #E7EAEF;
   --destructive: #EF4444;
-  --border: rgba(168, 109, 63, 0.1);
-  --input: rgba(168, 109, 63, 0.14);
-  --ring: #A86D3F;
-  --gold: #BD8C5E;
-  --gold-soft: #D5AB82;
-  --gold-deep: #855C3A;
-  --gold-gradient: linear-gradient(135deg, #D5AB82 0%, #A86D3F 55%, #6E3F1F 100%);
-  --gold-line: linear-gradient(to right, transparent 0%, rgba(168, 109, 63, 0.25) 50%, transparent 100%);
-  --glass-fill: rgba(24, 21, 18, 0.76);
-  --glass-border: rgba(168, 109, 63, 0.08);
-  --shadow-premium: 0 20px 40px -20px rgba(0, 0, 0, 0.55);
-  --shadow-card: 0 8px 24px -14px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 0 24px -14px rgba(168, 109, 63, 0.2);
-  --sidebar: #181512;
-  --sidebar-foreground: #E5DDD3;
-  --sidebar-primary: #A86D3F;
-  --sidebar-primary-foreground: #140804;
-  --sidebar-accent: #2A2420;
-  --sidebar-accent-foreground: #E5DDD3;
-  --sidebar-border: rgba(168, 109, 63, 0.1);
-  --sidebar-ring: #C07945;
+  --border: rgba(74, 114, 168, 0.14);
+  --input: rgba(74, 114, 168, 0.18);
+  --ring: #4A72A8;
+  --gold: #B9C7A8;
+  --gold-soft: #D3DEC5;
+  --gold-deep: #8A9678;
+  --gold-gradient: linear-gradient(135deg, #D3DEC5 0%, #B9C7A8 60%, #768565 100%);
+  --gold-line: linear-gradient(to right, transparent 0%, rgba(74, 114, 168, 0.3) 50%, transparent 100%);
+  --glass-fill: rgba(17, 22, 33, 0.74);
+  --glass-border: rgba(74, 114, 168, 0.12);
+  --shadow-premium: 0 24px 48px -20px rgba(0, 0, 0, 0.65);
+  --shadow-card: 0 10px 28px -14px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 36px -12px rgba(74, 114, 168, 0.35);
+  --sidebar: #111621;
+  --sidebar-foreground: #E7EAEF;
+  --sidebar-primary: #4A72A8;
+  --sidebar-primary-foreground: #FAFBFD;
+  --sidebar-accent: #232B40;
+  --sidebar-accent-foreground: #E7EAEF;
+  --sidebar-border: rgba(74, 114, 168, 0.14);
+  --sidebar-ring: #4A72A8;
   --body-gradient:
-    radial-gradient(600px 400px at 8% -6%, rgba(192, 121, 69, 0.16), transparent 60%),
-    radial-gradient(460px 340px at 94% 6%, rgba(131, 67, 26, 0.12), transparent 58%),
-    linear-gradient(165deg, #110E0B 0%, #1C1510 50%, #0A0806 100%);
+    radial-gradient(600px 450px at 10% -8%, rgba(74, 114, 168, 0.15), transparent 60%),
+    radial-gradient(480px 360px at 92% 8%, rgba(185, 199, 168, 0.08), transparent 58%),
+    radial-gradient(400px 300px at 50% 100%, rgba(35, 61, 99, 0.06), transparent 55%),
+    linear-gradient(165deg, #090C12 0%, #141A29 50%, #05080E 100%);
 }
 
 /* ── 120FPS smooth optimizations and text rendering ── */

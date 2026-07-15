@@ -79,9 +79,9 @@ export const THEMES: Array<{
   },
   {
     id: "theme-sakura",
-    label: "Sakura",
-    description: "Anime malam sakura",
-    swatch: "linear-gradient(135deg, #1A1218 0%, #3A2230 45%, #E8A0B8 100%)",
+    label: "Sumi-e",
+    description: "Tinta kuas & merah Jepang",
+    swatch: "linear-gradient(135deg, #101012 0%, #222226 50%, #BC2026 100%)",
     mode: "dark",
   },
   {
@@ -93,9 +93,9 @@ export const THEMES: Array<{
   },
   {
     id: "theme-ember",
-    label: "Ember",
-    description: "Hangat copper",
-    swatch: "linear-gradient(135deg, #14100E 0%, #2A2018 50%, #C4895A 100%)",
+    label: "Aizome",
+    description: "Kuas nila & bambu Jepang",
+    swatch: "linear-gradient(135deg, #090C12 0%, #171E2B 50%, #3B5E91 100%)",
     mode: "dark",
   },
 ];
