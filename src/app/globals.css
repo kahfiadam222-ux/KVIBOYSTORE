@@ -909,6 +909,13 @@ img.float-banner-media {
     );
 }
 
+/* Mencegah transisi CSS berjalan saat pertama kali memuat halaman (initial load flash) */
+.preload,
+.preload * {
+  transition: none !important;
+  animation: none !important;
+}
+
 /* App shell: sidebar + konten (desktop grid push) */
 .kvibo-app-shell {
   width: 100%;

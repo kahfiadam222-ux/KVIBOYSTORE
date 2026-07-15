@@ -60,6 +60,7 @@ export default async function RootLayout({
                 } else {
                   document.documentElement.classList.add("dark");
                 }
+                document.documentElement.classList.add("preload");
                 var sc = localStorage.getItem("kvibo-sidebar-collapsed");
                 var mobile = window.innerWidth <= 767;
                 var collapsed = sc !== null ? sc === "true" : mobile;

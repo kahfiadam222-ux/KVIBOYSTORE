@@ -52,6 +52,11 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
     setIsMobile(mobile);
     applySidebarLayout(initial);
 
+    // Hapus kelas preload untuk mengaktifkan transisi setelah render pertama selesai
+    const timer = setTimeout(() => {
+      document.documentElement.classList.remove("preload");
+    }, 50);
+
     // Update layout saat ukuran layar berubah
     const handleResize = () => {
       const currentMobile = window.innerWidth <= MOBILE_MAX;
@@ -68,7 +73,10 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
     };
 
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(timer);
+    };
   }, []);
 
   // Update DOM saat state collapsed berubah
