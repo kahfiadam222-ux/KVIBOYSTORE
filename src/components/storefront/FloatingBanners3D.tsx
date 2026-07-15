@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { FloatBanner } from "@/lib/storefront/defaults";
 import { cn } from "@/lib/utils";
+import { X, ArrowRight, ExternalLink } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 
 /**
  * 4-slot circular glossy carousel.
  * Rotation + depth are applied via rAF/DOM only (no React re-renders per frame).
+ * Click to Zoom-in Modal feature is integrated elegantly.
  */
 export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
   const items = banners.slice(0, 4);
@@ -20,6 +23,25 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
   const pausedRef = useRef(false);
   const reducedRef = useRef(false);
   const radiusRef = useRef(150);
+
+  // State untuk banner yang sedang dizoom
+  const [zoomedBanner, setZoomedBanner] = useState<FloatBanner | null>(null);
+  const [modalStage, setModalStage] = useState<"enter" | "exit">("exit");
+
+  // Handle open/close modal zoom
+  const handleOpenZoom = (banner: FloatBanner) => {
+    setZoomedBanner(banner);
+    setModalStage("enter");
+    document.body.style.overflow = "hidden"; // Kunci scroll di belakang
+  };
+
+  const handleCloseZoom = () => {
+    setModalStage("exit");
+    setTimeout(() => {
+      setZoomedBanner(null);
+      document.body.style.overflow = "";
+    }, 250); // Sesuai durasi fade-out
+  };
 
   useEffect(() => {
     reducedRef.current = window.matchMedia(
@@ -35,22 +57,19 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
 
     const measureRadius = () => {
       const w = root.clientWidth;
-      // Keep cards from overlapping; scale with viewport
       radiusRef.current = Math.max(100, Math.min(180, w * 0.28));
     };
     measureRadius();
 
     let raf = 0;
     let last = performance.now();
-    const AUTO = 18; // deg/sec — steady orbit
+    const AUTO = 18; // deg/sec
     const FRICTION = 0.955;
     const MAX_VEL = 4.5;
 
     const paint = () => {
       const rot = rotRef.current;
       const radius = radiusRef.current;
-      // Stage itself does not rotate — each card orbits independently
-      // so we can face-camera + depth-sort cleanly.
       stage.style.transform = "translateZ(0)";
 
       for (let i = 0; i < count; i++) {
@@ -58,19 +77,18 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
         if (!el) continue;
         const base = i * step;
         const world = base + rot;
-        // Orbit then cancel yaw so face always looks at camera
         el.style.transform = `rotateY(${world}deg) translateZ(${radius}px) rotateY(${-world}deg)`;
 
-        // Front = cos(world) close to 1
         const rad = (world * Math.PI) / 180;
-        const facing = Math.cos(rad); // 1 front … -1 back
-        const t = (facing + 1) / 2; // 0..1
+        const facing = Math.cos(rad);
+        const t = (facing + 1) / 2;
         const scale = 0.82 + t * 0.22;
         el.style.setProperty("--fb-scale", String(scale));
         el.style.opacity = String(0.38 + t * 0.62);
         el.style.zIndex = String(Math.round(10 + t * 90));
         el.style.filter = `brightness(${0.72 + t * 0.38}) saturate(${0.85 + t * 0.2})`;
-        // Soften pointer on back cards
+
+        // Hanya izinkan interaksi mouse/klik pada banner depan
         el.style.pointerEvents = facing > 0.15 ? "auto" : "none";
       }
     };
@@ -80,7 +98,10 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
       last = now;
       const sec = dt / 1000;
 
-      if (!dragRef.current.active && !pausedRef.current && !reducedRef.current) {
+      // Hentikan putaran otomatis jika modal sedang terbuka
+      const isModalActive = zoomedBanner !== null || modalStage === "enter";
+
+      if (!dragRef.current.active && !pausedRef.current && !reducedRef.current && !isModalActive) {
         if (Math.abs(velRef.current) > 0.015) {
           rotRef.current += velRef.current * (dt / 16);
           velRef.current *= FRICTION;
@@ -103,7 +124,7 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
     };
 
     const onWheel = (e: WheelEvent) => {
-      // Only capture horizontal-ish / intentional scroll on the banner
+      if (zoomedBanner) return; // Nonaktifkan scroll wheel manipulasi jika dizoom
       if (Math.abs(e.deltaX) < 1 && Math.abs(e.deltaY) < 1) return;
       e.preventDefault();
       const delta = e.deltaY * 0.65 + e.deltaX * 0.85;
@@ -116,6 +137,7 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
     };
 
     const onPointerDown = (e: PointerEvent) => {
+      if (zoomedBanner) return;
       if (e.button !== 0 && e.pointerType === "mouse") return;
       dragRef.current = { active: true, lastX: e.clientX, moved: false };
       velRef.current = 0;
@@ -124,7 +146,7 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
     };
 
     const onPointerMove = (e: PointerEvent) => {
-      if (!dragRef.current.active) return;
+      if (!dragRef.current.active || zoomedBanner) return;
       const dx = e.clientX - dragRef.current.lastX;
       if (Math.abs(dx) > 2) dragRef.current.moved = true;
       dragRef.current.lastX = e.clientX;
@@ -144,7 +166,6 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
       }
     };
 
-    // Pause auto only on fine pointer hover (desktop)
     const pause = () => {
       if (window.matchMedia("(hover: hover)").matches) pausedRef.current = true;
     };
@@ -172,7 +193,7 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
       root.removeEventListener("mouseenter", pause);
       root.removeEventListener("mouseleave", resume);
     };
-  }, [items.length]);
+  }, [items.length, zoomedBanner, modalStage]);
 
   if (items.length === 0) return null;
 
@@ -201,7 +222,6 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
           }}
         >
           {items.map((banner, i) => {
-            const href = banner.ctaHref || "#produk";
             return (
               <div
                 key={banner.slot}
@@ -211,15 +231,18 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
                 className="float-banner-orbit absolute"
                 style={{ transformStyle: "preserve-3d" }}
               >
-                <Link
-                  href={href}
-                  className="float-banner-card block outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                <button
+                  type="button"
+                  className="float-banner-card block outline-none text-left focus-visible:ring-2 focus-visible:ring-ring cursor-zoom-in"
                   draggable={false}
                   onClick={(e) => {
                     if (dragRef.current.moved) {
                       e.preventDefault();
                       dragRef.current.moved = false;
+                      return;
                     }
+                    // Klik memicu Zoom-in modal
+                    handleOpenZoom(banner);
                   }}
                 >
                   {/* Glossy layers */}
@@ -261,12 +284,101 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
                       </span>
                     )}
                   </span>
-                </Link>
+                </button>
               </div>
             );
           })}
         </div>
       </div>
+
+      {/* Lightbox / Modal Zoom Banner */}
+      {zoomedBanner && (
+        <div
+          className={cn(
+            "fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6",
+            "bg-black/55 backdrop-blur-[12px] transition-all duration-300 ease-out",
+            modalStage === "enter" ? "opacity-100" : "opacity-0 pointer-events-none"
+          )}
+          onClick={handleCloseZoom}
+        >
+          {/* Main Modal Box */}
+          <div
+            className={cn(
+              "relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[var(--glass-fill)] via-background/96 to-background/92 shadow-2xl backdrop-blur-2xl",
+              "transition-all duration-300 cubic-bezier(0.34, 1.56, 0.64, 1)",
+              modalStage === "enter" ? "scale-100 opacity-100 translate-y-0" : "scale-95 opacity-0 translate-y-4"
+            )}
+            onClick={(e) => e.stopPropagation()} // Cegah penutupan saat mengklik di dalam boks
+          >
+            {/* Close Button */}
+            <button
+              onClick={handleCloseZoom}
+              className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-background/50 text-muted-foreground backdrop-blur-md transition-all hover:bg-white/10 hover:text-foreground active:scale-95 cursor-pointer"
+              aria-label="Tutup zoom"
+            >
+              <X className="h-4.5 w-4.5" />
+            </button>
+
+            {/* Media/Image Area */}
+            <div className="relative aspect-video w-full overflow-hidden bg-muted">
+              {zoomedBanner.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={zoomedBanner.imageUrl}
+                  alt={zoomedBanner.title}
+                  className="h-full w-full object-cover object-center select-none"
+                  draggable={false}
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/35 flex items-center justify-center">
+                  <span className="brand-wordmark text-2xl text-premium opacity-50">kviboystore</span>
+                </div>
+              )}
+              {/* Glossy gradient bottom to text readability */}
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+            </div>
+
+            {/* Contents / Description Area */}
+            <div className="p-5 sm:p-6">
+              <span className="eyebrow block text-primary/95 text-[10px] sm:text-[11px] mb-1.5">
+                Detail Promo & Konten
+              </span>
+              <h3 className="heading-display text-lg sm:text-xl font-bold text-foreground">
+                {zoomedBanner.title}
+              </h3>
+              {zoomedBanner.subtitle && (
+                <p className="mt-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  {zoomedBanner.subtitle}
+                </p>
+              )}
+
+              {/* Action Button */}
+              <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                <Link
+                  href={zoomedBanner.ctaHref || "#produk"}
+                  onClick={handleCloseZoom}
+                  className={cn(
+                    buttonVariants({ variant: "default" }),
+                    "h-10.5 rounded-2xl w-full text-xs font-bold gap-2 justify-center border border-white/10 shadow-[var(--shadow-glow)]"
+                  )}
+                >
+                  {zoomedBanner.ctaLabel || "Beli Sekarang"}
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Link>
+                <button
+                  onClick={handleCloseZoom}
+                  className={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "h-10.5 rounded-2xl w-full sm:w-1/3 text-xs font-semibold border-[var(--glass-border)] bg-transparent hover:bg-muted"
+                  )}
+                >
+                  Kembali
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
