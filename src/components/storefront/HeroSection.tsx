@@ -13,17 +13,17 @@ const trustPoints = [
   {
     icon: Zap,
     title: "Instant delivery",
-    desc: "Kode terkirim otomatis setelah bayar",
+    desc: "Kirim otomatis pasca bayar",
   },
   {
     icon: ShieldCheck,
     title: "Escrow aman",
-    desc: "Dana dilindungi sampai order selesai",
+    desc: "Dana dilindungi sampai selesai",
   },
   {
     icon: BadgeCheck,
     title: "Produk resmi",
-    desc: "Listing terverifikasi dan transparan",
+    desc: "Terverifikasi & transparan",
   },
 ];
 
@@ -39,77 +39,79 @@ export function HeroSection({
   floatBanners?: FloatBanner[];
 }) {
   return (
-    <section className="relative mb-10 overflow-hidden">
+    <section className="relative mb-6 overflow-hidden">
       <div
         aria-hidden
-        className="hero-depth-plane pointer-events-none absolute -right-8 top-0 hidden h-full w-[52%] md:block"
+        className="hero-depth-plane pointer-events-none absolute -right-8 top-0 hidden h-full w-[48%] md:block"
       />
 
-      <div className="relative glass-hero rounded-2xl sm:rounded-[1.75rem] border border-[var(--glass-border)] px-4 py-6 sm:px-10 sm:py-11 lg:px-14 lg:py-12">
+      <div className="relative glass-hero rounded-2xl sm:rounded-[1.5rem] border border-[var(--glass-border)] px-4 py-5 sm:px-8 sm:py-8 lg:px-10 lg:py-8.5">
         <div className="relative z-[1] max-w-2xl">
-          <p className="eyebrow mb-4">{content.eyebrow}</p>
-          <h1 className="heading-display text-[1.65rem] leading-tight sm:text-4xl lg:text-[2.75rem]">
+          <p className="eyebrow mb-2.5 text-[9px] sm:text-[10px]">{content.eyebrow}</p>
+          <h1 className="heading-display text-[1.4rem] leading-tight sm:text-3xl lg:text-[2.2rem]">
             {content.title}
             <br />
             <span className="text-premium">{content.titleHighlight}</span>
           </h1>
-          <p className="mt-4 max-w-lg text-sm sm:text-[15px] text-muted-foreground leading-relaxed">
+          <p className="mt-2.5 max-w-lg text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
             {content.description}
           </p>
         </div>
 
         {/* 3D banners sit above primary CTA ("Jelajahi katalog") */}
         {floatBanners.length > 0 && (
-          <div className="relative z-[1] mt-6 -mx-1">
+          <div className="relative z-[1] mt-4 -mx-1">
             <FloatingBanners3D banners={floatBanners} />
           </div>
         )}
 
-        <div className="relative z-[1] mt-2 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+        <div className="relative z-[1] mt-4.5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2.5">
           <Link
             href={content.ctaPrimaryHref || "#produk"}
             className={cn(
               buttonVariants({ size: "lg" }),
-              "h-10 sm:h-11 w-full sm:w-auto rounded-full px-5 sm:px-6 text-sm font-semibold gap-2 justify-center"
+              "group/cta h-9 sm:h-10 w-full sm:w-auto rounded-2xl px-5 sm:px-6 text-xs sm:text-sm font-bold gap-2 justify-center",
+              "shadow-[0_8px_16px_-6px_color-mix(in_oklch,var(--primary)_45%,transparent)] hover:shadow-[0_12px_24px_-8px_color-mix(in_oklch,var(--primary)_50%,transparent)]",
+              "border border-white/10"
             )}
           >
             {content.ctaPrimaryLabel}
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover/cta:translate-x-1" />
           </Link>
           <Link
             href={content.ctaSecondaryHref || "/promo"}
             className={cn(
               buttonVariants({ variant: "outline", size: "lg" }),
-              "h-10 sm:h-11 w-full sm:w-auto rounded-full px-5 sm:px-6 text-sm font-semibold border-[var(--glass-border)] bg-[var(--glass-fill)]/80 backdrop-blur justify-center"
+              "h-9 sm:h-10 w-full sm:w-auto rounded-2xl px-5 sm:px-6 text-xs sm:text-sm font-semibold border-[var(--glass-border)] bg-[var(--glass-fill)]/80 backdrop-blur justify-center"
             )}
           >
             {content.ctaSecondaryLabel}
           </Link>
           {typeof productCount === "number" && productCount > 0 && (
-            <span className="text-xs text-muted-foreground sm:pl-1 tracking-wide text-center sm:text-left">
+            <span className="text-[11px] text-muted-foreground sm:pl-1 tracking-wide text-center sm:text-left">
               {productCount} produk aktif
             </span>
           )}
         </div>
 
-        <div className="relative z-[1] mt-8 max-w-xl">
+        <div className="relative z-[1] mt-5 max-w-xl">
           <SearchBar defaultValue={searchQuery} embedded />
         </div>
 
-        <ul className="relative z-[1] mt-8 grid gap-3 sm:grid-cols-3">
+        <ul className="relative z-[1] mt-5 grid gap-2.5 sm:grid-cols-3">
           {trustPoints.map(({ icon: Icon, title, desc }) => (
             <li
               key={title}
-              className="flex items-start gap-3 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-fill)]/50 px-3.5 py-3.5 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
+              className="flex items-start gap-2.5 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-fill)]/50 px-3 py-2.5 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary">
-                <Icon className="h-4 w-4" />
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Icon className="h-3.5 w-3.5" />
               </span>
               <span>
-                <span className="block text-sm font-semibold text-foreground tracking-tight">
+                <span className="block text-xs font-bold text-foreground tracking-tight">
                   {title}
                 </span>
-                <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">
+                <span className="mt-0.5 block text-[10px] leading-tight text-muted-foreground">
                   {desc}
                 </span>
               </span>
