@@ -3,13 +3,14 @@ export const DEFAULT_THEME = "theme-sakura" as const;
 export const THEME_IDS = [
   "theme-daylight",
   "theme-sakura",
+  "theme-saffron",
 ] as const;
 
 export type ThemeId = (typeof THEME_IDS)[number];
 
 const LIGHT_THEMES = new Set<ThemeId>(["theme-daylight"]);
 
-/** Map legacy theme ids → current set (only Daylight and Sumi-e remain) */
+/** Map legacy theme ids → current set (only Daylight and Saffron Wash remain) */
 export const LEGACY_THEME_MAP: Record<string, ThemeId> = {
   "theme-editions": "theme-sakura",
   "theme-paper": "theme-daylight",
@@ -54,6 +55,13 @@ export const THEMES: Array<{
     label: "Sumi-e",
     description: "Tinta kuas & merah Jepang",
     swatch: "linear-gradient(135deg, #101012 0%, #222226 50%, #BC2026 100%)",
+    mode: "dark",
+  },
+  {
+    id: "theme-saffron",
+    label: "Saffron Wash",
+    description: "Jingga cat air artistik",
+    swatch: "linear-gradient(135deg, #FDF6EC 0%, #F8EDE0 50%, #F27C2E 100%)",
     mode: "dark",
   },
 ];

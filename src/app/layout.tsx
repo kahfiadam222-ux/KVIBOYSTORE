@@ -5,6 +5,7 @@ import { SpaceBackground } from "@/components/effects/SpaceBackground";
 import { AmbientOrbs } from "@/components/effects/AmbientOrbs";
 import { WelcomeScreen } from "@/components/effects/WelcomeScreen";
 import { InteractiveBackground } from "@/components/effects/InteractiveBackground";
+import { SaffronWashBackground } from "@/components/effects/SaffronWashBackground";
 import "./globals.css";
 
 const inter = Inter({
@@ -43,18 +44,20 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                var valid = ["theme-midnight","theme-daylight","theme-mono","theme-ocean","theme-forest","theme-sakura","theme-aether","theme-ember"];
+                var valid = ["theme-daylight","theme-sakura"];
                 var legacy = {
-                  "theme-editions":"theme-midnight","theme-paper":"theme-daylight","theme-ink":"theme-mono",
-                  "theme-champagne":"theme-ember","theme-slate":"theme-ocean","theme-olive":"theme-forest",
-                  "theme-dusk":"theme-aether","theme-rose":"theme-sakura","theme-cosmic":"theme-aether",
-                  "theme-jetblack":"theme-mono","theme-orchid":"theme-sakura","theme-wineash":"theme-ember",
-                  "theme-turquoise":"theme-forest","theme-candyblue":"theme-ocean","theme-lavender":"theme-aether",
-                  "theme-violet":"theme-aether"
+                  "theme-editions":"theme-sakura","theme-paper":"theme-daylight","theme-ink":"theme-sakura",
+                  "theme-champagne":"theme-sakura","theme-slate":"theme-sakura","theme-olive":"theme-sakura",
+                  "theme-dusk":"theme-sakura","theme-rose":"theme-sakura","theme-cosmic":"theme-sakura",
+                  "theme-jetblack":"theme-sakura","theme-orchid":"theme-sakura","theme-wineash":"theme-sakura",
+                  "theme-turquoise":"theme-sakura","theme-candyblue":"theme-sakura","theme-lavender":"theme-sakura",
+                  "theme-violet":"theme-sakura","theme-midnight":"theme-sakura","theme-mono":"theme-sakura",
+                  "theme-ocean":"theme-sakura","theme-forest":"theme-sakura","theme-aether":"theme-sakura",
+                  "theme-ember":"theme-sakura"
                 };
                 var t = localStorage.getItem("kvibo-theme");
                 if (legacy[t]) t = legacy[t];
-                if (!t || valid.indexOf(t) === -1) t = "theme-midnight";
+                if (!t || valid.indexOf(t) === -1) t = "theme-sakura";
                 localStorage.setItem("kvibo-theme", t);
                 document.documentElement.classList.add(t);
                 if (t === "theme-daylight") {
@@ -70,6 +73,7 @@ export default async function RootLayout({
       <body className="h-full">
         <AmbientOrbs />
         <InteractiveBackground />
+        <SaffronWashBackground />
         <WelcomeScreen />
         {children}
       </body>
