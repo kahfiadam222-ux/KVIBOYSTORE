@@ -251,4 +251,6 @@ export async function updateListing(listingId: string, formData: FormData) {
   }
 
   revalidatePath("/seller/dashboard");
+  revalidatePath("/admin/listings");
+  revalidatePath("/");
 }
