@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
-import { SearchBar } from "@/components/storefront/SearchBar";
 import { FloatingBanners3D } from "@/components/storefront/FloatingBanners3D";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -32,12 +31,10 @@ const trustPoints = [
 ];
 
 export function HeroSection({
-  searchQuery,
   productCount,
   content,
   floatBanners = [],
 }: {
-  searchQuery?: string;
   productCount?: number;
   content: StorefrontHeroContent;
   floatBanners?: FloatBanner[];
@@ -77,7 +74,7 @@ export function HeroSection({
 
         {/* 3D Carousel Slider Wrapper (Fixed Height to prevent vertical stacking and jumps - Manual swipe/drag disabled) */}
         <div
-          className="relative w-full h-[500px] sm:h-[440px] md:h-[400px] overflow-visible"
+          className="relative w-full h-[440px] sm:h-[380px] md:h-[350px] overflow-visible"
           style={{
             perspective: "1500px",
             transformStyle: "preserve-3d",
@@ -207,14 +204,10 @@ export function HeroSection({
         </div>
 
         {/* Divider line separating the slider from static bottom block */}
-        <div className="gold-line my-4.5 opacity-30" />
+        <div className="gold-line my-4 opacity-30" />
 
         {/* Static Bottom Area (Always visible on all slides) */}
-        <div className="relative z-[1] max-w-xl">
-          <SearchBar defaultValue={searchQuery} embedded />
-        </div>
-
-        <ul className="relative z-[1] mt-4 grid gap-2.5 sm:grid-cols-3">
+        <ul className="relative z-[1] grid gap-2.5 sm:grid-cols-3">
           {trustPoints.map(({ icon: Icon, title, desc }) => (
             <li
               key={title}

@@ -2,6 +2,7 @@ import { Navbar } from "@/components/nav/Navbar";
 import { SidebarProvider } from "@/components/nav/sidebar-context";
 import { StorefrontFrame } from "@/components/nav/StorefrontFrame";
 import { createClient } from "@/lib/supabase/server";
+import { getSidebarCategories } from "@/lib/categories/queries";
 
 export default async function StorefrontLayout({
   children,
@@ -27,9 +28,11 @@ export default async function StorefrontLayout({
     };
   }
 
+  const categories = await getSidebarCategories();
+
   return (
     <SidebarProvider>
-      <StorefrontFrame user={userWithRole}>
+      <StorefrontFrame user={userWithRole} categories={categories}>
         <Navbar />
         <main className="flex-1 w-full">{children}</main>
       </StorefrontFrame>

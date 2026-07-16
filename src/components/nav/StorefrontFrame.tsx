@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { useSidebar } from "./sidebar-context";
+import type { SidebarCategory } from "@/lib/categories/defaults";
 
 type StorefrontFrameProps = {
   user: {
@@ -10,10 +11,11 @@ type StorefrontFrameProps = {
     email: string;
     role: "buyer" | "seller" | "admin";
   } | null;
+  categories: SidebarCategory[];
   children: ReactNode;
 };
 
-export function StorefrontFrame({ user, children }: StorefrontFrameProps) {
+export function StorefrontFrame({ user, categories, children }: StorefrontFrameProps) {
   const { close } = useSidebar();
 
   return (
@@ -27,7 +29,7 @@ export function StorefrontFrame({ user, children }: StorefrontFrameProps) {
       />
 
       <div className="kvibo-app-shell grid min-h-screen w-full">
-        <Sidebar user={user} />
+        <Sidebar user={user} categories={categories} />
         <div className="storefront-main flex min-w-0 flex-col overflow-x-hidden">
           {children}
         </div>

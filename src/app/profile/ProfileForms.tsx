@@ -126,9 +126,8 @@ export function ProfileForms({
           <div 
             className="relative h-28 bg-cover bg-center flex items-end px-6 pb-4 border-b border-border/40"
             style={{
-              backgroundImage: coverPreview 
-                ? `url(${coverPreview})` 
-                : "linear-gradient(to right, color-mix(in oklch, var(--primary) 30%, transparent), color-mix(in oklch, var(--primary) 10%, transparent))",
+              backgroundColor: "color-mix(in oklch, var(--primary) 16%, transparent)",
+              backgroundImage: coverPreview ? `url(${coverPreview})` : "none",
             }}
           >
             {/* Clickable Profile Avatar to select from gallery */}

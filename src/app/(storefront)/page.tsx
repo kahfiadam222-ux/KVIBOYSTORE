@@ -48,17 +48,16 @@ export default async function StorefrontPage({
 
   return (
     <main className="mx-auto max-w-7xl w-full px-2.5 py-5 sm:px-6 sm:py-10 lg:px-8">
-      {!q ? (
+      <div className="mb-5 sm:mb-6 max-w-2xl mx-auto">
+        <SearchBar defaultValue={q} />
+      </div>
+
+      {!q && (
         <HeroSection
-          searchQuery={q}
           productCount={listings.length}
           content={hero}
           floatBanners={floatBanners}
         />
-      ) : (
-        <div className="mb-8 max-w-2xl mx-auto">
-          <SearchBar defaultValue={q} />
-        </div>
       )}
 
       {!q && (horizontalBanners.length > 0 || verticalBanners.length > 0) && (
@@ -104,7 +103,7 @@ export default async function StorefrontPage({
 
       {listings.length === 0 ? (
         <div className="glass-panel text-center py-16 px-6 rounded-3xl max-w-md mx-auto">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary mb-5 shadow-[0_0_15px_rgba(139,108,245,0.25)]">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary mb-5">
             <svg
               className="h-7 w-7"
               fill="none"
@@ -179,7 +178,7 @@ export default async function StorefrontPage({
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-2.5 sm:p-3.5 pt-2 pb-2 flex-grow">
-                    <p className="text-sm sm:text-base font-extrabold text-primary drop-shadow-[0_0_10px_color-mix(in_oklch,var(--gold)_35%,transparent)]">
+                    <p className="text-sm sm:text-base font-extrabold text-foreground">
                       {formatPrice(listing.price, listing.currency)}
                     </p>
                     {!listing.isPlatformOwned &&

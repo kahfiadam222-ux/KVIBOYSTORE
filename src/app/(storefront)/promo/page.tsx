@@ -29,7 +29,7 @@ export default async function PromoPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <div className="mb-10 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--gold)] to-primary shadow-[var(--shadow-glow)]">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary shadow-[var(--shadow-glow)]">
           <Gift className="h-7 w-7 text-white" />
         </div>
         <span className="section-pill mb-3">Offers</span>
@@ -47,7 +47,7 @@ export default async function PromoPage() {
             key={index}
             className="group relative overflow-hidden product-card-shell glass-card border-0 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-gold)]"
           >
-            <div className="absolute right-0 top-0 flex h-16 w-16 items-center justify-center rounded-bl-3xl bg-gradient-to-br from-[var(--gold)]/20 to-primary/20">
+            <div className="absolute right-0 top-0 flex h-16 w-16 items-center justify-center rounded-bl-3xl bg-primary/15">
               <span className="text-lg font-bold text-[var(--gold-soft)]">{promo.discount}</span>
             </div>
             <CardHeader className="pb-2">
