@@ -42,12 +42,18 @@ export async function createListing(formData: FormData) {
     throw new Error("Harga dan stok harus berupa angka valid.");
   }
 
-  // If user is admin, allow specifying a different seller_id, otherwise use current user
-  let sellerId = user.id;
+  // Admin bisa memilih penjual mana pun, ATAU membuat listing milik platform
+  // (tanpa penjual). Penjual biasa selalu jadi owner listing-nya sendiri.
+  // Constraint products_seller_pairing: platform-owned <=> seller_id NULL.
+  let sellerId: string | null = user.id;
+  let isPlatformOwned = false;
   if (profile.role === "admin") {
-    const specifiedSellerId = formData.get("sellerId") as string;
-    if (specifiedSellerId) {
-      sellerId = specifiedSellerId;
+    const specified = String(formData.get("sellerId") ?? "").trim();
+    if (!specified || specified === "__platform__") {
+      isPlatformOwned = true;
+      sellerId = null;
+    } else {
+      sellerId = specified;
     }
   }
 
@@ -64,7 +70,7 @@ export async function createListing(formData: FormData) {
       title: title as string,
       description: description ? (description as string) : "",
       image_url: imageUrl ? (imageUrl as string) : null,
-      is_platform_owned: false,
+      is_platform_owned: isPlatformOwned,
       status: "active",
     })
     .select("id")
@@ -83,6 +89,80 @@ export async function createListing(formData: FormData) {
 
   if (listingError) {
     throw new Error(`Gagal membuat listing: ${listingError.message}`);
+  }
+
+  revalidatePath("/seller/dashboard");
+  revalidatePath("/admin/listings");
+  revalidatePath("/");
+}
+
+/** Verifikasi user boleh mengubah listing ini (admin, atau pemilik produknya). */
+async function authorizeListingMutation(listingId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Sesi tidak valid. Silakan login kembali.");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || (profile.role !== "seller" && profile.role !== "admin")) {
+    throw new Error("Akses ditolak.");
+  }
+
+  const admin = createAdminClient();
+  const { data: listing } = await admin
+    .from("listings")
+    .select("id, product_id, products ( seller_id )")
+    .eq("id", listingId)
+    .single();
+
+  if (!listing) throw new Error("Listing tidak ditemukan.");
+
+  if (profile.role !== "admin") {
+    const sellerId = (listing as unknown as { products: { seller_id: string | null } })
+      .products?.seller_id;
+    if (sellerId !== user.id) {
+      throw new Error("Akses ditolak. Produk ini bukan milik Anda.");
+    }
+  }
+
+  return { admin, productId: listing.product_id as string };
+}
+
+export async function setListingActive(listingId: string, isActive: boolean) {
+  const { admin } = await authorizeListingMutation(listingId);
+
+  const { error } = await admin
+    .from("listings")
+    .update({ is_active: isActive })
+    .eq("id", listingId);
+
+  if (error) throw new Error(`Gagal mengubah status stok: ${error.message}`);
+
+  revalidatePath("/seller/dashboard");
+  revalidatePath("/admin/listings");
+  revalidatePath("/");
+}
+
+export async function deleteListing(listingId: string) {
+  const { admin, productId } = await authorizeListingMutation(listingId);
+
+  // Hapus produk → listing ikut terhapus (FK ON DELETE CASCADE). Jika masih ada
+  // pesanan yang mereferensikan listing ini, FK akan menolak → beri pesan jelas.
+  const { error } = await admin.from("products").delete().eq("id", productId);
+
+  if (error) {
+    if (error.code === "23503") {
+      throw new Error(
+        "Tidak bisa dihapus: masih ada pesanan terkait produk ini. Nonaktifkan stok saja."
+      );
+    }
+    throw new Error(`Gagal menghapus produk: ${error.message}`);
   }
 
   revalidatePath("/seller/dashboard");

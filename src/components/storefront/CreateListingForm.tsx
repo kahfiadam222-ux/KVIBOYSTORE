@@ -84,23 +84,30 @@ export function CreateListingForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Left Column: Basic Details */}
             <div className="flex flex-col gap-4">
-              {isAdmin && sellers && sellers.length > 0 && (
+              {isAdmin && (
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="sellerId" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-                    <UserCheck className="h-3.5 w-3.5" /> Pilih Penjual (Owner)
+                    <UserCheck className="h-3.5 w-3.5" /> Pemilik Listing
                   </Label>
                   <select
                     id="sellerId"
                     name="sellerId"
                     required
+                    defaultValue="__platform__"
                     className="form-select-glass h-10 rounded-xl px-3 text-sm cursor-pointer border-border bg-background/30"
                   >
-                    {sellers.map((s) => (
+                    <option value="__platform__" className="bg-popover text-foreground">
+                      🏪 Platform (milik toko, tanpa penjual)
+                    </option>
+                    {(sellers ?? []).map((s) => (
                       <option key={s.user_id} value={s.user_id} className="bg-popover text-foreground">
                         {s.legal_name}
                       </option>
                     ))}
                   </select>
+                  <p className="text-[10px] text-muted-foreground">
+                    Pilih Platform untuk stok milik toko sendiri, atau pilih penjual terdaftar.
+                  </p>
                 </div>
               )}
 

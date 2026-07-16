@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import type { ReactNode, ComponentType } from "react";
+import type { ReactNode, ComponentType, CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -71,6 +71,7 @@ const mainNavItems = [
 const adminNavItems = [
   { href: "/admin/banners", label: "Konten beranda", icon: ImageIcon },
   { href: "/admin/categories", label: "Kategori sidebar", icon: Tags },
+  { href: "/admin/product-types", label: "Jenis produk", icon: Package },
   { href: "/admin/sellers", label: "Penjual", icon: Users },
   { href: "/admin/listings", label: "Stok jualan", icon: PackageOpen },
   { href: "/admin/disputes", label: "Sengketa", icon: AlertTriangle },
@@ -183,7 +184,7 @@ function SidebarPanel({
           <SidebarSectionLabel collapsed={collapsed} className="text-muted-foreground/70">
             Menu
           </SidebarSectionLabel>
-          {mainNavItems.map((item) => {
+          {mainNavItems.map((item, i) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
             return (
@@ -192,8 +193,9 @@ function SidebarPanel({
                 href={item.href}
                 onClick={onNavigate}
                 aria-current={isActive ? "page" : undefined}
+                style={{ "--i": i } as CSSProperties}
                 className={cn(
-                  "group relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-200",
+                  "sidebar-stagger group relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-200",
                   isActive
                     ? "bg-primary/10 text-foreground"
                     : "text-muted-foreground hover:bg-[var(--accent)] hover:text-foreground",
@@ -225,7 +227,7 @@ function SidebarPanel({
             Kategori
           </SidebarSectionLabel>
           <div className="grid grid-cols-2 gap-1.5">
-            {categories.map((cat) => {
+            {categories.map((cat, i) => {
               const Icon = CATEGORY_ICONS[cat.iconName] ?? Tag;
               return (
                 <Link
@@ -233,7 +235,8 @@ function SidebarPanel({
                   href={cat.href}
                   onClick={onNavigate}
                   tabIndex={collapsed ? -1 : 0}
-                  className="flex h-9 items-center gap-2 rounded-lg px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-[var(--accent)] hover:text-foreground"
+                  style={{ "--i": mainNavItems.length + i } as CSSProperties}
+                  className="sidebar-stagger flex h-9 items-center gap-2 rounded-lg px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-[var(--accent)] hover:text-foreground"
                 >
                   {cat.iconUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -257,7 +260,7 @@ function SidebarPanel({
             <SidebarSectionLabel collapsed={collapsed} className="text-primary/80">
               Admin
             </SidebarSectionLabel>
-            {adminNavItems.map((item) => {
+            {adminNavItems.map((item, i) => {
               const Icon = item.icon;
               const isActive =
                 pathname === item.href || pathname.startsWith(item.href + "/");
@@ -267,8 +270,9 @@ function SidebarPanel({
                   href={item.href}
                   onClick={onNavigate}
                   aria-current={isActive ? "page" : undefined}
+                  style={{ "--i": mainNavItems.length + categories.length + i } as CSSProperties}
                   className={cn(
-                    "group relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-200",
+                    "sidebar-stagger group relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-200",
                     isActive
                       ? "bg-primary/10 text-foreground"
                       : "text-muted-foreground hover:bg-[var(--accent)] hover:text-foreground",
@@ -309,15 +313,20 @@ function SidebarPanel({
           <SidebarSectionLabel collapsed={collapsed} className="text-muted-foreground/70">
             Aksi
           </SidebarSectionLabel>
-          {quickActions.map((item) => {
+          {quickActions.map((item, i) => {
             const Icon = item.icon;
+            const staggerBase =
+              mainNavItems.length +
+              categories.length +
+              (user?.role === "admin" ? adminNavItems.length + 1 : 0);
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={onNavigate}
+                style={{ "--i": staggerBase + i } as CSSProperties}
                 className={cn(
-                  "group flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-200",
+                  "sidebar-stagger group flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-200",
                   item.highlight
                     ? "text-primary hover:bg-primary/10"
                     : "text-muted-foreground hover:bg-[var(--accent)] hover:text-foreground",

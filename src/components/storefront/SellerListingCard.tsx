@@ -1,14 +1,18 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { updateListing } from "@/app/seller/dashboard/actions";
+import { useState, useRef, useTransition } from "react";
+import {
+  updateListing,
+  deleteListing,
+  setListingActive,
+} from "@/app/seller/dashboard/actions";
 import { compressImageDetailed } from "@/lib/image";
 import { IMAGE_PRESETS } from "@/lib/image-presets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Edit2, X, Check, Package, FileText, Tag, DollarSign, Upload } from "lucide-react";
+import { Edit2, X, Check, Package, FileText, Tag, DollarSign, Upload, Trash2, Power } from "lucide-react";
 
 interface ProductType {
   id: string;
@@ -51,6 +55,7 @@ export function SellerListingCard({
   const [submitting, setSubmitting] = useState(false);
   const [productImagePreview, setProductImagePreview] = useState<string | null>(product.image_url ?? null);
   const [uploadingProductImage, setUploadingProductImage] = useState(false);
+  const [mutating, startMutation] = useTransition();
   const productImageInputRef = useRef<HTMLInputElement>(null);
 
   const handleProductImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,20 +113,67 @@ export function SellerListingCard({
                   <span className="text-xs text-muted-foreground flex items-center gap-1 font-medium">
                     <span>📦</span> Stok: {listing.stock_count}
                   </span>
+                  {listing.is_active === false && (
+                    <span className="inline-flex items-center rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-400 border border-red-500/20">
+                      Nonaktif
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
-            <Button
-              onClick={() => setIsEditing(true)}
-              variant="outline"
-              size="touch"
-              className="rounded-xl font-semibold gap-1.5 px-3 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer w-full sm:w-auto"
-              type="button"
-            >
-              <Edit2 className="h-3.5 w-3.5" />
-              Edit Produk
-            </Button>
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <Button
+                onClick={() => setIsEditing(true)}
+                variant="outline"
+                size="touch"
+                className="rounded-xl font-semibold gap-1.5 px-3 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer flex-1 sm:flex-none"
+                type="button"
+              >
+                <Edit2 className="h-3.5 w-3.5" />
+                Edit
+              </Button>
+              <Button
+                onClick={() =>
+                  startMutation(async () => {
+                    try {
+                      await setListingActive(listing.id, !listing.is_active);
+                    } catch (err: any) {
+                      alert(err.message || "Gagal mengubah status stok.");
+                    }
+                  })
+                }
+                disabled={mutating}
+                variant="outline"
+                size="touch"
+                type="button"
+                className="rounded-xl font-semibold gap-1.5 px-3 cursor-pointer"
+                title={listing.is_active ? "Nonaktifkan stok" : "Aktifkan stok"}
+              >
+                <Power className="h-3.5 w-3.5" />
+                {listing.is_active ? "Nonaktifkan" : "Aktifkan"}
+              </Button>
+              <Button
+                onClick={() =>
+                  startMutation(async () => {
+                    if (!confirm(`Hapus produk "${product.title}"? Tindakan ini permanen.`)) return;
+                    try {
+                      await deleteListing(listing.id);
+                    } catch (err: any) {
+                      alert(err.message || "Gagal menghapus produk.");
+                    }
+                  })
+                }
+                disabled={mutating}
+                variant="outline"
+                size="touch"
+                type="button"
+                className="rounded-xl font-semibold gap-1.5 px-3 border-red-500/20 text-red-400 hover:bg-red-500/10 cursor-pointer"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Hapus
+              </Button>
+            </div>
           </div>
         ) : (
           <form

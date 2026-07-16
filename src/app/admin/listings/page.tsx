@@ -19,11 +19,11 @@ export default async function AdminListingsPage() {
     .select("id, name")
     .order("name");
 
-  // Query approved sellers for admin listing creator
+  // Query semua penjual untuk pembuat listing admin (fleksibel — tidak dibatasi
+  // hanya yang approved; admin juga bisa memilih Platform sebagai pemilik).
   const { data: sellers } = await admin
     .from("seller_profiles")
     .select("user_id, legal_name")
-    .eq("verification_status", "approved")
     .order("legal_name");
 
   return (
