@@ -86,16 +86,26 @@ export function SaffronWashBackground() {
     };
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
 
-    // Bloom besar, lembut — sedikit saja.
+    // Bloom besar, lembut — sedikit saja. Intensitas glow utama datang dari
+    // CSS --body-gradient (gratis/GPU); canvas hanya menambah gerak halus.
     const blooms: Bloom[] = [
-      { baseX: 0.16, baseY: 0.1, size: 540, color: 1, opacity: 0.42, phase: 0.0, driftX: 0.035, driftY: 0.03 },
-      { baseX: 0.86, baseY: 0.18, size: 580, color: 0, opacity: 0.42, phase: 2.1, driftX: 0.04, driftY: 0.028 },
-      { baseX: 0.5, baseY: 1.02, size: 640, color: 1, opacity: 0.3, phase: 4.0, driftX: 0.03, driftY: 0.022 },
+      { baseX: 0.15, baseY: 0.1, size: 560, color: 1, opacity: 0.5, phase: 0.0, driftX: 0.04, driftY: 0.03 },
+      { baseX: 0.87, baseY: 0.16, size: 600, color: 0, opacity: 0.5, phase: 2.1, driftX: 0.045, driftY: 0.028 },
+      { baseX: 0.5, baseY: 1.02, size: 640, color: 0, opacity: 0.36, phase: 4.2, driftX: 0.032, driftY: 0.024 },
     ];
 
     let raf: number;
+    // Batasi ke ~30fps: drift glow sangat pelan, 30fps tak terlihat bedanya
+    // tapi memangkas beban main thread separuh (penting di perangkat low-end).
+    const FRAME_MS = 33;
+    let lastFrame = 0;
 
     const draw = (t: number) => {
+      if (t - lastFrame < FRAME_MS) {
+        raf = requestAnimationFrame(draw);
+        return;
+      }
+      lastFrame = t;
       ctx.clearRect(0, 0, width, height);
 
       // Parallax mouse yang sangat halus (lerp).
@@ -146,7 +156,7 @@ export function SaffronWashBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 -z-10 opacity-70 mix-blend-multiply"
+      className="pointer-events-none fixed inset-0 -z-10 opacity-80 mix-blend-multiply"
       style={{ willChange: "transform" }}
     />
   );
