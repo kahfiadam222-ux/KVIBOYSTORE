@@ -2,7 +2,12 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { checkRateLimit } from "@/lib/security/rateLimiter";
+import { checkRateLimit, getClientIp } from "@/lib/security/rateLimiter";
+import {
+  isValidEmail,
+  isValidPassword,
+  normalizeEmail,
+} from "@/lib/security/validation";
 
 // 5 login attempts per 15 minutes per email — enough headroom for a
 // forgetful user, tight enough to blunt brute-force attempts.
@@ -18,27 +23,43 @@ function formatMinutes(ms: number): string {
 export async function login(formData: FormData) {
   const supabase = await createClient();
 
-  const email = formData.get("email");
+  const rawEmail = formData.get("email");
   const password = formData.get("password");
 
-  if (!email || !password) {
+  if (!isValidEmail(rawEmail) || !password || typeof password !== "string") {
     redirect(`/login?error=${encodeURIComponent("Email dan password wajib diisi.")}`);
   }
 
-  const { allowed, resetIn } = checkRateLimit(
-    `login:${String(email).toLowerCase()}`,
+  const email = normalizeEmail(rawEmail);
+  const ip = await getClientIp();
+
+  // 1. Rate limit by Email
+  const emailLimit = checkRateLimit(
+    `login:email:${email}`,
     LOGIN_LIMIT.max,
     LOGIN_LIMIT.windowMs,
   );
-  if (!allowed) {
+  if (!emailLimit.allowed) {
     redirect(`/login?error=${encodeURIComponent(
-      `Terlalu banyak percobaan masuk. Coba lagi dalam ${formatMinutes(resetIn)}.`,
+      `Terlalu banyak percobaan masuk untuk email ini. Coba lagi dalam ${formatMinutes(emailLimit.resetIn)}.`,
+    )}`);
+  }
+
+  // 2. Rate limit by IP
+  const ipLimit = checkRateLimit(
+    `login:ip:${ip}`,
+    30, // Max 30 attempts per 15 minutes per IP
+    LOGIN_LIMIT.windowMs,
+  );
+  if (!ipLimit.allowed) {
+    redirect(`/login?error=${encodeURIComponent(
+      `Terlalu banyak percobaan masuk dari alamat IP ini. Coba lagi dalam ${formatMinutes(ipLimit.resetIn)}.`,
     )}`);
   }
 
   const { error } = await supabase.auth.signInWithPassword({
-    email: email as string,
-    password: password as string,
+    email,
+    password,
   });
 
   if (error) {
@@ -51,27 +72,47 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
   const supabase = await createClient();
 
-  const email = formData.get("email");
+  const rawEmail = formData.get("email");
   const password = formData.get("password");
 
-  if (!email || !password) {
-    redirect(`/signup?error=${encodeURIComponent("Email dan password wajib diisi.")}`);
+  if (!isValidEmail(rawEmail)) {
+    redirect(`/signup?error=${encodeURIComponent("Format email tidak valid.")}`);
   }
 
-  const { allowed, resetIn } = checkRateLimit(
-    `signup:${String(email).toLowerCase()}`,
+  if (!isValidPassword(password)) {
+    redirect(`/signup?error=${encodeURIComponent("Password minimal 8 karakter.")}`);
+  }
+
+  const email = normalizeEmail(rawEmail);
+  const ip = await getClientIp();
+
+  // 1. Rate limit by Email
+  const emailLimit = checkRateLimit(
+    `signup:email:${email}`,
     SIGNUP_LIMIT.max,
     SIGNUP_LIMIT.windowMs,
   );
-  if (!allowed) {
+  if (!emailLimit.allowed) {
     redirect(`/signup?error=${encodeURIComponent(
-      `Terlalu banyak percobaan daftar. Coba lagi dalam ${formatMinutes(resetIn)}.`,
+      `Terlalu banyak percobaan daftar untuk email ini. Coba lagi dalam ${formatMinutes(emailLimit.resetIn)}.`,
+    )}`);
+  }
+
+  // 2. Rate limit by IP
+  const ipLimit = checkRateLimit(
+    `signup:ip:${ip}`,
+    10, // Max 10 signups per hour per IP
+    SIGNUP_LIMIT.windowMs,
+  );
+  if (!ipLimit.allowed) {
+    redirect(`/signup?error=${encodeURIComponent(
+      `Terlalu banyak percobaan daftar dari alamat IP ini. Coba lagi dalam ${formatMinutes(ipLimit.resetIn)}.`,
     )}`);
   }
 
   const { error } = await supabase.auth.signUp({
-    email: email as string,
-    password: password as string,
+    email,
+    password,
   });
 
   if (error) {

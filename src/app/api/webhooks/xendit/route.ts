@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revealExpiresAt } from "@/lib/orders/autoConfirm";
+import { safeEqualSecret } from "@/lib/security/crypto";
+import { logger } from "@/lib/debug";
 
 interface XenditWebhookBody {
   external_id: string;
@@ -20,10 +22,13 @@ export async function POST(request: NextRequest) {
   const token = request.headers.get("x-callback-token");
   const expectedToken = process.env.XENDIT_WEBHOOK_TOKEN;
   if (!expectedToken) {
-    console.error("XENDIT_WEBHOOK_TOKEN not configured");
+    logger.error("XENDIT_WEBHOOK_TOKEN not configured");
     return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
   }
-  if (token !== expectedToken) {
+  if (!safeEqualSecret(token, expectedToken)) {
+    logger.security("Invalid Xendit webhook token", {
+      ip: request.headers.get("x-forwarded-for") ?? "unknown",
+    });
     return NextResponse.json({ error: "Invalid webhook token" }, { status: 401 });
   }
 
@@ -36,12 +41,51 @@ export async function POST(request: NextRequest) {
   }
 
   if (!isXenditWebhookBody(body)) {
-    console.error("Xendit webhook body missing expected fields:", body);
+    logger.error("Xendit webhook body missing expected fields", {
+      body: typeof body,
+    });
     return NextResponse.json({ error: "Invalid payload structure" }, { status: 400 });
   }
 
   const orderId = body.external_id;
   const status = body.status;
+
+  if (status === "EXPIRED" || status === "FAILED") {
+    const admin = createAdminClient();
+    const { data: order } = await admin
+      .from("orders")
+      .select("id, state, listing_id")
+      .eq("id", orderId)
+      .single();
+
+    if (order && order.state === "created") {
+      await admin.from("orders").update({ state: "cancelled" }).eq("id", orderId);
+
+      await admin.from("order_state_transitions").insert({
+        order_id: orderId,
+        from_state: "created",
+        to_state: "cancelled",
+        actor_type: "system",
+        reason: `Xendit invoice status: ${status}`,
+      });
+
+      const { error: stockError } = await admin.rpc("increment_listing_stock", {
+        p_listing_id: order.listing_id,
+      });
+
+      if (stockError) {
+        logger.error("Failed to restore stock after invoice expiry", {
+          orderId,
+          listingId: order.listing_id,
+          error: stockError.message,
+        });
+      } else {
+        logger.info("Order cancelled and stock restored", { orderId, status });
+      }
+    }
+
+    return NextResponse.json({ received: true });
+  }
 
   if (status !== "PAID") {
     return NextResponse.json({ received: true });

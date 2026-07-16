@@ -6,7 +6,27 @@
 // Redis with a shared store. For an MVP storefront this is sufficient: it still
 // slows down brute-force attempts within a single warm instance.
 
+import { headers } from "next/headers";
+import { logger } from "@/lib/debug";
+
 const buckets = new Map<string, { count: number; resetAt: number }>();
+
+export async function getClientIp(): Promise<string> {
+  try {
+    const headersList = await headers();
+    const forwardedFor = headersList.get("x-forwarded-for");
+    if (forwardedFor) {
+      return forwardedFor.split(",")[0].trim();
+    }
+    const realIp = headersList.get("x-real-ip");
+    if (realIp) {
+      return realIp.trim();
+    }
+  } catch {
+    // If headers() is called outside request context (e.g. static builds)
+  }
+  return "127.0.0.1";
+}
 
 export interface RateLimitResult {
   /** false means the action is currently blocked. */
@@ -40,6 +60,11 @@ export function checkRateLimit(
 
   if (record.count >= maxAttempts) {
     // Over the limit — do NOT increment, just report the lockout.
+    logger.security("Rate limit exceeded for identifier", {
+      identifier,
+      maxAttempts,
+      resetInMs: record.resetAt - now,
+    });
     return { allowed: false, remaining: 0, resetIn: record.resetAt - now };
   }
 

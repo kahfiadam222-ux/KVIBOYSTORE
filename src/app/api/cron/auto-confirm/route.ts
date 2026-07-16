@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { completeOrder } from "@/lib/orders/completeOrder";
+import { safeEqualSecret } from "@/lib/security/crypto";
+import { logger } from "@/lib/debug";
 
 // A cron endpoint must never serve a cached result — each invocation has to
 // see the database's current state, not a snapshot from the last run.
@@ -8,7 +10,14 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const expected = process.env.CRON_SECRET
+    ? `Bearer ${process.env.CRON_SECRET}`
+    : null;
+
+  if (!safeEqualSecret(authHeader, expected)) {
+    logger.security("Unauthorized cron auto-confirm attempt", {
+      ip: request.headers.get("x-forwarded-for") ?? "unknown",
+    });
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -17,10 +26,17 @@ export async function GET(request: NextRequest) {
   // Orders whose delivery reveal window has lapsed with no buyer action —
   // confirming on their behalf is what actually releases held funds instead
   // of leaving them stuck in escrow forever.
-  const { data: expiredDeliveries } = await admin
+  const { data: expiredDeliveries, error } = await admin
     .from("deliveries")
     .select("order_id, orders ( id, state, seller_id, amount, currency, is_platform_owned )")
     .lt("reveal_expires_at", new Date().toISOString());
+
+  if (error) {
+    logger.error("Failed to load expired deliveries for auto-confirm", {
+      error: error.message,
+    });
+    return NextResponse.json({ error: "Query failed" }, { status: 500 });
+  }
 
   let confirmed = 0;
 
@@ -45,5 +61,6 @@ export async function GET(request: NextRequest) {
     confirmed++;
   }
 
+  logger.info("Auto-confirm cron finished", { confirmed });
   return NextResponse.json({ confirmed });
 }

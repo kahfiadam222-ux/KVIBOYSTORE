@@ -1,0 +1,15 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "search.exclude": {
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/tsconfig.tsbuildinfo": true,
+    "**/.vercel": true
+  },
+  "files.exclude": {
+    "**/.next": true,
+    "**/tsconfig.tsbuildinfo": true,
+    "**/.vercel": true
+  }
+}
