@@ -4,6 +4,7 @@ import { toggleBanner, deleteBanner } from "./actions";
 import { AdminBannerForm } from "./AdminBannerForm";
 import { HeroEditorForm } from "./HeroEditorForm";
 import { FloatBannerEditorForm } from "./FloatBannerEditorForm";
+import { PartnershipEditorForm } from "./PartnershipEditorForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,13 +17,18 @@ import {
 import {
   DEFAULT_FLOAT_BANNERS,
   DEFAULT_HERO,
+  DEFAULT_PARTNERSHIP,
   type FloatBanner,
   type StorefrontHeroContent,
+  type PartnershipSettingsContent,
 } from "@/lib/storefront/defaults";
+import { getPartnershipSettings } from "@/lib/storefront/queries";
 
 export default async function AdminBannersPage() {
   await requireAdmin();
   const admin = createAdminClient();
+
+  const partnershipSettings = await getPartnershipSettings();
 
   // Safely fetch storefront_hero with Slide 2 columns fallback
   let heroRow = null;
@@ -141,6 +147,18 @@ export default async function AdminBannersPage() {
         </CardHeader>
         <CardContent>
           <HeroEditorForm hero={hero} />
+        </CardContent>
+      </Card>
+
+      <Card className="border-border bg-card/40 backdrop-blur-xl">
+        <CardHeader>
+          <CardTitle>Pengaturan Program Kemitraan (Partnership)</CardTitle>
+          <CardDescription>
+            Ubah teks, email hubungan, dan tombol pendaftaran seller di halaman /partners.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <PartnershipEditorForm settings={partnershipSettings} />
         </CardContent>
       </Card>
 

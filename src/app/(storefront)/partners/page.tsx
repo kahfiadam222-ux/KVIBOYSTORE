@@ -6,7 +6,6 @@ import {
   Zap,
   Mail,
   ArrowRight,
-  Sparkles,
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getPartnershipSettings } from "@/lib/storefront/queries";
 
 export const metadata = {
   title: "Partnership Program - Kviboystore",
@@ -79,7 +79,9 @@ const steps = [
   },
 ];
 
-export default function PartnersPage() {
+export default async function PartnersPage() {
+  const settings = await getPartnershipSettings();
+
   return (
     <main className="mx-auto max-w-5xl w-full px-4 py-10 sm:py-16">
       {/* Hero Section */}
@@ -88,32 +90,31 @@ export default function PartnersPage() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-72 rounded-full bg-primary/10 blur-[80px] pointer-events-none" />
 
         <span className="section-pill mb-4 inline-flex items-center gap-1.5">
-          <Sparkles className="size-3 text-primary animate-pulse" />
-          Kviboystore Partnership
+          <Handshake className="size-3.5 text-primary" />
+          {settings.eyebrow}
         </span>
 
         <h1 className="heading-display text-3xl sm:text-5xl tracking-tight mb-6">
-          Tumbuh Bersama Sebagai <br className="hidden sm:inline" />
-          <span className="text-premium">Partner Resmi Kviboystore</span>
+          {settings.title} <br className="hidden sm:inline" />
+          <span className="text-premium">{settings.titleHighlight}</span>
         </h1>
 
         <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
-          Hubungkan produk digital Anda dengan ribuan kreator, profesional, dan tech-enthusiast.
-          Nikmati infrastruktur distribusi lisensi otomatis dan gerbang pembayaran lokal terlengkap.
+          {settings.description}
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href="/sell"
+            href={settings.ctaPrimaryHref}
             className="flex items-center justify-center gap-2 rounded-2xl px-6 h-12 font-semibold w-full sm:w-auto shadow-md btn-gradient text-primary-foreground shadow-[0_8px_20px_-6px_color-mix(in_oklch,var(--primary)_60%,transparent)] hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-8px_color-mix(in_oklch,var(--primary)_65%,transparent)] transition-all select-none duration-200 text-sm"
           >
-            Mulai Jadi Seller <ArrowRight className="size-4" />
+            {settings.ctaPrimaryLabel} <ArrowRight className="size-4" />
           </Link>
           <a
-            href="mailto:partner@kviboystore.com?subject=Pengajuan Partnership Kviboystore"
+            href={`mailto:${settings.email}?subject=Pengajuan Partnership Kviboystore`}
             className="flex items-center justify-center gap-2 rounded-2xl px-6 h-12 font-semibold w-full sm:w-auto border border-border bg-background hover:bg-muted hover:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 transition-all select-none duration-200 text-sm backdrop-blur-md"
           >
-            <Mail className="size-4 text-primary" /> Hubungi Tim Partnership
+            <Mail className="size-4 text-primary" /> {settings.ctaSecondaryLabel}
           </a>
         </div>
       </section>

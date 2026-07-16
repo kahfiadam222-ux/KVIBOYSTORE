@@ -15,6 +15,17 @@ export type StorefrontHeroContent = {
   slide2PromoText: string;
 };
 
+export type PartnershipSettingsContent = {
+  eyebrow: string;
+  title: string;
+  titleHighlight: string;
+  description: string;
+  email: string;
+  ctaPrimaryLabel: string;
+  ctaPrimaryHref: string;
+  ctaSecondaryLabel: string;
+};
+
 export type FloatBanner = {
   slot: 1 | 2 | 3 | 4;
   title: string;
@@ -42,6 +53,17 @@ export const DEFAULT_HERO: StorefrontHeroContent = {
   slide2CtaLabel: "Discover",
   slide2CtaHref: "#produk",
   slide2PromoText: "PROMO DISKON 10% KHUSUS PENGGUNA BARU",
+};
+
+export const DEFAULT_PARTNERSHIP: PartnershipSettingsContent = {
+  eyebrow: "Kviboystore Partnership",
+  title: "Tumbuh Bersama Sebagai",
+  titleHighlight: "Partner Resmi Kviboystore",
+  description: "Hubungkan produk digital Anda dengan ribuan kreator, profesional, dan tech-enthusiast. Nikmati infrastruktur distribusi lisensi otomatis dan gerbang pembayaran lokal terlengkap.",
+  email: "partner@kviboystore.com",
+  ctaPrimaryLabel: "Mulai Jadi Seller",
+  ctaPrimaryHref: "/sell",
+  ctaSecondaryLabel: "Hubungi Tim Partnership",
 };
 
 export const DEFAULT_FLOAT_BANNERS: FloatBanner[] = [

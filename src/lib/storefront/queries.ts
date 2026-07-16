@@ -2,8 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import {
   DEFAULT_FLOAT_BANNERS,
   DEFAULT_HERO,
+  DEFAULT_PARTNERSHIP,
   type FloatBanner,
   type StorefrontHeroContent,
+  type PartnershipSettingsContent,
 } from "./defaults";
 
 export async function getStorefrontHero(): Promise<StorefrontHeroContent> {
@@ -114,5 +116,35 @@ export async function getFloatBanners(
     return opts.includeInactive
       ? DEFAULT_FLOAT_BANNERS
       : DEFAULT_FLOAT_BANNERS.filter((b) => b.isActive);
+  }
+}
+
+export async function getPartnershipSettings(): Promise<PartnershipSettingsContent> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("partnership_settings")
+      .select(
+        "eyebrow, title, title_highlight, description, email, cta_primary_label, cta_primary_href, cta_secondary_label"
+      )
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (error || !data) {
+      return DEFAULT_PARTNERSHIP;
+    }
+
+    return {
+      eyebrow: data.eyebrow ?? DEFAULT_PARTNERSHIP.eyebrow,
+      title: data.title ?? DEFAULT_PARTNERSHIP.title,
+      titleHighlight: data.title_highlight ?? DEFAULT_PARTNERSHIP.titleHighlight,
+      description: data.description ?? DEFAULT_PARTNERSHIP.description,
+      email: data.email ?? DEFAULT_PARTNERSHIP.email,
+      ctaPrimaryLabel: data.cta_primary_label ?? DEFAULT_PARTNERSHIP.ctaPrimaryLabel,
+      ctaPrimaryHref: data.cta_primary_href ?? DEFAULT_PARTNERSHIP.ctaPrimaryHref,
+      ctaSecondaryLabel: data.cta_secondary_label ?? DEFAULT_PARTNERSHIP.ctaSecondaryLabel,
+    };
+  } catch {
+    return DEFAULT_PARTNERSHIP;
   }
 }

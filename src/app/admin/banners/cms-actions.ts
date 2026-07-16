@@ -112,3 +112,39 @@ export async function updateFloatBanner(
   revalidatePath("/admin/banners");
   return { ok: true };
 }
+
+export async function updatePartnershipSettings(
+  _prev: CmsActionState,
+  formData: FormData
+): Promise<CmsActionState> {
+  await requireAdmin();
+  const admin = createAdminClient();
+
+  const payload = {
+    id: 1,
+    eyebrow: String(formData.get("eyebrow") ?? "").trim() || "Kviboystore Partnership",
+    title: String(formData.get("title") ?? "").trim() || "Tumbuh Bersama Sebagai",
+    title_highlight: String(formData.get("titleHighlight") ?? "").trim() || "Partner Resmi Kviboystore",
+    description: String(formData.get("description") ?? "").trim() || "Hubungkan produk digital Anda...",
+    email: String(formData.get("email") ?? "").trim() || "partner@kviboystore.com",
+    cta_primary_label: String(formData.get("ctaPrimaryLabel") ?? "").trim() || "Mulai Jadi Seller",
+    cta_primary_href: String(formData.get("ctaPrimaryHref") ?? "").trim() || "/sell",
+    cta_secondary_label: String(formData.get("ctaSecondaryLabel") ?? "").trim() || "Hubungi Tim Partnership",
+    updated_at: new Date().toISOString(),
+  };
+
+  const { error } = await admin.from("partnership_settings").upsert(payload);
+
+  if (error) {
+    return {
+      ok: false,
+      error:
+        error.message +
+        " — pastikan migration 0018_partnership_settings.sql sudah dijalankan di Supabase.",
+    };
+  }
+
+  revalidatePath("/partners");
+  revalidatePath("/admin/banners");
+  return { ok: true };
+}
