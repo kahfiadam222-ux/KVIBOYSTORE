@@ -89,9 +89,10 @@ export function SaffronWashBackground() {
     // Bloom besar, lembut — sedikit saja. Intensitas glow utama datang dari
     // CSS --body-gradient (gratis/GPU); canvas hanya menambah gerak halus.
     const blooms: Bloom[] = [
-      { baseX: 0.15, baseY: 0.1, size: 560, color: 1, opacity: 0.5, phase: 0.0, driftX: 0.04, driftY: 0.03 },
-      { baseX: 0.87, baseY: 0.16, size: 600, color: 0, opacity: 0.5, phase: 2.1, driftX: 0.045, driftY: 0.028 },
-      { baseX: 0.5, baseY: 1.02, size: 640, color: 0, opacity: 0.36, phase: 4.2, driftX: 0.032, driftY: 0.024 },
+      { baseX: 0.04, baseY: 0.3, size: 760, color: 1, opacity: 0.5, phase: 0.0, driftX: 0.035, driftY: 0.028 },
+      { baseX: 0.97, baseY: 0.34, size: 800, color: 0, opacity: 0.52, phase: 2.1, driftX: 0.04, driftY: 0.026 },
+      { baseX: 0.62, baseY: 0.04, size: 620, color: 1, opacity: 0.34, phase: 3.2, driftX: 0.05, driftY: 0.03 },
+      { baseX: 0.5, baseY: 1.06, size: 820, color: 0, opacity: 0.4, phase: 4.2, driftX: 0.03, driftY: 0.022 },
     ];
 
     let raf: number;
