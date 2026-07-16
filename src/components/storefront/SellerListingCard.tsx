@@ -48,6 +48,7 @@ export function SellerListingCard({
   productTypes: any[];
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [productImagePreview, setProductImagePreview] = useState<string | null>(product.image_url ?? null);
   const [uploadingProductImage, setUploadingProductImage] = useState(false);
   const productImageInputRef = useRef<HTMLInputElement>(null);
