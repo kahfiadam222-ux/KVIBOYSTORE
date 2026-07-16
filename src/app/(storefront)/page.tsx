@@ -1,6 +1,8 @@
 import { getActiveListings } from "@/lib/catalog/queries";
 import { getDeliveryLabel } from "@/lib/catalog/tierLabels";
 import { getActiveBanners } from "@/lib/banners/queries";
+import Link from "next/link";
+import { Handshake } from "lucide-react";
 import {
   getFloatBanners,
   getStorefrontHero,
@@ -48,17 +50,26 @@ export default async function StorefrontPage({
 
   return (
     <main className="mx-auto max-w-7xl w-full px-2.5 py-5 sm:px-6 sm:py-10 lg:px-8">
-      {!q ? (
+      <div className="mb-5 sm:mb-6 max-w-2xl mx-auto flex items-center gap-2 sm:gap-3">
+        <div className="flex-1 min-w-0">
+          <SearchBar defaultValue={q} />
+        </div>
+        <Link
+          href="/partners"
+          className="shrink-0 flex items-center gap-1.5 px-3 sm:px-4 h-12 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-fill)] backdrop-blur-xl hover:border-primary/50 text-foreground text-xs sm:text-sm font-semibold transition-all duration-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),var(--shadow-card)] hover:text-primary active:scale-95"
+        >
+          <Handshake className="size-4 text-primary" />
+          <span className="hidden xs:inline">Partners</span>
+          <span className="xs:hidden">Partner</span>
+        </Link>
+      </div>
+
+      {!q && (
         <HeroSection
-          searchQuery={q}
           productCount={listings.length}
           content={hero}
           floatBanners={floatBanners}
         />
-      ) : (
-        <div className="mb-8 max-w-2xl mx-auto">
-          <SearchBar defaultValue={q} />
-        </div>
       )}
 
       {!q && (horizontalBanners.length > 0 || verticalBanners.length > 0) && (
@@ -104,7 +115,7 @@ export default async function StorefrontPage({
 
       {listings.length === 0 ? (
         <div className="glass-panel text-center py-16 px-6 rounded-3xl max-w-md mx-auto">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary mb-5 shadow-[0_0_15px_rgba(139,108,245,0.25)]">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary mb-5">
             <svg
               className="h-7 w-7"
               fill="none"
@@ -179,7 +190,7 @@ export default async function StorefrontPage({
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-2.5 sm:p-3.5 pt-2 pb-2 flex-grow">
-                    <p className="text-sm sm:text-base font-extrabold text-primary drop-shadow-[0_0_10px_color-mix(in_oklch,var(--gold)_35%,transparent)]">
+                    <p className="text-sm sm:text-base font-extrabold text-foreground">
                       {formatPrice(listing.price, listing.currency)}
                     </p>
                     {!listing.isPlatformOwned &&

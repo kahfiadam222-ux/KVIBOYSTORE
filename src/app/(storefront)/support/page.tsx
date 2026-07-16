@@ -8,7 +8,7 @@ export default async function SupportPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <div className="mb-8 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-[var(--gold)]">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary">
           <HelpCircle className="h-7 w-7 text-white" />
         </div>
         <h1 className="text-2xl font-bold">Pusat Bantuan</h1>

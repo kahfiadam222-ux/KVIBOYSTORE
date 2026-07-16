@@ -62,7 +62,7 @@ export function InteractiveBackground() {
     window.addEventListener("deviceorientation", handleDeviceOrientation);
 
     // Particles
-    const particles: Particle[] = Array.from({ length: 60 }, () => ({
+    const particles: Particle[] = Array.from({ length: 45 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
       size: Math.random() * 2.5 + 1,
@@ -95,7 +95,7 @@ export function InteractiveBackground() {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size * pulse, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(147, 197, 253, ${p.opacity * pulse})`;
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity * pulse * 0.85})`;
         ctx.fill();
       });
 
@@ -115,7 +115,7 @@ export function InteractiveBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 -z-10 opacity-60 mix-blend-screen"
+      className="pointer-events-none fixed inset-0 -z-10 opacity-45 mix-blend-screen"
     />
   );
 }

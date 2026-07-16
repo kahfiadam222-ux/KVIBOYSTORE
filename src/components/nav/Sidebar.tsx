@@ -1,11 +1,12 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ReactNode, ComponentType } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useSidebar, MOBILE_MAX } from "./sidebar-context";
+import type { SidebarCategory } from "@/lib/categories/defaults";
 
 import {
   Home,
@@ -31,8 +32,25 @@ import {
   Users,
   AlertTriangle,
   PackageOpen,
+  Tag,
+  Tags,
+  type LucideProps,
 } from "lucide-react";
 import { ThemeSwitcher } from "./ThemeSwitcher";
+
+/** Lucide icons used as fallback when a category has no uploaded logo. */
+const CATEGORY_ICONS: Record<string, ComponentType<LucideProps>> = {
+  Tv,
+  Music2,
+  Palette,
+  Bot,
+  Shield,
+  FileText,
+  Tag,
+  Gift,
+  Store,
+  CreditCard,
+};
 
 interface SidebarProps {
   user: {
@@ -40,6 +58,7 @@ interface SidebarProps {
     email: string;
     role: "buyer" | "seller" | "admin";
   } | null;
+  categories: SidebarCategory[];
 }
 
 const mainNavItems = [
@@ -51,6 +70,7 @@ const mainNavItems = [
 
 const adminNavItems = [
   { href: "/admin/banners", label: "Konten beranda", icon: ImageIcon },
+  { href: "/admin/categories", label: "Kategori sidebar", icon: Tags },
   { href: "/admin/sellers", label: "Penjual", icon: Users },
   { href: "/admin/listings", label: "Stok jualan", icon: PackageOpen },
   { href: "/admin/disputes", label: "Sengketa", icon: AlertTriangle },
@@ -107,22 +127,15 @@ function SidebarSectionLabel({
   );
 }
 
-const categories = [
-  { href: "/?q=netflix", label: "Netflix", icon: Tv },
-  { href: "/?q=spotify", label: "Spotify", icon: Music2 },
-  { href: "/?q=canva", label: "Canva Pro", icon: Palette },
-  { href: "/?q=chatgpt", label: "ChatGPT Plus", icon: Bot },
-  { href: "/?q=vpn", label: "VPN Premium", icon: Shield },
-  { href: "/?q=microsoft", label: "Microsoft 365", icon: FileText },
-];
-
 function SidebarPanel({
   user,
+  categories = [],
   collapsed,
   toggle,
   onNavigate,
 }: {
   user: SidebarProps["user"];
+  categories?: SidebarCategory[];
   collapsed: boolean;
   toggle: () => void;
   onNavigate?: () => void;
@@ -178,31 +191,25 @@ function SidebarPanel({
                 key={item.href}
                 href={item.href}
                 onClick={onNavigate}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                  "group relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-200",
                   isActive
-                    ? "bg-primary/12 text-primary"
-                    : "text-muted-foreground hover:bg-[var(--glass-fill)] hover:text-foreground",
+                    ? "bg-primary/10 text-foreground"
+                    : "text-muted-foreground hover:bg-[var(--accent)] hover:text-foreground",
                   collapsed && "justify-center px-0"
                 )}
               >
-                <div
+                {isActive && !collapsed && (
+                  <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-primary" />
+                )}
+                <Icon
                   className={cn(
-                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all",
-                    isActive
-                      ? "bg-primary/15 text-primary"
-                      : "bg-[var(--glass-fill)] text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                  )}
-                >
-                  <Icon className="h-[18px] w-[18px]" />
-                </div>
-                <SidebarNavLabel collapsed={collapsed}>{item.label}</SidebarNavLabel>
-                <div
-                  className={cn(
-                    "absolute right-2 h-1.5 w-1.5 rounded-full bg-primary transition-opacity duration-300",
-                    isActive && !collapsed ? "opacity-100" : "opacity-0"
+                    "h-[18px] w-[18px] shrink-0 transition-colors",
+                    isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
                   )}
                 />
+                <SidebarNavLabel collapsed={collapsed}>{item.label}</SidebarNavLabel>
               </Link>
             );
           })}
@@ -219,16 +226,25 @@ function SidebarPanel({
           </SidebarSectionLabel>
           <div className="grid grid-cols-2 gap-1.5">
             {categories.map((cat) => {
-              const Icon = cat.icon;
+              const Icon = CATEGORY_ICONS[cat.iconName] ?? Tag;
               return (
                 <Link
-                  key={cat.href}
+                  key={cat.id}
                   href={cat.href}
                   onClick={onNavigate}
                   tabIndex={collapsed ? -1 : 0}
-                  className="flex items-center gap-2 rounded-lg bg-[var(--glass-fill)]/60 px-2.5 py-2 text-xs font-medium text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary"
+                  className="flex h-9 items-center gap-2 rounded-lg px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-[var(--accent)] hover:text-foreground"
                 >
-                  <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />
+                  {cat.iconUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={cat.iconUrl}
+                      alt=""
+                      className="h-4 w-4 shrink-0 rounded-sm object-cover"
+                    />
+                  ) : (
+                    <Icon className="h-3.5 w-3.5 shrink-0" />
+                  )}
                   <span className="truncate">{cat.label}</span>
                 </Link>
               );
@@ -250,24 +266,24 @@ function SidebarPanel({
                   key={item.href}
                   href={item.href}
                   onClick={onNavigate}
+                  aria-current={isActive ? "page" : undefined}
                   className={cn(
-                    "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                    "group relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-200",
                     isActive
-                      ? "bg-primary/15 text-primary"
-                      : "text-muted-foreground hover:bg-primary/10 hover:text-primary",
+                      ? "bg-primary/10 text-foreground"
+                      : "text-muted-foreground hover:bg-[var(--accent)] hover:text-foreground",
                     collapsed && "justify-center px-0"
                   )}
                 >
-                  <div
+                  {isActive && !collapsed && (
+                    <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-primary" />
+                  )}
+                  <Icon
                     className={cn(
-                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all",
-                      isActive
-                        ? "bg-primary/20 text-primary"
-                        : "bg-primary/10 text-primary/90 group-hover:bg-primary/15"
+                      "h-[18px] w-[18px] shrink-0 transition-colors",
+                      isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
                     )}
-                  >
-                    <Icon className="h-[18px] w-[18px]" />
-                  </div>
+                  />
                   <SidebarNavLabel collapsed={collapsed}>{item.label}</SidebarNavLabel>
                 </Link>
               );
@@ -277,7 +293,7 @@ function SidebarPanel({
               onClick={onNavigate}
               tabIndex={collapsed ? -1 : 0}
               className={cn(
-                "mt-1 flex items-center gap-2 overflow-hidden rounded-xl bg-[image:var(--primary-gradient)] px-3 py-2.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-all duration-300",
+                "mt-1 flex h-10 items-center gap-2 overflow-hidden rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground transition-opacity duration-300",
                 collapsed
                   ? "pointer-events-none max-h-0 opacity-0 py-0"
                   : "max-h-12 opacity-100"
@@ -301,30 +317,27 @@ function SidebarPanel({
                 href={item.href}
                 onClick={onNavigate}
                 className={cn(
-                  "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                  "group flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-200",
                   item.highlight
-                    ? "bg-primary/10 text-primary hover:bg-primary/15"
-                    : "text-muted-foreground hover:bg-[var(--glass-fill)] hover:text-foreground",
+                    ? "text-primary hover:bg-primary/10"
+                    : "text-muted-foreground hover:bg-[var(--accent)] hover:text-foreground",
                   collapsed && "justify-center px-0"
                 )}
               >
-                <div
+                <Icon
                   className={cn(
-                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all",
-                    item.highlight
-                      ? "bg-primary/15 text-primary"
-                      : "bg-[var(--glass-fill)] text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                    "h-[18px] w-[18px] shrink-0 transition-colors",
+                    item.highlight ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
                   )}
-                >
-                  <Icon className="h-[18px] w-[18px]" />
-                </div>
+                />
                 <SidebarNavLabel collapsed={collapsed}>{item.label}</SidebarNavLabel>
               </Link>
             );
           })}
         </div>
+      </div>
 
-        <div className="mt-auto border-t border-[var(--glass-border)] px-3 pt-4">
+      <div className="shrink-0 border-t border-[var(--glass-border)] px-3 pb-4 pt-4">
           {user && (
             <div
               className={cn(
@@ -371,13 +384,12 @@ function SidebarPanel({
               </Link>
             )}
           </div>
-        </div>
       </div>
     </>
   );
 }
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar({ user, categories = [] }: SidebarProps) {
   const pathname = usePathname();
   const { collapsed, toggle, close } = useSidebar();
 
@@ -392,14 +404,13 @@ export function Sidebar({ user }: SidebarProps) {
     <div className="sidebar-slot">
       <aside
         className={cn(
-          "sidebar-rail flex h-full h-[100dvh] w-full flex-col overflow-hidden border-r border-[var(--glass-border)] backdrop-blur-2xl",
-          "bg-gradient-to-b from-[var(--glass-fill)] via-background/96 to-background/92",
-          "shadow-[8px_0_40px_-28px_rgba(0,0,0,0.4)]"
+          "sidebar-rail flex h-full h-[100dvh] w-full flex-col overflow-hidden border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] backdrop-blur-2xl"
         )}
         aria-expanded={!collapsed}
       >
         <SidebarPanel
           user={user}
+          categories={categories}
           collapsed={collapsed}
           toggle={toggle}
           onNavigate={close}

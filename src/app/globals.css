@@ -564,6 +564,29 @@
     linear-gradient(165deg, #090C12 0%, #141A29 50%, #05080E 100%);
 }
 
+/* ──────────────────────────────────────────────────────────────
+   FLAT COLOR OVERRIDE — no gradients anywhere.
+   Ditempatkan setelah semua definisi tema agar selalu menang.
+   Semua token "*-gradient" dipaksa jadi warna solid (dua-stop sama
+   warna) sehingga `background-image: var(--…-gradient)` tetap valid
+   namun tampil rata/solid. Background halaman juga rata.
+   ────────────────────────────────────────────────────────────── */
+:root,
+.dark,
+.theme-daylight,
+.theme-sakura,
+.theme-saffron,
+.theme-midnight,
+.theme-mono,
+.theme-ocean,
+.theme-forest,
+.theme-aether,
+.theme-ember {
+  --primary-gradient: linear-gradient(0deg, var(--primary), var(--primary));
+  --gold-gradient: linear-gradient(0deg, var(--gold), var(--gold));
+  --body-gradient: linear-gradient(0deg, var(--background), var(--background));
+}
+
 /* ── 120FPS smooth optimizations and text rendering ── */
 html, body {
   text-rendering: optimizeLegibility;
@@ -659,28 +682,19 @@ a {
 }
 
 @utility btn-gradient {
-  background-image: var(--primary-gradient);
+  background-color: var(--primary);
   position: relative;
 }
 
 @utility gold-line {
   height: 1px;
   width: 100%;
-  background-image: var(--gold-line);
+  background-color: color-mix(in oklch, var(--border) 90%, transparent);
   border: 0;
 }
 
 @utility text-premium {
-  background-image: linear-gradient(
-    115deg,
-    var(--gold-soft) 0%,
-    var(--primary) 55%,
-    var(--gold) 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
+  color: var(--primary);
 }
 
 @utility eyebrow {
@@ -794,61 +808,15 @@ a {
 }
 
 @utility glass-hero {
-  background:
-    linear-gradient(
-      150deg,
-      color-mix(in oklch, var(--card) 82%, transparent) 0%,
-      color-mix(in oklch, var(--glass-fill) 90%, transparent) 100%
-    );
-  backdrop-filter: blur(28px) saturate(1.2);
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
-    0 28px 60px -28px rgba(0, 0, 0, 0.4),
-    0 0 0 1px color-mix(in oklch, var(--primary) 6%, transparent);
+  background: var(--glass-fill);
+  backdrop-filter: blur(28px) saturate(1.15);
+  box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
 }
-.glass-hero::before {
-  content: "";
-  position: absolute;
-  inset: -35% auto auto -8%;
-  width: 50%;
-  height: 75%;
-  background: radial-gradient(
-    ellipse at center,
-    color-mix(in oklch, var(--primary) 12%, transparent),
-    transparent 70%
-  );
-  pointer-events: none;
-}
-.glass-hero::after {
-  content: "";
-  position: absolute;
-  right: -12%;
-  top: 8%;
-  width: 42%;
-  height: 68%;
-  background: radial-gradient(
-    ellipse at center,
-    color-mix(in oklch, var(--gold) 9%, transparent),
-    transparent 72%
-  );
-  pointer-events: none;
-}
 
 .hero-depth-plane {
-  transform: perspective(1000px) rotateY(-10deg) rotateX(5deg) translateZ(0);
-  border-radius: 2rem;
-  background:
-    linear-gradient(
-      140deg,
-      color-mix(in oklch, var(--primary) 14%, transparent),
-      color-mix(in oklch, var(--gold) 8%, transparent) 55%,
-      transparent
-    );
-  border: 1px solid color-mix(in oklch, var(--glass-border) 80%, transparent);
-  box-shadow: var(--shadow-premium);
-  opacity: 0.5;
+  display: none;
 }
 
 @utility product-card-shell {
@@ -860,24 +828,9 @@ a {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    150deg,
-    color-mix(in oklch, white 16%, transparent),
-    transparent 42%,
-    color-mix(in oklch, var(--primary) 18%, transparent) 100%
-  );
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  box-shadow: inset 0 0 0 1px var(--glass-border);
   pointer-events: none;
   z-index: 2;
-  opacity: 0.65;
 }
 
 @utility section-pill {

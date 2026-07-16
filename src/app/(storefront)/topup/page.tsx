@@ -23,7 +23,7 @@ export default async function TopupPage() {
     <div className="mx-auto max-w-2xl px-4 py-12">
       <Card className="border-border bg-card/40 backdrop-blur-xl shadow-xl">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-[var(--gold)]">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary">
             <Wallet className="h-7 w-7 text-white" />
           </div>
           <CardTitle className="text-xl">Top Up Saldo</CardTitle>
