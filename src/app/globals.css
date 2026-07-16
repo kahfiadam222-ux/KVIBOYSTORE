@@ -92,6 +92,8 @@
   --shadow-card: 0 10px 28px -16px rgba(40, 36, 28, 0.14);
   --shadow-glow: 0 0 32px -12px color-mix(in oklch, var(--primary) 28%, transparent);
   --shadow-gold: 0 0 24px -10px color-mix(in oklch, var(--gold) 22%, transparent);
+  --wash-1: 147, 197, 253;
+  --wash-2: 196, 181, 253;
   --sidebar: #FFFCFA;
   --sidebar-foreground: #1A1916;
   --sidebar-primary: #2F6B4F;
@@ -428,49 +430,55 @@
     linear-gradient(165deg, #101012 0%, #19191D 50%, #08080A 100%);
 }
 
-/* Saffron Wash — Bright orange watercolor with interactive light bloom (Artisan Anime) */
+/* Aurora Pastel (dulu "Saffron Wash") — aturan 60-30-10:
+   60% putih bersih · 30% glow biru-langit ↔ lavender · 10% indigo pekat.
+   Catatan: tema ini juga membawa class `.dark`, jadi ketiga token *-gradient
+   di-assert ulang setelah blok FLAT OVERRIDE di bawah agar selalu menang. */
 .theme-saffron {
-  --background: #FDF6EC;
-  --foreground: #2C2520;
-  --card: #F8EDE0;
-  --card-foreground: #2C2520;
-  --popover: #F4E4D0;
-  --popover-foreground: #2C2520;
-  --primary: #F27C2E;
+  --background: #FFFFFF;
+  --foreground: #1E1B3A;
+  --card: #FFFFFF;
+  --card-foreground: #1E1B3A;
+  --popover: #FFFFFF;
+  --popover-foreground: #1E1B3A;
+  --primary: #4338CA;
   --primary-foreground: #FFFFFF;
-  --primary-gradient: linear-gradient(135deg, #F27C2E 0%, #E85D04 100%);
-  --secondary: #E8D9C7;
-  --secondary-foreground: #2C2520;
-  --muted: #E8D9C7;
-  --muted-foreground: #7A6B5A;
-  --accent: #334155;
-  --accent-foreground: #F4E4D0;
-  --destructive: #E63946;
-  --border: rgba(51, 65, 85, 0.18);
-  --input: rgba(51, 65, 85, 0.22);
-  --ring: #F27C2E;
-  --gold: #C4956A;
-  --gold-soft: #D4B48C;
-  --gold-deep: #8B5E3C;
-  --gold-gradient: linear-gradient(135deg, #C4956A 0%, #8B5E3C 100%);
-  --gold-line: linear-gradient(to right, transparent 0%, rgba(242, 124, 46, 0.35) 50%, transparent 100%);
-  --glass-fill: rgba(248, 237, 224, 0.82);
-  --glass-border: rgba(51, 65, 85, 0.15);
-  --shadow-premium: 0 20px 40px -20px rgba(0, 0, 0, 0.12);
-  --shadow-card: 0 8px 24px -14px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 0 32px -12px rgba(242, 124, 46, 0.25);
-  --sidebar: rgba(248, 237, 224, 0.55);
-  --sidebar-foreground: #2C2520;
-  --sidebar-primary: #F27C2E;
+  --secondary: #EEF1FC;
+  --secondary-foreground: #2A2550;
+  --muted: #F1F3FB;
+  --muted-foreground: #6B6A8C;
+  --accent: #ECEDFB;
+  --accent-foreground: #2A2550;
+  --destructive: #E11D48;
+  --border: rgba(67, 56, 202, 0.12);
+  --input: rgba(67, 56, 202, 0.16);
+  --ring: #6366F1;
+  --chart-1: #4338CA;
+  --chart-2: #7C6FE8;
+  --chart-3: #E11D48;
+  --chart-4: #38BDF8;
+  --chart-5: #A78BFA;
+  --gold: #7C6FE8;
+  --gold-soft: #A5B4FC;
+  --gold-deep: #5B4FCF;
+  --gold-line: linear-gradient(to right, transparent 0%, rgba(124, 111, 232, 0.35) 50%, transparent 100%);
+  --glass-fill: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(67, 56, 202, 0.10);
+  --shadow-premium: 0 24px 48px -22px rgba(67, 56, 202, 0.22);
+  --shadow-card: 0 12px 30px -18px rgba(67, 56, 202, 0.16);
+  --shadow-glow: 0 0 32px -12px rgba(99, 102, 241, 0.30);
+  --shadow-gold: 0 0 28px -12px rgba(124, 111, 232, 0.28);
+  --sidebar: rgba(255, 255, 255, 0.70);
+  --sidebar-foreground: #1E1B3A;
+  --sidebar-primary: #4338CA;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #334155;
-  --sidebar-accent-foreground: #F4E4D0;
-  --sidebar-border: rgba(51, 65, 85, 0.1);
-  --sidebar-ring: #F27C2E;
-  --body-gradient:
-    radial-gradient(900px 700px at 25% 30%, rgba(242, 124, 46, 0.08), transparent 70%),
-    radial-gradient(800px 600px at 70% 75%, rgba(212, 180, 140, 0.06), transparent 70%),
-    linear-gradient(165deg, #FDF6EC 0%, #F8EDE0 100%);
+  --sidebar-accent: #ECEDFB;
+  --sidebar-accent-foreground: #2A2550;
+  --sidebar-border: rgba(67, 56, 202, 0.10);
+  --sidebar-ring: #6366F1;
+  /* Warna wash (r,g,b) dibaca oleh SaffronWashBackground */
+  --wash-1: 147, 197, 253; /* sky blue */
+  --wash-2: 196, 181, 253; /* lavender */
 }
 
 /* Anime soft cyber — indigo + soft cyan */
@@ -575,7 +583,6 @@
 .dark,
 .theme-daylight,
 .theme-sakura,
-.theme-saffron,
 .theme-midnight,
 .theme-mono,
 .theme-ocean,
@@ -585,6 +592,18 @@
   --primary-gradient: linear-gradient(0deg, var(--primary), var(--primary));
   --gold-gradient: linear-gradient(0deg, var(--gold), var(--gold));
   --body-gradient: linear-gradient(0deg, var(--background), var(--background));
+}
+
+/* Aurora Pastel mempertahankan gradasi hidup — ditaruh SETELAH flat override
+   (dan setelah `.dark`, yang juga dibawa tema ini) agar selalu menang. */
+.theme-saffron {
+  --primary-gradient: linear-gradient(135deg, #5B52E0 0%, #4338CA 55%, #362DA8 100%);
+  --gold-gradient: linear-gradient(135deg, #A5B4FC 0%, #7C6FE8 55%, #5B4FCF 100%);
+  --body-gradient:
+    radial-gradient(820px 620px at 12% 6%, rgba(196, 181, 253, 0.24), transparent 60%),
+    radial-gradient(780px 600px at 88% 14%, rgba(147, 197, 253, 0.22), transparent 62%),
+    radial-gradient(720px 640px at 50% 110%, rgba(167, 139, 250, 0.14), transparent 60%),
+    linear-gradient(180deg, #FFFFFF 0%, #FBFBFF 55%, #F5F6FE 100%);
 }
 
 /* ── 120FPS smooth optimizations and text rendering ── */

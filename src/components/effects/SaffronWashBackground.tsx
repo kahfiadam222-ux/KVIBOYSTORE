@@ -2,63 +2,60 @@
 
 import { useEffect, useRef } from "react";
 
-interface Particle {
-  x: number;
-  y: number;
-  size: number;
-  speedX: number;
-  speedY: number;
-  opacity: number;
-  phase: number;
+/** Baca CSS var `--wash-N` bertformat "r, g, b". Fallback ke pastel. */
+function readWash(varName: string, fallback: string): string {
+  if (typeof document === "undefined") return fallback;
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue(varName)
+    .trim();
+  if (/^\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}$/.test(raw)) {
+    return raw.replace(/\s+/g, " ");
+  }
+  return fallback;
 }
 
 interface Bloom {
-  x: number;
-  y: number;
-  size: number;
+  baseX: number; // 0..1 relatif lebar
+  baseY: number; // 0..1 relatif tinggi
+  size: number; // px
+  color: 0 | 1; // index warna wash
   opacity: number;
   phase: number;
+  driftX: number;
+  driftY: number;
 }
 
-/** Parse `#rgb` / `#rrggbb` → "r, g, b". Falls back to saffron orange. */
-function readPrimaryRgb(): string {
-  if (typeof document === "undefined") return "242, 124, 46";
-  const raw = getComputedStyle(document.documentElement)
-    .getPropertyValue("--primary")
-    .trim();
-  let hex = raw.replace("#", "");
-  if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
-  if (hex.length !== 6) return "242, 124, 46";
-  const r = parseInt(hex.slice(0, 2), 16);
-  const g = parseInt(hex.slice(2, 4), 16);
-  const b = parseInt(hex.slice(4, 6), 16);
-  if ([r, g, b].some((n) => Number.isNaN(n))) return "242, 124, 46";
-  return `${r}, ${g}, ${b}`;
-}
-
+/**
+ * Aurora Pastel wash — glow lembut sky-blue ↔ lavender.
+ * Disederhanakan dari efek partikel jadi beberapa bloom besar yang
+ * mengambang sangat pelan. Tenang, tidak ramai, hemat CPU.
+ */
 export function SaffronWashBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: 0, y: 0, active: false });
-  // Warna mengikuti --primary tema (adaptif), diperbarui saat tema berganti.
-  const colorRef = useRef("242, 124, 46");
+  const mouseRef = useRef({ x: 0.5, y: 0.5 });
+  const parallaxRef = useRef({ x: 0.5, y: 0.5 });
+  const colorsRef = useRef<[string, string]>(["147, 197, 253", "196, 181, 253"]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    colorRef.current = readPrimaryRgb();
-    const themeObserver = new MutationObserver(() => {
-      colorRef.current = readPrimaryRgb();
-    });
+    const syncColors = () => {
+      colorsRef.current = [
+        readWash("--wash-1", "147, 197, 253"),
+        readWash("--wash-2", "196, 181, 253"),
+      ];
+    };
+    syncColors();
+
+    // Warna mengikuti tema aktif (adaptif saat class <html> berganti).
+    const themeObserver = new MutationObserver(syncColors);
     themeObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class"],
     });
 
-    const ctx = canvas.getContext("2d", {
-      alpha: true,
-      desynchronized: true
-    });
+    const ctx = canvas.getContext("2d", { alpha: true, desynchronized: true });
     if (!ctx) return;
 
     let width = window.innerWidth;
@@ -73,153 +70,65 @@ export function SaffronWashBackground() {
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
-      ctx.scale(dpr, dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
     resize();
     window.addEventListener("resize", resize);
 
-    // Mouse tracking with throttling
     let lastMove = 0;
     const handleMouseMove = (e: MouseEvent) => {
       const now = Date.now();
-      if (now - lastMove > 16) { // ~60fps tracking
-        mouseRef.current = {
-          x: e.clientX,
-          y: e.clientY,
-          active: true,
-        };
+      if (now - lastMove > 32) {
+        mouseRef.current = { x: e.clientX / width, y: e.clientY / height };
         lastMove = now;
       }
     };
-
-    const handleMouseLeave = () => {
-      mouseRef.current.active = false;
-    };
-
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    window.addEventListener("mouseleave", handleMouseLeave);
 
-    // Watercolor particles (toned down — aksen, bukan dominan)
-    const particles: Particle[] = Array.from({ length: 40 }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      size: Math.random() * 22 + 12,
-      speedX: (Math.random() - 0.5) * 0.14,
-      speedY: (Math.random() - 0.5) * 0.14,
-      opacity: Math.random() * 0.3 + 0.12,
-      phase: Math.random() * Math.PI * 2,
-    }));
-
-    // Soft light blooms
-    const blooms: Bloom[] = Array.from({ length: 5 }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      size: Math.random() * 150 + 90,
-      opacity: Math.random() * 0.14 + 0.08,
-      phase: Math.random() * Math.PI * 2,
-    }));
+    // Bloom besar, lembut — sedikit saja.
+    const blooms: Bloom[] = [
+      { baseX: 0.16, baseY: 0.1, size: 540, color: 1, opacity: 0.42, phase: 0.0, driftX: 0.035, driftY: 0.03 },
+      { baseX: 0.86, baseY: 0.18, size: 580, color: 0, opacity: 0.42, phase: 2.1, driftX: 0.04, driftY: 0.028 },
+      { baseX: 0.5, baseY: 1.02, size: 640, color: 1, opacity: 0.3, phase: 4.0, driftX: 0.03, driftY: 0.022 },
+    ];
 
     let raf: number;
-    let lastTime = performance.now();
 
-    const draw = (currentTime: number) => {
-      const delta = currentTime - lastTime;
-      lastTime = currentTime;
-
+    const draw = (t: number) => {
       ctx.clearRect(0, 0, width, height);
 
-      const { x: mx, y: my, active } = mouseRef.current;
+      // Parallax mouse yang sangat halus (lerp).
+      parallaxRef.current.x += (mouseRef.current.x - parallaxRef.current.x) * 0.04;
+      parallaxRef.current.y += (mouseRef.current.y - parallaxRef.current.y) * 0.04;
+      const px = (parallaxRef.current.x - 0.5) * width * 0.03;
+      const py = (parallaxRef.current.y - 0.5) * height * 0.03;
 
-      // Draw watercolor particles (optimized)
-      particles.forEach((p, i) => {
-        // Very smooth movement
-        p.x += p.speedX * (delta / 16);
-        p.y += p.speedY * (delta / 16);
+      const colors = colorsRef.current;
 
-        // Wrap around
-        if (p.x < -28) p.x = width + 28;
-        if (p.x > width + 28) p.x = -28;
-        if (p.y < -28) p.y = height + 28;
-        if (p.y > height + 28) p.y = -28;
+      for (const b of blooms) {
+        const cx =
+          b.baseX * width +
+          Math.sin(t * 0.00012 + b.phase) * width * b.driftX +
+          px;
+        const cy =
+          b.baseY * height +
+          Math.cos(t * 0.0001 + b.phase) * height * b.driftY +
+          py;
+        const pulse = Math.sin(t * 0.0006 + b.phase) * 0.06 + 0.94;
+        const r = b.size * pulse;
+        const c = colors[b.color];
 
-        // Smooth mouse interaction
-        if (active) {
-          const dx = mx - p.x;
-          const dy = my - p.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        const grad = ctx.createRadialGradient(cx, cy, r * 0.1, cx, cy, r);
+        grad.addColorStop(0, `rgba(${c}, ${b.opacity * pulse})`);
+        grad.addColorStop(0.5, `rgba(${c}, ${b.opacity * 0.4 * pulse})`);
+        grad.addColorStop(1, `rgba(${c}, 0)`);
 
-          if (dist < 340 && dist > 0) {
-            const force = (340 - dist) / 3200;
-            p.x += dx * force * 0.65;
-            p.y += dy * force * 0.65;
-          }
-        }
-
-        // Very smooth pulsing
-        const pulse = Math.sin(currentTime * 0.00085 + p.phase) * 0.1 + 0.9;
-
-        ctx.save();
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * pulse, 0, Math.PI * 2);
-
-        const gradient = ctx.createRadialGradient(
-          p.x, p.y, p.size * 0.18,
-          p.x, p.y, p.size * pulse
-        );
-
-        const c = colorRef.current;
-        gradient.addColorStop(0, `rgba(${c}, ${p.opacity * pulse})`);
-        gradient.addColorStop(0.45, `rgba(${c}, ${p.opacity * 0.5 * pulse})`);
-        gradient.addColorStop(1, `rgba(${c}, 0)`);
-
-        ctx.fillStyle = gradient;
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
         ctx.fill();
-        ctx.restore();
-      });
-
-      // Draw light blooms (premium quality)
-      blooms.forEach((b, i) => {
-        if (active) {
-          const dx = mx - b.x;
-          const dy = my - b.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist > 35) {
-            const speed = Math.min(dist / 2800, 0.018);
-            b.x += dx * speed;
-            b.y += dy * speed;
-          }
-        } else {
-          // Very gentle floating
-          b.x += Math.sin(currentTime * 0.00035 + b.phase) * 0.18;
-          b.y += Math.cos(currentTime * 0.00032 + b.phase) * 0.15;
-        }
-
-        // Keep in bounds smoothly
-        b.x = Math.max(0, Math.min(width, b.x));
-        b.y = Math.max(0, Math.min(height, b.y));
-
-        const pulse = Math.sin(currentTime * 0.0011 + b.phase) * 0.07 + 0.93;
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.size * pulse, 0, Math.PI * 2);
-
-        const gradient = ctx.createRadialGradient(
-          b.x, b.y, b.size * 0.12,
-          b.x, b.y, b.size * pulse
-        );
-
-        const bc = colorRef.current;
-        gradient.addColorStop(0, `rgba(${bc}, ${b.opacity * pulse})`);
-        gradient.addColorStop(0.3, `rgba(${bc}, ${b.opacity * 0.45 * pulse})`);
-        gradient.addColorStop(1, `rgba(${bc}, 0)`);
-
-        ctx.fillStyle = gradient;
-        ctx.fill();
-        ctx.restore();
-      });
+      }
 
       raf = requestAnimationFrame(draw);
     };
@@ -231,15 +140,14 @@ export function SaffronWashBackground() {
       themeObserver.disconnect();
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 -z-10 opacity-55 mix-blend-multiply"
-      style={{ willChange: 'transform' }}
+      className="pointer-events-none fixed inset-0 -z-10 opacity-70 mix-blend-multiply"
+      style={{ willChange: "transform" }}
     />
   );
 }

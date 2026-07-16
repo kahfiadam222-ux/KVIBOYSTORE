@@ -104,3 +104,12 @@ export const DEFAULT_FLOAT_BANNERS: FloatBanner[] = [
     isActive: true,
   },
 ];
+
+export type PartnerLogo = {
+  id: string;
+  name: string;
+  logoUrl: string;
+  partnerUrl: string;
+  isActive: boolean;
+  sortOrder: number;
+};

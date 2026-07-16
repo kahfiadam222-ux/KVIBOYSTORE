@@ -17,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getPartnershipSettings } from "@/lib/storefront/queries";
+import { getPartnershipSettings, getPartnerLogos } from "@/lib/storefront/queries";
 
 export const metadata = {
   title: "Partnership Program - Kviboystore",
@@ -81,6 +81,7 @@ const steps = [
 
 export default async function PartnersPage() {
   const settings = await getPartnershipSettings();
+  const partnerLogos = await getPartnerLogos();
 
   return (
     <main className="mx-auto max-w-5xl w-full px-4 py-10 sm:py-16">
@@ -168,6 +169,42 @@ export default async function PartnersPage() {
           ))}
         </div>
       </section>
+
+      {/* Official Partners Section */}
+      {partnerLogos && partnerLogos.length > 0 && (
+        <section className="mb-20">
+          <div className="text-center mb-10">
+            <h2 className="heading-display text-2xl sm:text-3xl">Partner Resmi Kami</h2>
+            <p className="text-muted-foreground text-sm sm:text-base mt-2">
+              Bekerja sama dengan berbagai brand dan platform kreatif tepercaya untuk menghadirkan layanan terbaik.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 justify-center items-center">
+            {partnerLogos.map((partner) => (
+              <a
+                key={partner.id}
+                href={partner.partnerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col items-center gap-3 p-4 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-fill)] backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5 cursor-pointer text-center"
+              >
+                <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl border border-border/40 bg-background/30 flex items-center justify-center p-2 group-hover:bg-background/80 transition-colors">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={partner.logoUrl}
+                    alt={partner.name}
+                    className="h-full w-full object-contain filter grayscale opacity-75 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                  />
+                </div>
+                <span className="font-semibold text-xs sm:text-sm text-muted-foreground group-hover:text-primary transition-colors truncate w-full max-w-[120px]">
+                  {partner.name}
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* CTA Bottom Section */}
       <section className="rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-fill)] backdrop-blur-xl p-8 sm:p-12 text-center relative overflow-hidden shadow-lg">

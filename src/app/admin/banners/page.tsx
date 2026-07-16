@@ -5,6 +5,7 @@ import { AdminBannerForm } from "./AdminBannerForm";
 import { HeroEditorForm } from "./HeroEditorForm";
 import { FloatBannerEditorForm } from "./FloatBannerEditorForm";
 import { PartnershipEditorForm } from "./PartnershipEditorForm";
+import { PartnerLogosManager } from "./PartnerLogosManager";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,14 +22,16 @@ import {
   type FloatBanner,
   type StorefrontHeroContent,
   type PartnershipSettingsContent,
+  type PartnerLogo,
 } from "@/lib/storefront/defaults";
-import { getPartnershipSettings } from "@/lib/storefront/queries";
+import { getPartnershipSettings, getPartnerLogos } from "@/lib/storefront/queries";
 
 export default async function AdminBannersPage() {
   await requireAdmin();
   const admin = createAdminClient();
 
   const partnershipSettings = await getPartnershipSettings();
+  const partnerLogos = await getPartnerLogos({ includeInactive: true });
 
   // Safely fetch storefront_hero with Slide 2 columns fallback
   let heroRow = null;
@@ -159,6 +162,18 @@ export default async function AdminBannersPage() {
         </CardHeader>
         <CardContent>
           <PartnershipEditorForm settings={partnershipSettings} />
+        </CardContent>
+      </Card>
+
+      <Card className="border-border bg-card/40 backdrop-blur-xl">
+        <CardHeader>
+          <CardTitle>Kelola Brand Partner Resmi</CardTitle>
+          <CardDescription>
+            Unggah logo banner, nama, dan link platform partner untuk ditampilkan di halaman /partners.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <PartnerLogosManager partners={partnerLogos} />
         </CardContent>
       </Card>
 

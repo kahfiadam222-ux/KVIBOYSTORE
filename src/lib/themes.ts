@@ -59,9 +59,9 @@ export const THEMES: Array<{
   },
   {
     id: "theme-saffron",
-    label: "Saffron Wash",
-    description: "Jingga cat air artistik",
-    swatch: "linear-gradient(135deg, #FDF6EC 0%, #F8EDE0 50%, #F27C2E 100%)",
+    label: "Aurora Pastel",
+    description: "Putih bersih, glow biru-lavender",
+    swatch: "linear-gradient(135deg, #FFFFFF 0%, #C4B5FD 50%, #4338CA 100%)",
     mode: "dark",
   },
 ];

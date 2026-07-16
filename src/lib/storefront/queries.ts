@@ -6,6 +6,7 @@ import {
   type FloatBanner,
   type StorefrontHeroContent,
   type PartnershipSettingsContent,
+  type PartnerLogo,
 } from "./defaults";
 
 export async function getStorefrontHero(): Promise<StorefrontHeroContent> {
@@ -146,5 +147,35 @@ export async function getPartnershipSettings(): Promise<PartnershipSettingsConte
     };
   } catch {
     return DEFAULT_PARTNERSHIP;
+  }
+}
+
+export async function getPartnerLogos(
+  opts: { includeInactive?: boolean } = {}
+): Promise<PartnerLogo[]> {
+  try {
+    const supabase = await createClient();
+    let query = supabase
+      .from("partner_logos")
+      .select("id, name, logo_url, partner_url, is_active, sort_order")
+      .order("sort_order", { ascending: true });
+
+    if (!opts.includeInactive) {
+      query = query.eq("is_active", true);
+    }
+
+    const { data, error } = await query;
+    if (error || !data) return [];
+
+    return data.map((row) => ({
+      id: row.id,
+      name: row.name,
+      logoUrl: row.logo_url,
+      partnerUrl: row.partner_url,
+      isActive: row.is_active,
+      sortOrder: row.sort_order,
+    }));
+  } catch {
+    return [];
   }
 }

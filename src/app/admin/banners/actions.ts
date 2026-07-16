@@ -43,3 +43,52 @@ export async function deleteBanner(bannerId: string) {
   revalidatePath("/admin/banners");
   revalidatePath("/");
 }
+
+export async function createPartnerLogo(formData: FormData) {
+  await requireAdmin();
+  const admin = createAdminClient();
+
+  const name = String(formData.get("name") ?? "").trim();
+  const logoUrl = String(formData.get("logoUrl") ?? "").trim();
+  const partnerUrl = String(formData.get("partnerUrl") ?? "").trim();
+  const sortOrder = Number(formData.get("sortOrder")) || 0;
+
+  if (!name || !logoUrl || !partnerUrl) {
+    throw new Error("Nama, URL logo, dan Link Partner wajib diisi.");
+  }
+
+  const { error } = await admin.from("partner_logos").insert({
+    name,
+    logo_url: logoUrl,
+    partner_url: partnerUrl,
+    sort_order: sortOrder,
+    is_active: true,
+  });
+
+  if (error) {
+    throw new Error(error.message + " — pastikan migration 0019_partner_logos.sql sudah dijalankan.");
+  }
+
+  revalidatePath("/admin/banners");
+  revalidatePath("/partners");
+}
+
+export async function togglePartnerLogo(partnerId: string, isActive: boolean) {
+  await requireAdmin();
+  const admin = createAdminClient();
+
+  await admin.from("partner_logos").update({ is_active: !isActive }).eq("id", partnerId);
+
+  revalidatePath("/admin/banners");
+  revalidatePath("/partners");
+}
+
+export async function deletePartnerLogo(partnerId: string) {
+  await requireAdmin();
+  const admin = createAdminClient();
+
+  await admin.from("partner_logos").delete().eq("id", partnerId);
+
+  revalidatePath("/admin/banners");
+  revalidatePath("/partners");
+}
