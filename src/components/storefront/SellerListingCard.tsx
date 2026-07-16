@@ -126,11 +126,14 @@ export function SellerListingCard({
         ) : (
           <form
             action={async (formData) => {
+              setSubmitting(true);
               try {
                 await updateListing(listing.id, formData);
                 setIsEditing(false);
               } catch (err: any) {
                 alert(err.message || "Gagal memperbarui produk. Coba lagi.");
+              } finally {
+                setSubmitting(false);
               }
             }}
             className="p-5 flex flex-col gap-4.5 border-t border-primary/10 bg-primary/5 rounded-2xl"
@@ -272,6 +275,7 @@ export function SellerListingCard({
               <Button
                 type="button"
                 onClick={() => setIsEditing(false)}
+                disabled={submitting}
                 variant="outline"
                 size="touch"
                 className="rounded-xl font-semibold px-4 cursor-pointer flex-1 sm:flex-none"
@@ -281,9 +285,16 @@ export function SellerListingCard({
               <Button
                 type="submit"
                 size="touch"
+                disabled={submitting || uploadingProductImage}
                 className="rounded-xl font-semibold px-4 shadow-lg shadow-primary/20 hover:shadow-primary/35 gap-1 cursor-pointer flex-1 sm:flex-none"
               >
-                <Check className="h-4 w-4" /> Simpan Perubahan
+                {submitting ? (
+                  "Menyimpan..."
+                ) : (
+                  <>
+                    <Check className="h-4 w-4" /> Simpan Perubahan
+                  </>
+                )}
               </Button>
             </div>
           </form>
