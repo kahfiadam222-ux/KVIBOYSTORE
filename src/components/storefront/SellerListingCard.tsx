@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Edit2, X, Check, Package, FileText, Tag, DollarSign, Upload, Trash2, Power } from "lucide-react";
 
-interface ProductType {
+interface ProductTypeOption {
   id: string;
   name: string;
 }
@@ -27,13 +27,23 @@ interface ProductListing {
   is_active: boolean;
 }
 
-interface Product {
+interface SellerProduct {
   id: string;
   title: string;
   description?: string | null;
   image_url?: string | null;
   product_type_id: string;
-  listings: ProductListing[] | any;
+  listings: ProductListing[] | ProductListing | null;
+  // PostgREST may return a nested object or a one-element array depending on relation shape.
+  seller_profiles?:
+    | { legal_name?: string | null }
+    | { legal_name?: string | null }[]
+    | null;
+}
+
+function errorMessage(err: unknown, fallback: string) {
+  if (err instanceof Error && err.message) return err.message;
+  return fallback;
 }
 
 function formatPrice(amount: number, currency: string) {
@@ -44,12 +54,17 @@ function formatPrice(amount: number, currency: string) {
   }).format(amount);
 }
 
+function asListings(listings: SellerProduct["listings"]): ProductListing[] {
+  if (!listings) return [];
+  return Array.isArray(listings) ? listings : [listings];
+}
+
 export function SellerListingCard({
   product,
   productTypes,
 }: {
-  product: any;
-  productTypes: any[];
+  product: SellerProduct;
+  productTypes: ProductTypeOption[];
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -74,8 +89,11 @@ export function SellerListingCard({
     }
   };
 
-  const listingsList = product.listings as unknown as ProductListing[];
-  const listing = listingsList?.[0];
+  const listingsList = asListings(product.listings);
+  const listing = listingsList[0];
+  const sellerProfile = Array.isArray(product.seller_profiles)
+    ? product.seller_profiles[0]
+    : product.seller_profiles;
 
   if (!listing) return null;
 
@@ -85,7 +103,7 @@ export function SellerListingCard({
         {!isEditing ? (
           <div className="flex flex-wrap items-center justify-between gap-4 p-5">
             <div className="flex items-center gap-4 min-w-0 flex-1">
-              <div 
+              <div
                 className="h-16 w-16 rounded-xl bg-cover bg-center border border-border/40 shrink-0 shadow-sm overflow-hidden flex items-center justify-center bg-background/20"
                 style={{
                   backgroundImage: productImagePreview ? `url(${productImagePreview})` : "none",
@@ -102,9 +120,9 @@ export function SellerListingCard({
                   <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
                     {productTypes.find((t) => t.id === product.product_type_id)?.name || "Jenis Lain"}
                   </span>
-                  {product.seller_profiles?.legal_name && (
+                  {sellerProfile?.legal_name && (
                     <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-400 border border-amber-500/20">
-                      Penjual: {product.seller_profiles.legal_name}
+                      Penjual: {sellerProfile.legal_name}
                     </span>
                   )}
                   <span className="text-xs text-muted-foreground flex items-center gap-1 font-medium">
@@ -138,8 +156,8 @@ export function SellerListingCard({
                   startMutation(async () => {
                     try {
                       await setListingActive(listing.id, !listing.is_active);
-                    } catch (err: any) {
-                      alert(err.message || "Gagal mengubah status stok.");
+                    } catch (err: unknown) {
+                      alert(errorMessage(err, "Gagal mengubah status stok."));
                     }
                   })
                 }
@@ -159,8 +177,8 @@ export function SellerListingCard({
                     if (!confirm(`Hapus produk "${product.title}"? Tindakan ini permanen.`)) return;
                     try {
                       await deleteListing(listing.id);
-                    } catch (err: any) {
-                      alert(err.message || "Gagal menghapus produk.");
+                    } catch (err: unknown) {
+                      alert(errorMessage(err, "Gagal menghapus produk."));
                     }
                   })
                 }
@@ -180,10 +198,13 @@ export function SellerListingCard({
             action={async (formData) => {
               setSubmitting(true);
               try {
+                if (productImagePreview) {
+                  formData.set("imageUrl", productImagePreview);
+                }
                 await updateListing(listing.id, formData);
                 setIsEditing(false);
-              } catch (err: any) {
-                alert(err.message || "Gagal memperbarui produk. Coba lagi.");
+              } catch (err: unknown) {
+                alert(errorMessage(err, "Gagal memperbarui produk. Coba lagi."));
               } finally {
                 setSubmitting(false);
               }
@@ -205,7 +226,6 @@ export function SellerListingCard({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Left Column: Basic Info */}
               <div className="flex flex-col gap-3.5">
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor={`title-${listing.id}`} className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
@@ -253,7 +273,6 @@ export function SellerListingCard({
                 </div>
               </div>
 
-              {/* Right Column: Pricing, Inventory & Image */}
               <div className="flex flex-col gap-3.5">
                 <div className="flex flex-col gap-1.5">
                   <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">

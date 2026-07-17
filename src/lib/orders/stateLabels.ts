@@ -69,4 +69,9 @@ export const orderStateLabels: Record<
     description: "Pembayaran Anda sudah dikembalikan.",
     tone: "neutral",
   },
+  cancelled: {
+    label: "Dibatalkan",
+    description: "Pesanan dibatalkan atau pembayaran kedaluwarsa. Stok dikembalikan.",
+    tone: "neutral",
+  },
 };

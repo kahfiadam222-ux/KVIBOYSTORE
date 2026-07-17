@@ -40,8 +40,8 @@ export async function updatePassword(formData: FormData) {
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
 
-  if (!password || password.length < 6) {
-    throw new Error("Kata sandi baru minimal 6 karakter.");
+  if (!password || password.length < 8 || password.length > 128) {
+    throw new Error("Kata sandi baru minimal 8 karakter.");
   }
 
   if (password !== confirmPassword) {

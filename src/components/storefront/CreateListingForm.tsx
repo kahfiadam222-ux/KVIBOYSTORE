@@ -73,8 +73,8 @@ export function CreateListingForm({
               formRef.current?.reset();
               setImagePreview(null);
               alert("Produk baru berhasil ditambahkan!");
-            } catch (err: any) {
-              alert(err.message || "Gagal membuat produk.");
+            } catch (err: unknown) {
+              alert(err instanceof Error ? err.message : "Gagal membuat produk.");
             } finally {
               setSubmitting(false);
             }

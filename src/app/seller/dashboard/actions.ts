@@ -5,6 +5,8 @@ import { requireSeller } from "@/lib/auth/requireSeller";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revealExpiresAt } from "@/lib/orders/autoConfirm";
+import { encryptPayload } from "@/lib/security/payload";
+import { transitionOrderState } from "@/lib/orders/transition";
 
 export async function createListing(formData: FormData) {
   const supabase = await createClient();
@@ -84,16 +86,20 @@ export async function createListing(formData: FormData) {
     product_id: product.id,
     price,
     stock_count: stockCount,
-    is_active: true,
+    // Stok 0 tidak ditampilkan di beranda; aktif hanya jika ada unit.
+    is_active: stockCount > 0,
   });
 
   if (listingError) {
+    // Roll back orphan product so dashboard doesn't show empty cards.
+    await admin.from("products").delete().eq("id", product.id);
     throw new Error(`Gagal membuat listing: ${listingError.message}`);
   }
 
   revalidatePath("/seller/dashboard");
   revalidatePath("/admin/listings");
   revalidatePath("/");
+  revalidatePath("/", "layout");
 }
 
 /** Verifikasi user boleh mengubah listing ini (admin, atau pemilik produknya). */
@@ -137,6 +143,17 @@ async function authorizeListingMutation(listingId: string) {
 export async function setListingActive(listingId: string, isActive: boolean) {
   const { admin } = await authorizeListingMutation(listingId);
 
+  if (isActive) {
+    const { data: listing } = await admin
+      .from("listings")
+      .select("stock_count")
+      .eq("id", listingId)
+      .single();
+    if (!listing || listing.stock_count <= 0) {
+      throw new Error("Tidak bisa mengaktifkan listing tanpa stok. Isi stok dulu.");
+    }
+  }
+
   const { error } = await admin
     .from("listings")
     .update({ is_active: isActive })
@@ -147,6 +164,7 @@ export async function setListingActive(listingId: string, isActive: boolean) {
   revalidatePath("/seller/dashboard");
   revalidatePath("/admin/listings");
   revalidatePath("/");
+  revalidatePath("/", "layout");
 }
 
 export async function deleteListing(listingId: string) {
@@ -168,6 +186,7 @@ export async function deleteListing(listingId: string) {
   revalidatePath("/seller/dashboard");
   revalidatePath("/admin/listings");
   revalidatePath("/");
+  revalidatePath("/", "layout");
 }
 
 export async function updatePayoutAccount(formData: FormData) {
@@ -216,27 +235,31 @@ export async function deliverOrder(orderId: string, formData: FormData) {
   // these writes use the admin client because orders/deliveries have no client-facing write policy.
   const admin = createAdminClient();
 
+  const moved = await transitionOrderState(
+    admin,
+    orderId,
+    "awaiting_delivery",
+    "delivered",
+    {
+      actorType: "seller",
+      actorId: user.id,
+      reason: "Seller delivered manually",
+    },
+  );
+  if (!moved) return;
+
   const deliveredAt = new Date();
   await admin.from("deliveries").insert({
     order_id: orderId,
-    payload_encrypted: payload,
+    payload_encrypted: encryptPayload(payload),
     delivery_method: deliveryMethod,
     delivered_at: deliveredAt.toISOString(),
     reveal_expires_at: revealExpiresAt(deliveredAt),
   });
 
-  await admin.from("orders").update({ state: "delivered" }).eq("id", orderId);
-
-  await admin.from("order_state_transitions").insert({
-    order_id: orderId,
-    from_state: "awaiting_delivery",
-    to_state: "delivered",
-    actor_type: "seller",
-    actor_id: user.id,
-    reason: "Seller delivered manually",
-  });
-
   revalidatePath("/seller/dashboard");
+  revalidatePath(`/orders/${orderId}`);
+  revalidatePath("/orders");
 }
 
 export async function updateListing(listingId: string, formData: FormData) {
@@ -317,12 +340,15 @@ export async function updateListing(listingId: string, formData: FormData) {
     throw new Error(`Gagal memperbarui produk: ${productUpdateError.message}`);
   }
 
-  // Update listing pricing and stock
+  // Update listing pricing and stock. When stock hits 0, listings are auto-
+  // deactivated by decrement_listing_stock — so any restock must re-activate
+  // or the product stays hidden on the storefront homepage.
   const { error: listingUpdateError } = await admin
     .from("listings")
     .update({
       price,
       stock_count: stockCount,
+      is_active: stockCount > 0,
     })
     .eq("id", listingId);
 
@@ -333,4 +359,5 @@ export async function updateListing(listingId: string, formData: FormData) {
   revalidatePath("/seller/dashboard");
   revalidatePath("/admin/listings");
   revalidatePath("/");
+  revalidatePath("/", "layout");
 }

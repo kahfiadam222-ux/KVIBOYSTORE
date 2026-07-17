@@ -50,7 +50,7 @@ export default async function AdminListingsPage() {
           {products.map((product) => (
             <SellerListingCard
               key={product.id}
-              product={product as any}
+              product={product}
               productTypes={productTypes ?? []}
             />
           ))}

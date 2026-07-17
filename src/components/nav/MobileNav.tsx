@@ -27,7 +27,6 @@ import {
   FileText,
 } from "lucide-react";
 import { ThemeSwitcher } from "./ThemeSwitcher";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface UserProfile {
@@ -55,11 +54,13 @@ const categories = [
 export function MobileNav({ user }: { user: UserProfile | null }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const [prevPathname, setPrevPathname] = useState(pathname);
 
-  // Close sidebar on path change
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  // Close drawer when the route changes (adjust state during render — React-recommended).
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    if (open) setOpen(false);
+  }
 
   // Lock scroll when mobile menu is open
   useEffect(() => {

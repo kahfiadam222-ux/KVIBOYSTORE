@@ -63,7 +63,9 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/login?error=${encodeURIComponent(error.message)}`);
+    redirect(
+      `/login?error=${encodeURIComponent("Email atau password salah. Coba lagi.")}`,
+    );
   }
 
   redirect("/");
@@ -116,7 +118,10 @@ export async function signup(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+    const msg = error.message?.toLowerCase().includes("already")
+      ? "Email sudah terdaftar. Silakan masuk."
+      : "Gagal mendaftar. Periksa data Anda dan coba lagi.";
+    redirect(`/signup?error=${encodeURIComponent(msg)}`);
   }
 
   redirect("/signup/check-email");
@@ -139,7 +144,9 @@ async function loginWithOAuth(provider: "google" | "github") {
   });
 
   if (error || !data.url) {
-    redirect(`/login?error=${encodeURIComponent(error?.message ?? `Gagal masuk dengan ${provider}.`)}`);
+    redirect(
+      `/login?error=${encodeURIComponent(`Gagal masuk dengan ${provider}. Coba lagi.`)}`,
+    );
   }
 
   redirect(data.url);

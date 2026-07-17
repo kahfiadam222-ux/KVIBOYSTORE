@@ -2,11 +2,16 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revealExpiresAt } from "@/lib/orders/autoConfirm";
 import { safeEqualSecret } from "@/lib/security/crypto";
+import { encryptPayload } from "@/lib/security/payload";
+import { transitionOrderState } from "@/lib/orders/transition";
 import { logger } from "@/lib/debug";
 
 interface XenditWebhookBody {
   external_id: string;
   status: string;
+  amount?: number;
+  paid_amount?: number;
+  currency?: string;
 }
 
 function isXenditWebhookBody(body: unknown): body is XenditWebhookBody {
@@ -36,7 +41,6 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    // Malformed JSON — can't come from a legitimate Xendit webhook.
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
@@ -59,28 +63,31 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (order && order.state === "created") {
-      await admin.from("orders").update({ state: "cancelled" }).eq("id", orderId);
+      const cancelled = await transitionOrderState(
+        admin,
+        orderId,
+        "created",
+        "cancelled",
+        {
+          actorType: "system",
+          reason: `Xendit invoice status: ${status}`,
+        },
+      );
 
-      await admin.from("order_state_transitions").insert({
-        order_id: orderId,
-        from_state: "created",
-        to_state: "cancelled",
-        actor_type: "system",
-        reason: `Xendit invoice status: ${status}`,
-      });
-
-      const { error: stockError } = await admin.rpc("increment_listing_stock", {
-        p_listing_id: order.listing_id,
-      });
-
-      if (stockError) {
-        logger.error("Failed to restore stock after invoice expiry", {
-          orderId,
-          listingId: order.listing_id,
-          error: stockError.message,
+      if (cancelled) {
+        const { error: stockError } = await admin.rpc("increment_listing_stock", {
+          p_listing_id: order.listing_id,
         });
-      } else {
-        logger.info("Order cancelled and stock restored", { orderId, status });
+
+        if (stockError) {
+          logger.error("Failed to restore stock after invoice expiry", {
+            orderId,
+            listingId: order.listing_id,
+            error: stockError.message,
+          });
+        } else {
+          logger.info("Order cancelled and stock restored", { orderId, status });
+        }
       }
     }
 
@@ -95,37 +102,69 @@ export async function POST(request: NextRequest) {
 
   const { data: order } = await admin
     .from("orders")
-    .select("id, amount, is_platform_owned, state, listings ( products ( id, is_platform_owned ) )")
+    .select(
+      "id, amount, currency, is_platform_owned, state, listings ( products ( id, is_platform_owned ) )",
+    )
     .eq("id", orderId)
     .single();
 
-  // Already processed (webhook retries are common) — acknowledge without double-crediting the ledger.
   if (!order || order.state !== "created") {
     return NextResponse.json({ received: true });
   }
 
-  await admin.from("orders").update({ state: "payment_held" }).eq("id", orderId);
+  // Flag amount mismatches without blocking (webhook shape varies by channel).
+  const paidAmount = body.paid_amount ?? body.amount;
+  if (
+    typeof paidAmount === "number" &&
+    Number(paidAmount) !== Number(order.amount)
+  ) {
+    logger.security("Xendit paid amount mismatch", {
+      orderId,
+      expected: order.amount,
+      paid: paidAmount,
+    });
+  }
 
-  await admin.from("order_state_transitions").insert({
-    order_id: orderId,
-    from_state: "created",
-    to_state: "payment_held",
-    actor_type: "system",
-    reason: "Xendit invoice paid",
-  });
+  // CAS: only the first PAID webhook advances created → payment_held.
+  const held = await transitionOrderState(
+    admin,
+    orderId,
+    "created",
+    "payment_held",
+    {
+      actorType: "system",
+      reason: "Xendit invoice paid",
+    },
+  );
 
-  await admin.from("escrow_ledger").insert({
-    order_id: orderId,
-    entry_type: "payment_held",
-    direction: "credit",
-    amount: order.amount,
-  });
+  if (!held) {
+    return NextResponse.json({ received: true });
+  }
 
-  const product = (order.listings as unknown as { products: { id: string; is_platform_owned: boolean } })
-    .products;
+  // Guard duplicate ledger rows on rare races.
+  const { data: existingLedger } = await admin
+    .from("escrow_ledger")
+    .select("id")
+    .eq("order_id", orderId)
+    .eq("entry_type", "payment_held")
+    .maybeSingle();
 
-  // Tier 1 platform-owned products are "Instant Delivery" — no seller action needed,
-  // so fulfillment fires immediately instead of waiting on a manual delivery step.
+  if (!existingLedger) {
+    await admin.from("escrow_ledger").insert({
+      order_id: orderId,
+      entry_type: "payment_held",
+      direction: "credit",
+      amount: order.amount,
+    });
+  }
+
+  const product = (
+    order.listings as unknown as {
+      products: { id: string; is_platform_owned: boolean };
+    }
+  ).products;
+
+  // Tier 1 platform-owned products are "Instant Delivery".
   if (product?.is_platform_owned) {
     const { data: code } = await admin.rpc("claim_product_code", {
       p_product_id: product.id,
@@ -136,33 +175,45 @@ export async function POST(request: NextRequest) {
       const deliveredAt = new Date();
       await admin.from("deliveries").insert({
         order_id: orderId,
-        payload_encrypted: code,
+        payload_encrypted: encryptPayload(String(code)),
         delivery_method: "redeem_code",
         delivered_at: deliveredAt.toISOString(),
         reveal_expires_at: revealExpiresAt(deliveredAt),
       });
 
-      await admin.from("orders").update({ state: "delivered" }).eq("id", orderId);
-
-      await admin.from("order_state_transitions").insert({
-        order_id: orderId,
-        from_state: "payment_held",
-        to_state: "delivered",
-        actor_type: "system",
+      await transitionOrderState(admin, orderId, "payment_held", "delivered", {
+        actorType: "system",
         reason: "Instant delivery: code claimed from inventory",
       });
+    } else {
+      // Paid but no code inventory — escalate for ops instead of silent stuck state.
+      logger.error("Platform code inventory empty after payment", {
+        orderId,
+        productId: product.id,
+      });
+      await transitionOrderState(
+        admin,
+        orderId,
+        "payment_held",
+        "under_review",
+        {
+          actorType: "system",
+          reason:
+            "Instant delivery failed: no product codes available — needs ops fulfillment or refund",
+        },
+      );
     }
   } else {
-    // Seller-owned orders need the seller to deliver manually from their dashboard.
-    await admin.from("orders").update({ state: "awaiting_delivery" }).eq("id", orderId);
-
-    await admin.from("order_state_transitions").insert({
-      order_id: orderId,
-      from_state: "payment_held",
-      to_state: "awaiting_delivery",
-      actor_type: "system",
-      reason: "Awaiting manual delivery from seller",
-    });
+    await transitionOrderState(
+      admin,
+      orderId,
+      "payment_held",
+      "awaiting_delivery",
+      {
+        actorType: "system",
+        reason: "Awaiting manual delivery from seller",
+      },
+    );
   }
 
   return NextResponse.json({ received: true });

@@ -55,8 +55,8 @@ export function PartnerLogosManager({ partners }: { partners: PartnerLogo[] }) {
             await createPartnerLogo(formData);
             formRef.current?.reset();
             setLogoPreview(null);
-          } catch (err: any) {
-            alert(err.message || "Gagal menambahkan partner.");
+          } catch (err: unknown) {
+            alert(err instanceof Error ? err.message : "Gagal menambahkan partner.");
           } finally {
             setSubmitting(false);
           }

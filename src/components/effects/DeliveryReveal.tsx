@@ -1,22 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { RevealBurst } from "./RevealBurst";
 
-// Plays the unboxing-style burst once per order, the first time this browser
-// sees the code — reloading the page afterward just shows the code plainly,
-// the way opening a physical box a second time doesn't repeat the reveal.
-export function DeliveryReveal({ orderId, code }: { orderId: string; code: string }) {
-  const [showBurst, setShowBurst] = useState(false);
-  const [mounted, setMounted] = useState(false);
+function emptySubscribe() {
+  return () => {};
+}
 
-  useEffect(() => {
-    const key = `kvibo-reveal-${orderId}`;
-    if (!sessionStorage.getItem(key)) {
-      sessionStorage.setItem(key, "1");
-      setShowBurst(true);
+// Plays the unboxing-style burst once per order, the first time this browser
+// sees the code — reloading the page afterward just shows the code plainly.
+export function DeliveryReveal({ orderId, code }: { orderId: string; code: string }) {
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+
+  // Compute once per mount on the client (memo is fine; side-effect is intentional).
+  const showBurst = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const key = `kvibo-reveal-${orderId}`;
+      if (!sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, "1");
+        return true;
+      }
+    } catch {
+      // sessionStorage blocked
     }
-    setMounted(true);
+    return false;
   }, [orderId]);
 
   return (
@@ -32,9 +40,9 @@ export function DeliveryReveal({ orderId, code }: { orderId: string; code: strin
           100% { opacity: 1; transform: scale(1); }
         }
       `}</style>
-      {showBurst && <RevealBurst />}
+      {mounted && showBurst && <RevealBurst />}
       <p className="mb-1 text-xs font-medium text-muted-foreground">Kode Aktivasi</p>
-      <code className="text-sm font-semibold">{code}</code>
+      <code className="text-sm font-semibold break-all">{code}</code>
     </div>
   );
 }

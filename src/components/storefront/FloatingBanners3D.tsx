@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import type { FloatBanner } from "@/lib/storefront/defaults";
 import { cn } from "@/lib/utils";
 import { X, ExternalLink } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+
+function emptySubscribe() {
+  return () => {};
+}
 
 /**
  * 4-slot circular glossy carousel.
@@ -28,28 +32,31 @@ export function FloatingBanners3D({ banners }: { banners: FloatBanner[] }) {
   // Merekam waktu dan koordinat koordinat pointerdown pada tombol card untuk membedakan klik vs drag
   const clickStartRef = useRef<{ [key: string]: { x: number; y: number; time: number } }>({});
 
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [zoomedBanner, setZoomedBanner] = useState<FloatBanner | null>(null);
   const [modalStage, setModalStage] = useState<"enter" | "exit">("exit");
-
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
 
   const handleOpenZoom = (banner: FloatBanner) => {
     setZoomedBanner(banner);
     setModalStage("enter");
-    document.body.style.overflow = "hidden"; // Kunci scroll
   };
 
   const handleCloseZoom = () => {
     setModalStage("exit");
     setTimeout(() => {
       setZoomedBanner(null);
-      document.body.style.overflow = "";
-    }, 200); // Durasi fade-out cepat
+    }, 200);
   };
+
+  // Lock body scroll while zoom modal is open (DOM side-effect only).
+  useEffect(() => {
+    if (!zoomedBanner) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [zoomedBanner]);
 
   useEffect(() => {
     reducedRef.current = window.matchMedia(

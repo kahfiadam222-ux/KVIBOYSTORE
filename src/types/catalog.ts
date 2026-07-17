@@ -17,6 +17,7 @@ export interface StorefrontListing {
   imageUrl: string | null;
   price: number;
   currency: string;
+  stockCount: number;
   productTypeName: string;
   riskTier: RiskTier;
   deliveryMethod: DeliveryMethod;

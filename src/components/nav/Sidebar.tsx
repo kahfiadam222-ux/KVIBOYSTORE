@@ -415,7 +415,7 @@ export function Sidebar({ user, categories = [] }: SidebarProps) {
         className={cn(
           "sidebar-rail flex h-full h-[100dvh] w-full flex-col overflow-hidden border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] backdrop-blur-2xl"
         )}
-        aria-expanded={!collapsed}
+        data-expanded={!collapsed}
       >
         <SidebarPanel
           user={user}

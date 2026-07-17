@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,14 +29,15 @@ export default async function CartPage() {
           </div>
           <h3 className="mb-2 text-lg font-semibold">Keranjang Kosong</h3>
           <p className="mb-6 max-w-sm text-sm text-muted-foreground">
-            Belum ada produk di keranjang. Yuk mulai belanja dan temukan produk digital favoritmu!
+            Belum ada produk di keranjang. Saat ini pembelian dilakukan langsung dari beranda
+            lewat tombol Beli Sekarang.
           </p>
-          <a
+          <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:shadow-primary/30"
           >
             Mulai Belanja
-          </a>
+          </Link>
         </CardContent>
       </Card>
     </div>
