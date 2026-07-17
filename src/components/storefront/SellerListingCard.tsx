@@ -5,6 +5,7 @@ import {
   updateListing,
   deleteListing,
   setListingActive,
+  addProductCodes,
 } from "@/app/seller/dashboard/actions";
 import { compressImageDetailed } from "@/lib/image";
 import { IMAGE_PRESETS } from "@/lib/image-presets";
@@ -12,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Edit2, X, Check, Package, FileText, Tag, DollarSign, Upload, Trash2, Power } from "lucide-react";
+import { Edit2, X, Check, Package, FileText, Tag, DollarSign, Upload, Trash2, Power, KeyRound } from "lucide-react";
 
 interface ProductTypeOption {
   id: string;
@@ -33,12 +34,71 @@ interface SellerProduct {
   description?: string | null;
   image_url?: string | null;
   product_type_id: string;
+  is_platform_owned?: boolean;
   listings: ProductListing[] | ProductListing | null;
   // PostgREST may return a nested object or a one-element array depending on relation shape.
   seller_profiles?:
     | { legal_name?: string | null }
     | { legal_name?: string | null }[]
     | null;
+}
+
+/** Panel inventori kode untuk produk platform (pengiriman instan). Admin bisa
+ *  menambah kode; stok listing otomatis disamakan dengan jumlah kode. */
+function ProductCodesPanel({
+  productId,
+  available,
+}: {
+  productId: string;
+  available: number;
+}) {
+  const [raw, setRaw] = useState("");
+  const [saving, startSave] = useTransition();
+  const count = raw.split(/[\n,]/).map((c) => c.trim()).filter(Boolean).length;
+
+  return (
+    <div className="mt-3 rounded-xl border border-primary/15 bg-primary/5 p-3">
+      <div className="flex items-center gap-2 mb-2">
+        <KeyRound className="h-3.5 w-3.5 text-primary" />
+        <span className="text-xs font-bold text-foreground">
+          Inventori kode instan
+        </span>
+        <span className="ml-auto text-[11px] font-semibold text-primary">
+          {available} kode siap
+        </span>
+      </div>
+      <textarea
+        value={raw}
+        onChange={(e) => setRaw(e.target.value)}
+        placeholder={"Tempel kode di sini, satu per baris\nNETFLIX-XXXX\nNETFLIX-YYYY"}
+        rows={3}
+        className="w-full rounded-lg border border-border bg-background/50 px-3 py-2 text-xs placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none"
+      />
+      <div className="flex items-center gap-2 mt-2">
+        <Button
+          type="button"
+          size="sm"
+          disabled={saving || count === 0}
+          onClick={() =>
+            startSave(async () => {
+              try {
+                await addProductCodes(productId, raw);
+                setRaw("");
+              } catch (err: unknown) {
+                alert(errorMessage(err, "Gagal menambah kode."));
+              }
+            })
+          }
+          className="h-8 rounded-lg text-xs font-semibold"
+        >
+          {saving ? "Menyimpan..." : count > 0 ? `Tambah ${count} kode` : "Tambah kode"}
+        </Button>
+        <span className="text-[10px] text-muted-foreground">
+          Stok ikut jumlah kode yang belum terpakai.
+        </span>
+      </div>
+    </div>
+  );
 }
 
 function errorMessage(err: unknown, fallback: string) {
@@ -62,9 +122,13 @@ function asListings(listings: SellerProduct["listings"]): ProductListing[] {
 export function SellerListingCard({
   product,
   productTypes,
+  availableCodes,
+  isAdmin = false,
 }: {
   product: SellerProduct;
   productTypes: ProductTypeOption[];
+  availableCodes?: number;
+  isAdmin?: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -192,6 +256,15 @@ export function SellerListingCard({
                 Hapus
               </Button>
             </div>
+
+            {isAdmin && product.is_platform_owned && (
+              <div className="w-full">
+                <ProductCodesPanel
+                  productId={product.id}
+                  available={availableCodes ?? 0}
+                />
+              </div>
+            )}
           </div>
         ) : (
           <form

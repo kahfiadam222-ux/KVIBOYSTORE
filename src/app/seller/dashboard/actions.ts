@@ -2,11 +2,22 @@
 
 import { revalidatePath } from "next/cache";
 import { requireSeller } from "@/lib/auth/requireSeller";
+import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revealExpiresAt } from "@/lib/orders/autoConfirm";
 import { encryptPayload } from "@/lib/security/payload";
 import { transitionOrderState } from "@/lib/orders/transition";
+
+/** Pisahkan teks kode (baris/koma) jadi daftar kode bersih & unik. */
+function parseCodes(raw: string): string[] {
+  const seen = new Set<string>();
+  for (const c of raw.split(/[\n,]/)) {
+    const t = c.trim();
+    if (t) seen.add(t);
+  }
+  return [...seen];
+}
 
 export async function createListing(formData: FormData) {
   const supabase = await createClient();
@@ -82,19 +93,82 @@ export async function createListing(formData: FormData) {
     throw new Error(productError?.message || "Gagal membuat produk.");
   }
 
-  const { error: listingError } = await admin.from("listings").insert({
-    product_id: product.id,
-    price,
-    stock_count: stockCount,
-    // Stok 0 tidak ditampilkan di beranda; aktif hanya jika ada unit.
-    is_active: stockCount > 0,
-  });
+  // Produk platform (pengiriman instan) butuh inventori kode. Jika admin
+  // menyertakan kode, stok = jumlah kode agar tidak oversell.
+  const codes = isPlatformOwned ? parseCodes(String(formData.get("codes") ?? "")) : [];
+  const effectiveStock = isPlatformOwned && codes.length > 0 ? codes.length : stockCount;
 
-  if (listingError) {
+  const { data: createdListing, error: listingError } = await admin
+    .from("listings")
+    .insert({
+      product_id: product.id,
+      price,
+      stock_count: effectiveStock,
+      // Stok 0 tidak ditampilkan di beranda; aktif hanya jika ada unit.
+      is_active: effectiveStock > 0,
+    })
+    .select("id")
+    .single();
+
+  if (listingError || !createdListing) {
     // Roll back orphan product so dashboard doesn't show empty cards.
     await admin.from("products").delete().eq("id", product.id);
-    throw new Error(`Gagal membuat listing: ${listingError.message}`);
+    throw new Error(`Gagal membuat listing: ${listingError?.message ?? "unknown"}`);
   }
+
+  if (codes.length > 0) {
+    const { error: codeError } = await admin
+      .from("product_codes")
+      .insert(codes.map((code) => ({ product_id: product.id, code })));
+    if (codeError) {
+      // Roll back product + listing so we don't leave an undeliverable platform listing.
+      await admin.from("products").delete().eq("id", product.id);
+      throw new Error(`Gagal menyimpan kode produk: ${codeError.message}`);
+    }
+  }
+
+  revalidatePath("/seller/dashboard");
+  revalidatePath("/admin/listings");
+  revalidatePath("/");
+  revalidatePath("/", "layout");
+}
+
+/** Tambah kode inventori untuk produk platform (pengiriman instan). Admin-only.
+ *  Menyinkronkan stok listing dengan jumlah kode yang belum terpakai. */
+export async function addProductCodes(productId: string, rawCodes: string) {
+  await requireAdmin();
+  const admin = createAdminClient();
+
+  const codes = parseCodes(rawCodes);
+  if (codes.length === 0) throw new Error("Tidak ada kode untuk ditambahkan.");
+
+  const { data: product } = await admin
+    .from("products")
+    .select("id, is_platform_owned")
+    .eq("id", productId)
+    .single();
+
+  if (!product) throw new Error("Produk tidak ditemukan.");
+  if (!product.is_platform_owned) {
+    throw new Error("Kode hanya untuk produk milik platform (pengiriman instan).");
+  }
+
+  const { error } = await admin
+    .from("product_codes")
+    .insert(codes.map((code) => ({ product_id: productId, code })));
+  if (error) throw new Error(`Gagal menambah kode: ${error.message}`);
+
+  // Samakan stok listing dengan jumlah kode yang belum terpakai.
+  const { count } = await admin
+    .from("product_codes")
+    .select("id", { count: "exact", head: true })
+    .eq("product_id", productId)
+    .eq("is_used", false);
+
+  await admin
+    .from("listings")
+    .update({ stock_count: count ?? 0, is_active: (count ?? 0) > 0 })
+    .eq("product_id", productId);
 
   revalidatePath("/seller/dashboard");
   revalidatePath("/admin/listings");
