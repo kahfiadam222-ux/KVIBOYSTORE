@@ -143,18 +143,18 @@ export default async function StorefrontPage({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
           {listings.map((listing, listingIndex) => {
             const tier = getDeliveryLabel(listing);
             const lowStock = listing.stockCount > 0 && listing.stockCount <= 3;
             return (
               <TiltCard
                 key={listing.listingId}
-                className="group/card relative rounded-xl product-card-shell h-full"
+                className="group/card relative z-0 hover:z-30 rounded-xl product-card-shell h-full"
               >
                 <Card className="h-full flex flex-col glass-card rounded-[inherit] border-0 shadow-none transition-shadow duration-300 hover:shadow-[var(--shadow-glow)] overflow-hidden">
                   {/* Responsive photo: square on mobile, slightly taller on sm+ */}
-                  <div className="relative w-full aspect-square sm:aspect-[4/3] overflow-hidden shrink-0">
+                  <div className="relative w-full aspect-[4/3] overflow-hidden shrink-0">
                     <StorefrontImage
                       src={listing.imageUrl}
                       alt={listing.title || listing.productTypeName}
@@ -196,7 +196,7 @@ export default async function StorefrontPage({
                       </Badge>
                     </div>
                   </div>
-                  <CardHeader className="p-2.5 sm:p-3.5 pb-0 space-y-0.5 min-w-0">
+                  <CardHeader className="p-2 sm:p-3 pb-0 space-y-0.5 min-w-0">
                     <CardTitle className="text-xs sm:text-sm font-bold line-clamp-2 leading-snug break-words">
                       {listing.title}
                     </CardTitle>
@@ -205,7 +205,7 @@ export default async function StorefrontPage({
                       {listing.description ? ` · ${listing.description}` : ""}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="p-2.5 sm:p-3.5 pt-2 pb-2 flex-grow min-w-0">
+                  <CardContent className="p-2 sm:p-3 pt-1.5 pb-1.5 flex-grow min-w-0">
                     <p className="text-sm sm:text-base font-extrabold text-foreground tabular-nums">
                       {formatPrice(listing.price, listing.currency)}
                     </p>
@@ -219,7 +219,7 @@ export default async function StorefrontPage({
                         </p>
                       )}
                   </CardContent>
-                  <CardFooter className="p-2.5 sm:p-3.5 pt-0 border-t-0 bg-transparent mt-auto">
+                  <CardFooter className="p-2 sm:p-3 pt-0 border-t-0 bg-transparent mt-auto">
                     <form action={createCheckout} className="w-full">
                       <input
                         type="hidden"
@@ -229,7 +229,7 @@ export default async function StorefrontPage({
                       <Button
                         type="submit"
                         size="sm"
-                        className="w-full h-9 sm:h-10 rounded-xl text-xs font-semibold shadow-md"
+                        className="w-full h-8 sm:h-9 rounded-xl text-xs font-semibold shadow-md"
                       >
                         Beli Sekarang
                       </Button>
