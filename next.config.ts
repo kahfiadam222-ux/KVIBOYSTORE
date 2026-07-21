@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  experimental: {
+    serverActions: {
+      // Foto produk/banner dikirim ke Server Action sebagai data URL base64.
+      // Default 1MB terlalu kecil → upload foto gagal & gambar tak muncul.
+      // 4MB memberi ruang, tetap di bawah batas request Vercel (~4.5MB).
+      bodySizeLimit: "4mb",
+    },
+  },
 };
 
 export default nextConfig;
