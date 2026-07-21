@@ -328,21 +328,24 @@ export function SellerListingCard({
 
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor={`type-${listing.id}`} className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-                    <Package className="h-3 w-3" /> Jenis Stok (Tipe Produk)
+                    <Package className="h-3 w-3" /> Jenis Stok (bebas ketik)
                   </Label>
-                  <select
+                  <Input
                     id={`type-${listing.id}`}
-                    name="productTypeId"
-                    defaultValue={product.product_type_id}
+                    name="productTypeName"
+                    defaultValue={
+                      productTypes.find((t) => t.id === product.product_type_id)?.name ?? ""
+                    }
                     required
-                    className="form-select-glass h-10 rounded-xl px-3 text-sm cursor-pointer border-border bg-background/50"
-                  >
+                    list={`type-options-${listing.id}`}
+                    placeholder="mis. Netflix, E-book, Jasa…"
+                    className="h-10 rounded-xl px-4 border-border bg-background/50"
+                  />
+                  <datalist id={`type-options-${listing.id}`}>
                     {productTypes.map((pt) => (
-                      <option key={pt.id} value={pt.id} className="bg-popover text-foreground">
-                        {pt.name}
-                      </option>
+                      <option key={pt.id} value={pt.name} />
                     ))}
-                  </select>
+                  </datalist>
                 </div>
               </div>
 

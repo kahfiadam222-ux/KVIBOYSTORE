@@ -1,6 +1,6 @@
 /** High-quality upload presets — tuned for retina display while staying practical for DB storage. */
 export const IMAGE_PRESETS = {
-  product: { maxWidth: 1200, maxHeight: 1200, quality: 0.9 },
+  product: { maxWidth: 1100, maxHeight: 1100, quality: 0.85 },
   bannerHorizontal: { maxWidth: 1920, maxHeight: 960, quality: 0.88 },
   bannerVertical: { maxWidth: 1200, maxHeight: 1600, quality: 0.88 },
   floatBanner: { maxWidth: 1200, maxHeight: 1600, quality: 0.88 },

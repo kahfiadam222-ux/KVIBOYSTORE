@@ -19,6 +19,51 @@ function parseCodes(raw: string): string[] {
   return [...seen];
 }
 
+/**
+ * Jenis produk fleksibel: penjual/admin boleh MENGETIK nama jenis apa pun.
+ * Jika `productTypeName` diisi, cari yang cocok (case-insensitive) atau buat
+ * baru otomatis. Jika kosong, pakai `productTypeId` dari dropdown (kompat lama).
+ */
+async function resolveProductTypeId(
+  admin: ReturnType<typeof createAdminClient>,
+  formData: FormData,
+): Promise<string> {
+  const typed = String(formData.get("productTypeName") ?? "").trim();
+  const selectedId = String(formData.get("productTypeId") ?? "").trim();
+
+  if (!typed) {
+    if (selectedId) return selectedId;
+    throw new Error("Jenis produk wajib diisi.");
+  }
+
+  const { data: existing } = await admin
+    .from("product_types")
+    .select("id")
+    .ilike("name", typed)
+    .limit(1)
+    .maybeSingle();
+  if (existing) return existing.id as string;
+
+  const { data: created, error } = await admin
+    .from("product_types")
+    .insert({ name: typed, risk_tier: "tier_1", delivery_method: "redeem_code" })
+    .select("id")
+    .single();
+  if (created) return created.id as string;
+
+  // Balapan unik (dua orang mengetik nama sama): ambil ulang yang sudah ada.
+  if (error?.code === "23505") {
+    const { data: again } = await admin
+      .from("product_types")
+      .select("id")
+      .ilike("name", typed)
+      .limit(1)
+      .maybeSingle();
+    if (again) return again.id as string;
+  }
+  throw new Error(`Gagal membuat jenis produk: ${error?.message ?? "tidak diketahui"}`);
+}
+
 export async function createListing(formData: FormData) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -37,15 +82,14 @@ export async function createListing(formData: FormData) {
     throw new Error("Akses ditolak. Anda tidak memiliki izin untuk membuat produk.");
   }
 
-  const productTypeId = formData.get("productTypeId");
   const title = formData.get("title");
   const description = formData.get("description");
   const imageUrl = formData.get("imageUrl");
   const priceStr = formData.get("price");
   const stockCountStr = formData.get("stockCount");
 
-  if (!productTypeId || !title || !priceStr || !stockCountStr) {
-    throw new Error("Jenis produk, judul, harga, dan stok wajib diisi.");
+  if (!title || !priceStr || !stockCountStr) {
+    throw new Error("Judul, harga, dan stok wajib diisi.");
   }
 
   const price = Number(priceStr);
@@ -75,11 +119,14 @@ export async function createListing(formData: FormData) {
   // which is the root cause of the frequent "Gagal membuat daftar harga" errors.
   const admin = createAdminClient();
 
+  // Jenis produk fleksibel: dari nama yang diketik (buat baru bila perlu) atau id dropdown.
+  const productTypeId = await resolveProductTypeId(admin, formData);
+
   const { data: product, error: productError } = await admin
     .from("products")
     .insert({
       seller_id: sellerId,
-      product_type_id: productTypeId as string,
+      product_type_id: productTypeId,
       title: title as string,
       description: description ? (description as string) : "",
       image_url: imageUrl ? (imageUrl as string) : null,
@@ -357,12 +404,11 @@ export async function updateListing(listingId: string, formData: FormData) {
   const title = formData.get("title");
   const description = formData.get("description");
   const imageUrl = formData.get("imageUrl");
-  const productTypeId = formData.get("productTypeId");
   const priceStr = formData.get("price");
   const stockCountStr = formData.get("stockCount");
 
-  if (!title || !productTypeId || !priceStr || !stockCountStr) {
-    throw new Error("Judul, jenis, harga, dan stok wajib diisi.");
+  if (!title || !priceStr || !stockCountStr) {
+    throw new Error("Judul, harga, dan stok wajib diisi.");
   }
 
   const price = Number(priceStr);
@@ -376,6 +422,9 @@ export async function updateListing(listingId: string, formData: FormData) {
   // policies on products/listings may reject updates the seller should be
   // allowed to make, which is the root cause of edit failures.
   const admin = createAdminClient();
+
+  // Jenis produk fleksibel: dari nama yang diketik (buat baru bila perlu) atau id dropdown.
+  const productTypeId = await resolveProductTypeId(admin, formData);
 
   const { data: listing } = await admin
     .from("listings")
@@ -406,7 +455,7 @@ export async function updateListing(listingId: string, formData: FormData) {
       title: title as string,
       description: description ? (description as string) : "",
       image_url: imageUrl ? (imageUrl as string) : null,
-      product_type_id: productTypeId as string,
+      product_type_id: productTypeId,
     })
     .eq("id", listing.product_id);
 

@@ -134,21 +134,25 @@ export function CreateListingForm({
               )}
 
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="productTypeId" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                <Label htmlFor="productTypeName" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
                   <Package className="h-3.5 w-3.5" /> Jenis Produk
                 </Label>
-                <select
-                  id="productTypeId"
-                  name="productTypeId"
+                <Input
+                  id="productTypeName"
+                  name="productTypeName"
                   required
-                  className="form-select-glass h-10 rounded-xl px-3 text-sm cursor-pointer border-border bg-background/30"
-                >
+                  list="product-type-options"
+                  placeholder="Ketik apa saja — mis. Netflix, E-book, Jasa Desain…"
+                  className="h-10 rounded-xl px-4 border-border bg-background/30"
+                />
+                <datalist id="product-type-options">
                   {productTypes.map((pt) => (
-                    <option key={pt.id} value={pt.id} className="bg-popover text-foreground">
-                      {pt.name}
-                    </option>
+                    <option key={pt.id} value={pt.name} />
                   ))}
-                </select>
+                </datalist>
+                <p className="text-[10px] text-muted-foreground">
+                  Bebas ketik jenis apa pun. Kalau belum ada, otomatis dibuat.
+                </p>
               </div>
 
               <div className="flex flex-col gap-1.5">
