@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { headers } from "next/headers";
-import { SpaceBackground } from "@/components/effects/SpaceBackground";
 import { AmbientOrbs } from "@/components/effects/AmbientOrbs";
 import { WelcomeScreen } from "@/components/effects/WelcomeScreen";
-import { InteractiveBackground } from "@/components/effects/InteractiveBackground";
 import { SaffronWashBackground } from "@/components/effects/SaffronWashBackground";
 import "./globals.css";
 
@@ -72,7 +70,6 @@ export default async function RootLayout({
       </head>
       <body className="h-full">
         <AmbientOrbs />
-        <InteractiveBackground />
         <SaffronWashBackground />
         <WelcomeScreen />
         {children}

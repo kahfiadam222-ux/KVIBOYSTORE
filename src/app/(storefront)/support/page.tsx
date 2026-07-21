@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { HelpCircle, MessageCircle, Mail, Phone, Clock, Send } from "lucide-react";
+import { HelpCircle, MessageCircle, Mail, Clock, Send } from "lucide-react";
 
 export default async function SupportPage() {
   return (

@@ -1,6 +1,6 @@
 import { requireSeller } from "@/lib/auth/requireSeller";
 import { createClient } from "@/lib/supabase/server";
-import { createListing, deliverOrder, updatePayoutAccount } from "./actions";
+import { deliverOrder, updatePayoutAccount } from "./actions";
 import { SellerListingCard } from "@/components/storefront/SellerListingCard";
 import { CreateListingForm } from "@/components/storefront/CreateListingForm";
 import { Button } from "@/components/ui/button";
@@ -146,7 +146,7 @@ export default async function SellerDashboardPage() {
           {products.map((product) => (
             <SellerListingCard
               key={product.id}
-              product={product as any}
+              product={product}
               productTypes={productTypes ?? []}
             />
           ))}

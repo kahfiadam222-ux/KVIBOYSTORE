@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { Check, Palette, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -14,23 +14,29 @@ import { cn } from "@/lib/utils";
 
 const PANEL_WIDTH = 288;
 
+function subscribe() {
+  return () => {};
+}
+
 export function ThemeSwitcher() {
-  const [activeTheme, setActiveTheme] = useState<ThemeId>("theme-sakura");
+  const mounted = useSyncExternalStore(subscribe, () => true, () => false);
+  const [activeTheme, setActiveTheme] = useState<ThemeId>(() => {
+    if (typeof window === "undefined") return "theme-sakura";
+    return resolveThemeId(localStorage.getItem("kvibo-theme"));
+  });
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
+  // Theme is initialized from localStorage in useState; only sync DOM class once mounted.
   useEffect(() => {
-    setMounted(true);
-    const saved = resolveThemeId(localStorage.getItem("kvibo-theme"));
-    setActiveTheme(saved);
-    applyThemeClass(saved);
-    if (localStorage.getItem("kvibo-theme") !== saved) {
-      localStorage.setItem("kvibo-theme", saved);
+    if (!mounted) return;
+    applyThemeClass(activeTheme);
+    if (localStorage.getItem("kvibo-theme") !== activeTheme) {
+      localStorage.setItem("kvibo-theme", activeTheme);
     }
-  }, []);
+  }, [mounted, activeTheme]);
 
   const updatePosition = useCallback(() => {
     const btn = buttonRef.current;
@@ -42,16 +48,13 @@ export function ThemeSwitcher() {
     let left = rect.left;
     let top = rect.top - panelH - gap;
 
-    // Prefer opening above; if clipped, open below
     if (top < 8) {
       top = rect.bottom + gap;
     }
-    // Keep inside viewport horizontally
     if (left + PANEL_WIDTH > window.innerWidth - 8) {
       left = window.innerWidth - PANEL_WIDTH - 8;
     }
     if (left < 8) left = 8;
-    // Clamp vertical if still overflowing bottom
     if (top + panelH > window.innerHeight - 8) {
       top = Math.max(8, window.innerHeight - panelH - 8);
     }

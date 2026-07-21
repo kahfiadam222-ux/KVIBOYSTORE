@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { FloatingBanners3D } from "@/components/storefront/FloatingBanners3D";
 import { buttonVariants } from "@/components/ui/button";
@@ -11,6 +11,10 @@ import type {
   StorefrontHeroContent,
 } from "@/lib/storefront/defaults";
 import { MockupSlide } from "./MockupSlide";
+
+function emptySubscribe() {
+  return () => {};
+}
 
 const trustPoints = [
   {
@@ -40,7 +44,7 @@ export function HeroSection({
   floatBanners?: FloatBanner[];
 }) {
   const [slide, setSlide] = useState(0);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const resetTimer = useCallback(() => {
@@ -51,7 +55,6 @@ export function HeroSection({
   }, []);
 
   useEffect(() => {
-    setMounted(true);
     resetTimer();
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);

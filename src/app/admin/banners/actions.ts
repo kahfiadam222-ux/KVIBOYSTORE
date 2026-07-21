@@ -57,6 +57,16 @@ export async function createPartnerLogo(formData: FormData) {
     throw new Error("Nama, URL logo, dan Link Partner wajib diisi.");
   }
 
+  // Block javascript: / data: URLs in partner links.
+  try {
+    const parsed = new URL(partnerUrl);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      throw new Error("invalid");
+    }
+  } catch {
+    throw new Error("Link partner harus URL http/https yang valid.");
+  }
+
   const { error } = await admin.from("partner_logos").insert({
     name,
     logo_url: logoUrl,

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { completeOrder } from "@/lib/orders/completeOrder";
+import { transitionOrderState } from "@/lib/orders/transition";
 
 export async function confirmDelivery(orderId: string) {
   const supabase = await createClient();
@@ -30,6 +31,7 @@ export async function confirmDelivery(orderId: string) {
   );
 
   revalidatePath(`/orders/${orderId}`);
+  revalidatePath("/orders");
 }
 
 export async function submitReview(orderId: string, formData: FormData) {
@@ -41,7 +43,7 @@ export async function submitReview(orderId: string, formData: FormData) {
 
   const rating = Number(formData.get("rating"));
   if (isNaN(rating) || rating < 1 || rating > 5) return;
-  const comment = formData.get("comment") as string;
+  const comment = String(formData.get("comment") ?? "").slice(0, 2000);
 
   const admin = createAdminClient();
 
@@ -79,7 +81,8 @@ export async function openDispute(orderId: string, formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) return;
 
-  const reason = formData.get("reason") as string;
+  const reason = String(formData.get("reason") ?? "").trim();
+  if (!reason) return;
 
   const admin = createAdminClient();
 
@@ -91,22 +94,38 @@ export async function openDispute(orderId: string, formData: FormData) {
 
   if (!order || order.buyer_id !== user.id || order.state !== "delivered") return;
 
-  await admin.from("disputes").insert({
-    order_id: orderId,
-    opened_by: "buyer",
-    reason,
-    status: "open",
-  });
+  // CAS so confirm + dispute cannot both win.
+  const disputed = await transitionOrderState(
+    admin,
+    orderId,
+    "delivered",
+    "buyer_disputed",
+    {
+      actorType: "buyer",
+      actorId: user.id,
+      reason: "Buyer opened a dispute",
+    },
+  );
 
-  await admin.from("orders").update({ state: "buyer_disputed" }).eq("id", orderId);
-  await admin.from("order_state_transitions").insert({
-    order_id: orderId,
-    from_state: "delivered",
-    to_state: "buyer_disputed",
-    actor_type: "buyer",
-    actor_id: user.id,
-    reason: "Buyer opened a dispute",
-  });
+  if (!disputed) return;
+
+  const { data: existing } = await admin
+    .from("disputes")
+    .select("id")
+    .eq("order_id", orderId)
+    .eq("status", "open")
+    .maybeSingle();
+
+  if (!existing) {
+    await admin.from("disputes").insert({
+      order_id: orderId,
+      opened_by: "buyer",
+      reason,
+      status: "open",
+    });
+  }
 
   revalidatePath(`/orders/${orderId}`);
+  revalidatePath("/orders");
+  revalidatePath("/admin/disputes");
 }

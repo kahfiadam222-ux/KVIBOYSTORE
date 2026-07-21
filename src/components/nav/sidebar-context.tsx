@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -32,58 +33,72 @@ function readInitialCollapsed(): boolean {
 }
 
 function applySidebarLayout(collapsed: boolean) {
+  if (typeof window === "undefined") return;
   const mobile = window.innerWidth <= MOBILE_MAX;
-  const width = mobile ? 0 : (collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED);
+  const width = mobile ? 0 : collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED;
 
   document.documentElement.style.setProperty("--sidebar-width", `${width}px`);
   document.documentElement.dataset.sidebarCollapsed = collapsed ? "true" : "false";
   document.documentElement.dataset.sidebarMobile = mobile ? "true" : "false";
 }
 
+function subscribeMobile(cb: () => void) {
+  if (typeof window === "undefined") return () => {};
+  const mq = window.matchMedia(`(max-width: ${MOBILE_MAX}px)`);
+  mq.addEventListener("change", cb);
+  window.addEventListener("resize", cb);
+  return () => {
+    mq.removeEventListener("change", cb);
+    window.removeEventListener("resize", cb);
+  };
+}
+
+function getIsMobile() {
+  if (typeof window === "undefined") return false;
+  return window.innerWidth <= MOBILE_MAX;
+}
+
 export function SidebarProvider({ children }: { children: ReactNode }) {
+  const isMobile = useSyncExternalStore(subscribeMobile, getIsMobile, () => false);
   const [collapsed, setCollapsed] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
+  const [prevMobile, setPrevMobile] = useState(isMobile);
+  const [hydratedPath, setHydratedPath] = useState(false);
 
-  // Sync state dengan DOM setelah mount
-  useEffect(() => {
+  // Hydrate collapsed from localStorage during first client render.
+  if (typeof window !== "undefined" && !hydratedPath) {
+    setHydratedPath(true);
     const initial = readInitialCollapsed();
-    const mobile = window.innerWidth <= MOBILE_MAX;
-    setCollapsed(initial);
-    setIsMobile(mobile);
+    if (initial !== collapsed) setCollapsed(initial);
     applySidebarLayout(initial);
+  }
 
-    // Hapus kelas preload untuk mengaktifkan transisi setelah render pertama selesai
+  // Respond to mobile/desktop breakpoint transitions during render.
+  if (isMobile !== prevMobile) {
+    setPrevMobile(isMobile);
+    if (isMobile) {
+      if (!collapsed) setCollapsed(true);
+      applySidebarLayout(true);
+    } else {
+      const stored = localStorage.getItem("kvibo-sidebar-collapsed");
+      const next = stored !== null ? stored === "true" : false;
+      if (next !== collapsed) setCollapsed(next);
+      applySidebarLayout(next);
+    }
+  }
+
+  useEffect(() => {
+    applySidebarLayout(collapsed);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("kvibo-sidebar-collapsed", String(collapsed));
+    }
+  }, [collapsed]);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       document.documentElement.classList.remove("preload");
     }, 600);
-
-    // Update layout saat ukuran layar berubah
-    const handleResize = () => {
-      const currentMobile = window.innerWidth <= MOBILE_MAX;
-      setIsMobile(currentMobile);
-      if (currentMobile) {
-        setCollapsed(true);
-        applySidebarLayout(true);
-      } else {
-        const stored = localStorage.getItem("kvibo-sidebar-collapsed");
-        const currentCollapsed = stored !== null ? stored === "true" : false;
-        setCollapsed(currentCollapsed);
-        applySidebarLayout(currentCollapsed);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(timer);
   }, []);
-
-  // Update DOM saat state collapsed berubah
-  useEffect(() => {
-    applySidebarLayout(collapsed);
-    localStorage.setItem("kvibo-sidebar-collapsed", String(collapsed));
-  }, [collapsed]);
 
   const toggle = useCallback(() => {
     setCollapsed((prev) => !prev);
@@ -105,7 +120,7 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
       open,
       isMobile,
     }),
-    [collapsed, toggle, close, open, isMobile]
+    [collapsed, toggle, close, open, isMobile],
   );
 
   return (

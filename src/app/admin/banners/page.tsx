@@ -18,11 +18,8 @@ import {
 import {
   DEFAULT_FLOAT_BANNERS,
   DEFAULT_HERO,
-  DEFAULT_PARTNERSHIP,
   type FloatBanner,
   type StorefrontHeroContent,
-  type PartnershipSettingsContent,
-  type PartnerLogo,
 } from "@/lib/storefront/defaults";
 import { getPartnershipSettings, getPartnerLogos } from "@/lib/storefront/queries";
 
@@ -76,7 +73,23 @@ export default async function AdminBannersPage() {
 
   const cmsReady = !floatErr;
 
-  const row = heroRow as any;
+  type HeroRow = {
+    eyebrow?: string | null;
+    title?: string | null;
+    title_highlight?: string | null;
+    description?: string | null;
+    cta_primary_label?: string | null;
+    cta_primary_href?: string | null;
+    cta_secondary_label?: string | null;
+    cta_secondary_href?: string | null;
+    slide2_title?: string | null;
+    slide2_description?: string | null;
+    slide2_cta_label?: string | null;
+    slide2_cta_href?: string | null;
+    slide2_promo_text?: string | null;
+  };
+
+  const row = heroRow as HeroRow | null;
   const hero: StorefrontHeroContent = row
     ? {
         eyebrow: row.eyebrow ?? DEFAULT_HERO.eyebrow,

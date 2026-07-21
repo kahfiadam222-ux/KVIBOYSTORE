@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Wallet, Sparkles } from "lucide-react";
+import { Wallet, Sparkles } from "lucide-react";
 
 const topupAmounts = [
   { amount: 50000, bonus: 0 },

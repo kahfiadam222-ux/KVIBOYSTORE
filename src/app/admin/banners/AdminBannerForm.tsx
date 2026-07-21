@@ -7,7 +7,7 @@ import { IMAGE_PRESETS } from "@/lib/image-presets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, X } from "lucide-react";
+import { Upload } from "lucide-react";
 
 export function AdminBannerForm() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);

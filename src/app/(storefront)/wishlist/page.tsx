@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,16 +27,17 @@ export default async function WishlistPage() {
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
             <Heart className="h-8 w-8 text-primary" />
           </div>
-          <h3 className="mb-2 text-lg font-semibold">Wishlist Kosong</h3>
+          <h3 className="mb-2 text-lg font-semibold">Wishlist Belum Tersedia</h3>
           <p className="mb-6 max-w-sm text-sm text-muted-foreground">
-            Simpan produk favoritmu di sini untuk dibeli nanti. Klik ikon hati pada produk untuk menambahkan ke wishlist.
+            Fitur simpan favorit sedang disiapkan. Untuk sekarang, temukan produk langsung di
+            beranda katalog.
           </p>
-          <a
+          <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:shadow-primary/30"
           >
             Jelajahi Produk
-          </a>
+          </Link>
         </CardContent>
       </Card>
     </div>

@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { payoutToSeller } from "@/lib/xendit/payout";
+import { transitionOrderState } from "@/lib/orders/transition";
+import { logger } from "@/lib/debug";
 
 type Order = {
   id: string;
@@ -7,6 +9,7 @@ type Order = {
   amount: number;
   currency: string;
   is_platform_owned: boolean;
+  state?: string;
 };
 
 // Shared by the buyer's "confirm" action and the auto-confirm cron job —
@@ -22,27 +25,54 @@ export async function completeOrder(
   const orderId = order.id;
 
   if (order.is_platform_owned) {
-    await admin.from("orders").update({ state: "completed" }).eq("id", orderId);
-    await admin.from("order_state_transitions").insert({
-      order_id: orderId,
-      from_state: "delivered",
-      to_state: "completed",
-      actor_type: actor.type,
-      actor_id: actor.id ?? null,
-      reason,
-    });
+    // CAS: only one concurrent confirm wins.
+    const moved = await transitionOrderState(
+      admin,
+      orderId,
+      "delivered",
+      "completed",
+      {
+        actorType: actor.type,
+        actorId: actor.id ?? null,
+        reason,
+      },
+    );
+    if (!moved) {
+      logger.info("completeOrder skipped — state race", { orderId });
+    }
     return;
   }
 
-  await admin.from("orders").update({ state: "buyer_confirmed" }).eq("id", orderId);
-  await admin.from("order_state_transitions").insert({
-    order_id: orderId,
-    from_state: "delivered",
-    to_state: "buyer_confirmed",
-    actor_type: actor.type,
-    actor_id: actor.id ?? null,
-    reason,
-  });
+  // Stay on delivered until payout succeeds so cron/retry can re-enter.
+  // Intermediate buyer_confirmed only after we have a payout destination;
+  // if payout fails we leave state at delivered for a later retry.
+  const claimed = await transitionOrderState(
+    admin,
+    orderId,
+    "delivered",
+    "buyer_confirmed",
+    {
+      actorType: actor.type,
+      actorId: actor.id ?? null,
+      reason,
+    },
+  );
+
+  if (!claimed) {
+    // Already confirmed by another caller — allow payout retry from buyer_confirmed.
+    const { data: current } = await admin
+      .from("orders")
+      .select("state")
+      .eq("id", orderId)
+      .single();
+    if (current?.state !== "buyer_confirmed") {
+      logger.info("completeOrder skipped — not deliverable", {
+        orderId,
+        state: current?.state,
+      });
+      return;
+    }
+  }
 
   const { data: sellerProfile } = await admin
     .from("seller_profiles")
@@ -56,29 +86,43 @@ export async function completeOrder(
     return;
   }
 
-  const payout = await payoutToSeller({
-    orderId,
-    amount: order.amount,
-    currency: order.currency,
-    channelCode: sellerProfile.payout_channel_code,
-    accountNumber: sellerProfile.payout_account_number,
-    accountHolderName: sellerProfile.payout_account_holder_name ?? "",
-  });
+  try {
+    const payout = await payoutToSeller({
+      orderId,
+      amount: order.amount,
+      currency: order.currency,
+      channelCode: sellerProfile.payout_channel_code,
+      accountNumber: sellerProfile.payout_account_number,
+      accountHolderName: sellerProfile.payout_account_holder_name ?? "",
+    });
 
-  await admin.from("escrow_ledger").insert({
-    order_id: orderId,
-    entry_type: "payout_released",
-    direction: "debit",
-    amount: order.amount,
-    reference_disbursement_id: payout.id,
-  });
+    // Only debit ledger + complete if we still own buyer_confirmed.
+    const completed = await transitionOrderState(
+      admin,
+      orderId,
+      "buyer_confirmed",
+      "completed",
+      {
+        actorType: "system",
+        reason: "Payout released to seller",
+      },
+    );
 
-  await admin.from("orders").update({ state: "completed" }).eq("id", orderId);
-  await admin.from("order_state_transitions").insert({
-    order_id: orderId,
-    from_state: "buyer_confirmed",
-    to_state: "completed",
-    actor_type: "system",
-    reason: "Payout released to seller",
-  });
+    if (!completed) return;
+
+    await admin.from("escrow_ledger").insert({
+      order_id: orderId,
+      entry_type: "payout_released",
+      direction: "debit",
+      amount: order.amount,
+      reference_disbursement_id: payout.id,
+    });
+  } catch (err) {
+    logger.error("Payout failed — order left at buyer_confirmed for retry", {
+      orderId,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    // Do not throw to buyer confirm UX for transient payout failures when
+    // confirmation already recorded; cron can retry buyer_confirmed later.
+  }
 }

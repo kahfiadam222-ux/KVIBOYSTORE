@@ -8,12 +8,10 @@ import {
   ArrowRight,
   Users,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { TiltCard } from "@/components/effects/TiltCard";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";

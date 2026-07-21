@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { orderStateLabels } from "@/lib/orders/stateLabels";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,6 +15,13 @@ function formatPrice(amount: number, currency: string) {
 
 export default async function OrdersListPage() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?error=" + encodeURIComponent("Silakan masuk untuk melihat pesanan."));
+  }
 
   const { data: orders } = await supabase
     .from("orders")

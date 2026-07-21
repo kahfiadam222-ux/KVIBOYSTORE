@@ -1,16 +1,21 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { updateListing } from "@/app/seller/dashboard/actions";
+import { useState, useRef, useTransition } from "react";
+import {
+  updateListing,
+  deleteListing,
+  setListingActive,
+  addProductCodes,
+} from "@/app/seller/dashboard/actions";
 import { compressImageDetailed } from "@/lib/image";
 import { IMAGE_PRESETS } from "@/lib/image-presets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Edit2, X, Check, Package, FileText, Tag, DollarSign, Upload } from "lucide-react";
+import { Edit2, X, Check, Package, FileText, Tag, DollarSign, Upload, Trash2, Power, KeyRound } from "lucide-react";
 
-interface ProductType {
+interface ProductTypeOption {
   id: string;
   name: string;
 }
@@ -23,13 +28,82 @@ interface ProductListing {
   is_active: boolean;
 }
 
-interface Product {
+interface SellerProduct {
   id: string;
   title: string;
   description?: string | null;
   image_url?: string | null;
   product_type_id: string;
-  listings: ProductListing[] | any;
+  is_platform_owned?: boolean;
+  listings: ProductListing[] | ProductListing | null;
+  // PostgREST may return a nested object or a one-element array depending on relation shape.
+  seller_profiles?:
+    | { legal_name?: string | null }
+    | { legal_name?: string | null }[]
+    | null;
+}
+
+/** Panel inventori kode untuk produk platform (pengiriman instan). Admin bisa
+ *  menambah kode; stok listing otomatis disamakan dengan jumlah kode. */
+function ProductCodesPanel({
+  productId,
+  available,
+}: {
+  productId: string;
+  available: number;
+}) {
+  const [raw, setRaw] = useState("");
+  const [saving, startSave] = useTransition();
+  const count = raw.split(/[\n,]/).map((c) => c.trim()).filter(Boolean).length;
+
+  return (
+    <div className="mt-3 rounded-xl border border-primary/15 bg-primary/5 p-3">
+      <div className="flex items-center gap-2 mb-2">
+        <KeyRound className="h-3.5 w-3.5 text-primary" />
+        <span className="text-xs font-bold text-foreground">
+          Inventori kode instan
+        </span>
+        <span className="ml-auto text-[11px] font-semibold text-primary">
+          {available} kode siap
+        </span>
+      </div>
+      <textarea
+        value={raw}
+        onChange={(e) => setRaw(e.target.value)}
+        placeholder={"Tempel kode di sini, satu per baris\nNETFLIX-XXXX\nNETFLIX-YYYY"}
+        rows={3}
+        className="w-full rounded-lg border border-border bg-background/50 px-3 py-2 text-xs placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none"
+      />
+      <div className="flex items-center gap-2 mt-2">
+        <Button
+          type="button"
+          size="sm"
+          disabled={saving || count === 0}
+          onClick={() =>
+            startSave(async () => {
+              try {
+                await addProductCodes(productId, raw);
+                setRaw("");
+              } catch (err: unknown) {
+                alert(errorMessage(err, "Gagal menambah kode."));
+              }
+            })
+          }
+          className="h-8 rounded-lg text-xs font-semibold"
+        >
+          {saving ? "Menyimpan..." : count > 0 ? `Tambah ${count} kode` : "Tambah kode"}
+        </Button>
+        <span className="text-[10px] text-muted-foreground">
+          Stok ikut jumlah kode yang belum terpakai.
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function errorMessage(err: unknown, fallback: string) {
+  if (err instanceof Error && err.message) return err.message;
+  return fallback;
 }
 
 function formatPrice(amount: number, currency: string) {
@@ -40,17 +114,27 @@ function formatPrice(amount: number, currency: string) {
   }).format(amount);
 }
 
+function asListings(listings: SellerProduct["listings"]): ProductListing[] {
+  if (!listings) return [];
+  return Array.isArray(listings) ? listings : [listings];
+}
+
 export function SellerListingCard({
   product,
   productTypes,
+  availableCodes,
+  isAdmin = false,
 }: {
-  product: any;
-  productTypes: any[];
+  product: SellerProduct;
+  productTypes: ProductTypeOption[];
+  availableCodes?: number;
+  isAdmin?: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [productImagePreview, setProductImagePreview] = useState<string | null>(product.image_url ?? null);
   const [uploadingProductImage, setUploadingProductImage] = useState(false);
+  const [mutating, startMutation] = useTransition();
   const productImageInputRef = useRef<HTMLInputElement>(null);
 
   const handleProductImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,8 +153,11 @@ export function SellerListingCard({
     }
   };
 
-  const listingsList = product.listings as unknown as ProductListing[];
-  const listing = listingsList?.[0];
+  const listingsList = asListings(product.listings);
+  const listing = listingsList[0];
+  const sellerProfile = Array.isArray(product.seller_profiles)
+    ? product.seller_profiles[0]
+    : product.seller_profiles;
 
   if (!listing) return null;
 
@@ -80,7 +167,7 @@ export function SellerListingCard({
         {!isEditing ? (
           <div className="flex flex-wrap items-center justify-between gap-4 p-5">
             <div className="flex items-center gap-4 min-w-0 flex-1">
-              <div 
+              <div
                 className="h-16 w-16 rounded-xl bg-cover bg-center border border-border/40 shrink-0 shadow-sm overflow-hidden flex items-center justify-center bg-background/20"
                 style={{
                   backgroundImage: productImagePreview ? `url(${productImagePreview})` : "none",
@@ -97,9 +184,9 @@ export function SellerListingCard({
                   <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
                     {productTypes.find((t) => t.id === product.product_type_id)?.name || "Jenis Lain"}
                   </span>
-                  {product.seller_profiles?.legal_name && (
+                  {sellerProfile?.legal_name && (
                     <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-400 border border-amber-500/20">
-                      Penjual: {product.seller_profiles.legal_name}
+                      Penjual: {sellerProfile.legal_name}
                     </span>
                   )}
                   <span className="text-xs text-muted-foreground flex items-center gap-1 font-medium">
@@ -108,30 +195,89 @@ export function SellerListingCard({
                   <span className="text-xs text-muted-foreground flex items-center gap-1 font-medium">
                     <span>📦</span> Stok: {listing.stock_count}
                   </span>
+                  {listing.is_active === false && (
+                    <span className="inline-flex items-center rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-400 border border-red-500/20">
+                      Nonaktif
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
-            <Button
-              onClick={() => setIsEditing(true)}
-              variant="outline"
-              size="touch"
-              className="rounded-xl font-semibold gap-1.5 px-3 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer w-full sm:w-auto"
-              type="button"
-            >
-              <Edit2 className="h-3.5 w-3.5" />
-              Edit Produk
-            </Button>
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <Button
+                onClick={() => setIsEditing(true)}
+                variant="outline"
+                size="touch"
+                className="rounded-xl font-semibold gap-1.5 px-3 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer flex-1 sm:flex-none"
+                type="button"
+              >
+                <Edit2 className="h-3.5 w-3.5" />
+                Edit
+              </Button>
+              <Button
+                onClick={() =>
+                  startMutation(async () => {
+                    try {
+                      await setListingActive(listing.id, !listing.is_active);
+                    } catch (err: unknown) {
+                      alert(errorMessage(err, "Gagal mengubah status stok."));
+                    }
+                  })
+                }
+                disabled={mutating}
+                variant="outline"
+                size="touch"
+                type="button"
+                className="rounded-xl font-semibold gap-1.5 px-3 cursor-pointer"
+                title={listing.is_active ? "Nonaktifkan stok" : "Aktifkan stok"}
+              >
+                <Power className="h-3.5 w-3.5" />
+                {listing.is_active ? "Nonaktifkan" : "Aktifkan"}
+              </Button>
+              <Button
+                onClick={() =>
+                  startMutation(async () => {
+                    if (!confirm(`Hapus produk "${product.title}"? Tindakan ini permanen.`)) return;
+                    try {
+                      await deleteListing(listing.id);
+                    } catch (err: unknown) {
+                      alert(errorMessage(err, "Gagal menghapus produk."));
+                    }
+                  })
+                }
+                disabled={mutating}
+                variant="outline"
+                size="touch"
+                type="button"
+                className="rounded-xl font-semibold gap-1.5 px-3 border-red-500/20 text-red-400 hover:bg-red-500/10 cursor-pointer"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Hapus
+              </Button>
+            </div>
+
+            {isAdmin && product.is_platform_owned && (
+              <div className="w-full">
+                <ProductCodesPanel
+                  productId={product.id}
+                  available={availableCodes ?? 0}
+                />
+              </div>
+            )}
           </div>
         ) : (
           <form
             action={async (formData) => {
               setSubmitting(true);
               try {
+                if (productImagePreview) {
+                  formData.set("imageUrl", productImagePreview);
+                }
                 await updateListing(listing.id, formData);
                 setIsEditing(false);
-              } catch (err: any) {
-                alert(err.message || "Gagal memperbarui produk. Coba lagi.");
+              } catch (err: unknown) {
+                alert(errorMessage(err, "Gagal memperbarui produk. Coba lagi."));
               } finally {
                 setSubmitting(false);
               }
@@ -153,7 +299,6 @@ export function SellerListingCard({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Left Column: Basic Info */}
               <div className="flex flex-col gap-3.5">
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor={`title-${listing.id}`} className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
@@ -201,7 +346,6 @@ export function SellerListingCard({
                 </div>
               </div>
 
-              {/* Right Column: Pricing, Inventory & Image */}
               <div className="flex flex-col gap-3.5">
                 <div className="flex flex-col gap-1.5">
                   <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">

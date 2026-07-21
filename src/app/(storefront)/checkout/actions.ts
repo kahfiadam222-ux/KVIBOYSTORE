@@ -64,6 +64,11 @@ export async function createCheckout(formData: FormData) {
     seller_id: string | null;
   };
 
+  // Block self-purchase (reputation / review gaming).
+  if (product.seller_id && product.seller_id === user.id) {
+    redirect(`/?error=${encodeURIComponent("Anda tidak bisa membeli produk milik sendiri.")}`);
+  }
+
   // Atomically claims one unit of stock — prevents overselling when two
   // buyers hit the last unit of a listing at the same time.
   const { data: stockClaimed, error: stockError } = await admin.rpc("decrement_listing_stock", {

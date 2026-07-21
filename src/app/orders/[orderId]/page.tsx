@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { orderStateLabels } from "@/lib/orders/stateLabels";
 import { confirmDelivery, openDispute, submitReview } from "./actions";
@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DeliveryReveal } from "@/components/effects/DeliveryReveal";
 import { StatusBadge } from "@/components/orders/StatusBadge";
 import { Button } from "@/components/ui/button";
+import { decryptPayload } from "@/lib/security/payload";
 
 function formatPrice(amount: number, currency: string) {
   return new Intl.NumberFormat("id-ID", {
@@ -22,6 +23,12 @@ export default async function OrderStatusPage({
 }) {
   const { orderId } = await params;
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    redirect("/login?error=" + encodeURIComponent("Silakan masuk untuk melihat pesanan."));
+  }
 
   const { data: order } = await supabase
     .from("orders")
@@ -69,7 +76,10 @@ export default async function OrderStatusPage({
           <p className="text-sm text-muted-foreground">{status.description}</p>
 
           {delivery && (
-            <DeliveryReveal orderId={order.id} code={delivery.payload_encrypted} />
+            <DeliveryReveal
+              orderId={order.id}
+              code={decryptPayload(delivery.payload_encrypted)}
+            />
           )}
 
           {order.state === "delivered" && (

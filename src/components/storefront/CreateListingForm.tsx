@@ -22,8 +22,10 @@ export function CreateListingForm({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [compressing, setCompressing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [owner, setOwner] = useState("__platform__");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const isPlatform = isAdmin && owner === "__platform__";
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -73,8 +75,8 @@ export function CreateListingForm({
               formRef.current?.reset();
               setImagePreview(null);
               alert("Produk baru berhasil ditambahkan!");
-            } catch (err: any) {
-              alert(err.message || "Gagal membuat produk.");
+            } catch (err: unknown) {
+              alert(err instanceof Error ? err.message : "Gagal membuat produk.");
             } finally {
               setSubmitting(false);
             }
@@ -84,23 +86,50 @@ export function CreateListingForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Left Column: Basic Details */}
             <div className="flex flex-col gap-4">
-              {isAdmin && sellers && sellers.length > 0 && (
+              {isAdmin && (
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="sellerId" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-                    <UserCheck className="h-3.5 w-3.5" /> Pilih Penjual (Owner)
+                    <UserCheck className="h-3.5 w-3.5" /> Pemilik Listing
                   </Label>
                   <select
                     id="sellerId"
                     name="sellerId"
                     required
+                    value={owner}
+                    onChange={(e) => setOwner(e.target.value)}
                     className="form-select-glass h-10 rounded-xl px-3 text-sm cursor-pointer border-border bg-background/30"
                   >
-                    {sellers.map((s) => (
+                    <option value="__platform__" className="bg-popover text-foreground">
+                      🏪 Platform (milik toko, tanpa penjual)
+                    </option>
+                    {(sellers ?? []).map((s) => (
                       <option key={s.user_id} value={s.user_id} className="bg-popover text-foreground">
                         {s.legal_name}
                       </option>
                     ))}
                   </select>
+                  <p className="text-[10px] text-muted-foreground">
+                    Pilih Platform untuk stok milik toko sendiri, atau pilih penjual terdaftar.
+                  </p>
+                </div>
+              )}
+
+              {isPlatform && (
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="codes" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                    <Tag className="h-3.5 w-3.5" /> Kode instan (satu per baris)
+                  </Label>
+                  <textarea
+                    id="codes"
+                    name="codes"
+                    placeholder={"NETFLIX-XXXX\nNETFLIX-YYYY\n..."}
+                    rows={3}
+                    className="rounded-xl border border-border bg-background/30 px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none"
+                  />
+                  <p className="text-[10px] text-muted-foreground">
+                    Produk platform dikirim instan dari kode ini. Stok = jumlah kode.
+                    Bisa ditambah lagi nanti dari daftar stok.
+                  </p>
                 </div>
               )}
 

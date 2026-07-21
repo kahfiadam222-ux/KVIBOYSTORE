@@ -10,7 +10,7 @@ export default async function AdminListingsPage() {
   // Query all listings with their seller legal name
   const { data: products } = await admin
     .from("products")
-    .select("id, title, description, image_url, product_type_id, status, seller_id, seller_profiles ( legal_name ), listings ( id, price, currency, stock_count, is_active )")
+    .select("id, title, description, image_url, product_type_id, status, seller_id, is_platform_owned, seller_profiles ( legal_name ), listings ( id, price, currency, stock_count, is_active )")
     .order("created_at", { ascending: false });
 
   // Query all product types
@@ -19,12 +19,25 @@ export default async function AdminListingsPage() {
     .select("id, name")
     .order("name");
 
-  // Query approved sellers for admin listing creator
+  // Query semua penjual untuk pembuat listing admin (fleksibel — tidak dibatasi
+  // hanya yang approved; admin juga bisa memilih Platform sebagai pemilik).
   const { data: sellers } = await admin
     .from("seller_profiles")
     .select("user_id, legal_name")
-    .eq("verification_status", "approved")
     .order("legal_name");
+
+  // Hitung kode instan yang belum terpakai per produk (untuk panel inventori
+  // produk platform di kartu). Ambil sekaligus lalu agregasi di memori.
+  const { data: unusedCodes } = await admin
+    .from("product_codes")
+    .select("product_id")
+    .eq("is_used", false);
+
+  const codeCounts = new Map<string, number>();
+  for (const row of unusedCodes ?? []) {
+    const pid = (row as { product_id: string }).product_id;
+    codeCounts.set(pid, (codeCounts.get(pid) ?? 0) + 1);
+  }
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-12 flex-grow">
@@ -50,8 +63,10 @@ export default async function AdminListingsPage() {
           {products.map((product) => (
             <SellerListingCard
               key={product.id}
-              product={product as any}
+              product={product}
               productTypes={productTypes ?? []}
+              availableCodes={codeCounts.get(product.id) ?? 0}
+              isAdmin
             />
           ))}
         </div>

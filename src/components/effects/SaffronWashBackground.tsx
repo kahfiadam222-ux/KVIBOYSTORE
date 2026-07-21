@@ -15,113 +15,61 @@ function readWash(varName: string, fallback: string): string {
 }
 
 interface Bloom {
-  baseX: number; // 0..1 relatif lebar
-  baseY: number; // 0..1 relatif tinggi
+  x: number; // 0..1 relatif lebar
+  y: number; // 0..1 relatif tinggi
   size: number; // px
   color: 0 | 1; // index warna wash
   opacity: number;
-  phase: number;
-  driftX: number;
-  driftY: number;
 }
 
+// Komposisi mengikuti referensi: lavender kiri, sky-blue kanan,
+// haze violet atas, glow lembut dari bawah. Posisi TETAP (statis).
+const BLOOMS: Bloom[] = [
+  { x: 0.04, y: 0.3, size: 760, color: 1, opacity: 0.5 },
+  { x: 0.97, y: 0.34, size: 800, color: 0, opacity: 0.52 },
+  { x: 0.62, y: 0.04, size: 620, color: 1, opacity: 0.34 },
+  { x: 0.5, y: 1.06, size: 820, color: 0, opacity: 0.4 },
+];
+
 /**
- * Aurora Pastel wash — glow lembut sky-blue ↔ lavender.
- * Disederhanakan dari efek partikel jadi beberapa bloom besar yang
- * mengambang sangat pelan. Tenang, tidak ramai, hemat CPU.
+ * Aurora Pastel wash — glow statis sky-blue ↔ lavender.
+ * Digambar SEKALI (tanpa animasi/mouse); redraw hanya saat resize
+ * atau ganti tema. Nol beban CPU saat idle.
  */
 export function SaffronWashBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: 0.5, y: 0.5 });
-  const parallaxRef = useRef({ x: 0.5, y: 0.5 });
-  const colorsRef = useRef<[string, string]>(["147, 197, 253", "196, 181, 253"]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    const syncColors = () => {
-      colorsRef.current = [
-        readWash("--wash-1", "147, 197, 253"),
-        readWash("--wash-2", "196, 181, 253"),
-      ];
-    };
-    syncColors();
-
-    // Warna mengikuti tema aktif (adaptif saat class <html> berganti).
-    const themeObserver = new MutationObserver(syncColors);
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    const ctx = canvas.getContext("2d", { alpha: true, desynchronized: true });
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    let dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    const resize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const render = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-
-    resize();
-    window.addEventListener("resize", resize);
-
-    let lastMove = 0;
-    const handleMouseMove = (e: MouseEvent) => {
-      const now = Date.now();
-      if (now - lastMove > 32) {
-        mouseRef.current = { x: e.clientX / width, y: e.clientY / height };
-        lastMove = now;
-      }
-    };
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-
-    // Bloom besar, lembut — sedikit saja.
-    const blooms: Bloom[] = [
-      { baseX: 0.16, baseY: 0.1, size: 540, color: 1, opacity: 0.42, phase: 0.0, driftX: 0.035, driftY: 0.03 },
-      { baseX: 0.86, baseY: 0.18, size: 580, color: 0, opacity: 0.42, phase: 2.1, driftX: 0.04, driftY: 0.028 },
-      { baseX: 0.5, baseY: 1.02, size: 640, color: 1, opacity: 0.3, phase: 4.0, driftX: 0.03, driftY: 0.022 },
-    ];
-
-    let raf: number;
-
-    const draw = (t: number) => {
       ctx.clearRect(0, 0, width, height);
 
-      // Parallax mouse yang sangat halus (lerp).
-      parallaxRef.current.x += (mouseRef.current.x - parallaxRef.current.x) * 0.04;
-      parallaxRef.current.y += (mouseRef.current.y - parallaxRef.current.y) * 0.04;
-      const px = (parallaxRef.current.x - 0.5) * width * 0.03;
-      const py = (parallaxRef.current.y - 0.5) * height * 0.03;
+      const colors: [string, string] = [
+        readWash("--wash-1", "147, 197, 253"),
+        readWash("--wash-2", "196, 181, 253"),
+      ];
 
-      const colors = colorsRef.current;
-
-      for (const b of blooms) {
-        const cx =
-          b.baseX * width +
-          Math.sin(t * 0.00012 + b.phase) * width * b.driftX +
-          px;
-        const cy =
-          b.baseY * height +
-          Math.cos(t * 0.0001 + b.phase) * height * b.driftY +
-          py;
-        const pulse = Math.sin(t * 0.0006 + b.phase) * 0.06 + 0.94;
-        const r = b.size * pulse;
+      for (const b of BLOOMS) {
+        const cx = b.x * width;
+        const cy = b.y * height;
+        const r = b.size;
         const c = colors[b.color];
 
         const grad = ctx.createRadialGradient(cx, cy, r * 0.1, cx, cy, r);
-        grad.addColorStop(0, `rgba(${c}, ${b.opacity * pulse})`);
-        grad.addColorStop(0.5, `rgba(${c}, ${b.opacity * 0.4 * pulse})`);
+        grad.addColorStop(0, `rgba(${c}, ${b.opacity})`);
+        grad.addColorStop(0.5, `rgba(${c}, ${b.opacity * 0.4})`);
         grad.addColorStop(1, `rgba(${c}, 0)`);
 
         ctx.beginPath();
@@ -129,25 +77,35 @@ export function SaffronWashBackground() {
         ctx.fillStyle = grad;
         ctx.fill();
       }
-
-      raf = requestAnimationFrame(draw);
     };
 
-    raf = requestAnimationFrame(draw);
+    render();
+
+    let resizeTimer: number | undefined;
+    const onResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(render, 150);
+    };
+    window.addEventListener("resize", onResize);
+
+    // Redraw saat tema berganti (warna wash ikut tema).
+    const themeObserver = new MutationObserver(render);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
 
     return () => {
-      cancelAnimationFrame(raf);
+      window.clearTimeout(resizeTimer);
       themeObserver.disconnect();
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 -z-10 opacity-70 mix-blend-multiply"
-      style={{ willChange: "transform" }}
+      className="pointer-events-none fixed inset-0 -z-10 opacity-80 mix-blend-multiply"
     />
   );
 }
