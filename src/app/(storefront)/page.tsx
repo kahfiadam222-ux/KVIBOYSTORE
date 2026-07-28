@@ -143,30 +143,30 @@ export default async function StorefrontPage({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
           {listings.map((listing, listingIndex) => {
             const tier = getDeliveryLabel(listing);
             const lowStock = listing.stockCount > 0 && listing.stockCount <= 3;
             return (
-              <TiltCard
+              <div
                 key={listing.listingId}
-                className="group/card relative z-0 hover:z-30 rounded-xl product-card-shell h-full"
+                className="group/card relative z-0 hover:z-30 rounded-xl product-card-shell h-full transition-transform duration-300 ease-out hover:translate-y-[-4px]"
               >
                 <Card className="h-full flex flex-col glass-card rounded-[inherit] border-0 shadow-none transition-shadow duration-300 hover:shadow-[var(--shadow-glow)] overflow-hidden">
-                  {/* Responsive photo: square on mobile, slightly taller on sm+ */}
+                  {/* Card image with 4/3 ratio and hover scale */}
                   <div className="relative w-full aspect-[4/3] overflow-hidden shrink-0">
                     <StorefrontImage
                       src={listing.imageUrl}
                       alt={listing.title || listing.productTypeName}
                       priority={listingIndex < 6}
                       overlay="product"
-                      className="absolute inset-0"
+                      className="absolute inset-0 group-hover/card:scale-105 transition-transform duration-500 ease-out"
                     />
-                    <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 flex flex-col gap-1 items-start max-w-[70%]">
+                    <div className="absolute top-2 left-2 flex flex-col gap-1 items-start max-w-[70%]">
                       {listing.isPlatformOwned && (
-                        <Badge className="bg-[var(--glass-fill)] backdrop-blur-lg text-[var(--gold)] border-[var(--glass-border)] text-[8px] sm:text-[9px] font-bold py-0.5 px-1.5 shadow-sm rounded-md flex items-center gap-0.5">
+                        <Badge className="bg-red-600/90 backdrop-blur-lg text-white border-0 text-[10px] sm:text-[11px] font-bold py-1 px-2 shadow-sm rounded-md flex items-center gap-1">
                           <svg
-                            className="h-2 w-2 shrink-0"
+                            className="h-2.5 w-2.5 shrink-0"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -181,12 +181,12 @@ export default async function StorefrontPage({
                         </Badge>
                       )}
                     </div>
-                    <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex flex-col gap-1 items-end">
-                      <Badge className="bg-[var(--glass-fill)] backdrop-blur-lg text-foreground border-[var(--glass-border)] text-[8px] sm:text-[9px] font-semibold py-0.5 px-1.5 shadow-sm rounded-md">
+                    <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
+                      <Badge className="bg-[var(--glass-fill)] backdrop-blur-lg text-foreground border-[var(--glass-border)] text-[10px] sm:text-[11px] font-semibold py-1 px-2 shadow-sm rounded-md">
                         {tier.label.replace(" Delivery", "")}
                       </Badge>
                       <Badge
-                        className={`backdrop-blur-lg border-[var(--glass-border)] text-[8px] sm:text-[9px] font-semibold py-0.5 px-1.5 shadow-sm rounded-md ${
+                        className={`backdrop-blur-lg border-[var(--glass-border)] text-[10px] sm:text-[11px] font-semibold py-1 px-2 shadow-sm rounded-md ${
                           lowStock
                             ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
                             : "bg-[var(--glass-fill)] text-foreground"
@@ -196,17 +196,17 @@ export default async function StorefrontPage({
                       </Badge>
                     </div>
                   </div>
-                  <CardHeader className="p-2 sm:p-3 pb-0 space-y-0.5 min-w-0">
-                    <CardTitle className="text-xs sm:text-sm font-bold line-clamp-2 leading-snug break-words">
+                  <CardHeader className="p-3 sm:p-3.5 pb-0 space-y-1 min-w-0">
+                    <CardTitle className="text-sm sm:text-base font-bold line-clamp-2 leading-snug break-words">
                       {listing.title}
                     </CardTitle>
-                    <CardDescription className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1">
+                    <CardDescription className="text-xs sm:text-xs text-muted-foreground line-clamp-1">
                       {listing.productTypeName}
                       {listing.description ? ` · ${listing.description}` : ""}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="p-2 sm:p-3 pt-1.5 pb-1.5 flex-grow min-w-0">
-                    <p className="text-sm sm:text-base font-extrabold text-foreground tabular-nums">
+                  <CardContent className="p-3 sm:p-3.5 pt-2 pb-2 flex-grow min-w-0">
+                    <p className="text-base sm:text-lg font-extrabold text-foreground tabular-nums">
                       {formatPrice(listing.price, listing.currency)}
                     </p>
                     {!listing.isPlatformOwned &&
@@ -219,7 +219,7 @@ export default async function StorefrontPage({
                         </p>
                       )}
                   </CardContent>
-                  <CardFooter className="p-2 sm:p-3 pt-0 border-t-0 bg-transparent mt-auto">
+                  <CardFooter className="p-3 sm:p-3.5 pt-2 border-t-0 bg-transparent mt-auto">
                     <form action={createCheckout} className="w-full">
                       <input
                         type="hidden"
@@ -229,14 +229,14 @@ export default async function StorefrontPage({
                       <Button
                         type="submit"
                         size="sm"
-                        className="w-full h-8 sm:h-9 rounded-xl text-xs font-semibold shadow-md"
+                        className="w-full h-9 sm:h-10 rounded-xl text-sm font-semibold shadow-md"
                       >
                         Beli Sekarang
                       </Button>
                     </form>
                   </CardFooter>
                 </Card>
-              </TiltCard>
+              </div>
             );
           })}
         </div>
