@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-48d314f0-355a-4c97-840b-9cf683fad669/styles.css">
+  <script src="_ds/modernist-48d314f0-355a-4c97-840b-9cf683fad669/_ds_bundle.js"></script>
+  <style>
+    [data-theme] { --accent-ink: var(--color-accent-700); background: var(--color-bg); color: var(--color-text); min-height: 100vh; }
+    [data-theme="dark"] {
+      --color-bg: #17181a;
+      --color-surface: #212226;
+      --color-text: #f2f0ee;
+      --color-divider: color-mix(in srgb, #f2f0ee 16%, transparent);
+      --accent-ink: var(--color-accent-300);
+    }
+    [data-theme] a { color: #fff; }
+    [data-theme] a:hover { color: #fff; }
+    [data-theme] .nav a { color: inherit; }
+    [data-theme] .nav a:hover, [data-theme] .nav a[aria-current='page'] { color: var(--color-accent); }
+    [data-theme] .input { background: var(--color-surface); color: var(--color-text); }
+    [data-theme] .btn-primary { color: #fff; }
+    [data-theme] .btn-secondary { color: var(--color-text); }
+    [data-theme] .nav a, [data-theme] .nav .nav-brand { color: var(--color-text); opacity: 1; }
+    [data-theme] .nav a:hover, [data-theme] .nav a[aria-current='page'] { color: var(--color-accent); opacity: 1; }
+    [data-theme].theme-ready *, [data-theme].theme-ready *::before, [data-theme].theme-ready *::after {
+      transition: background-color .55s cubic-bezier(.16,1,.3,1), color .55s cubic-bezier(.16,1,.3,1), border-color .55s cubic-bezier(.16,1,.3,1);
+    }
+    @keyframes riseIn { from { opacity: 0; transform: translate3d(0,14px,0); } to { opacity: 1; transform: translate3d(0,0,0); } }
+    .anim-rise { opacity: 0; will-change: transform, opacity; animation: riseIn 0.6s cubic-bezier(.16,1,.3,1) forwards; }
+    .order-card { border:1px solid var(--color-divider); border-radius:8px; padding:16px; transition: all 0.25s cubic-bezier(.16,1,.3,1); }
+    .order-card:hover { background:var(--color-surface); }
+    .btn { transition: all 0.25s cubic-bezier(.16,1,.3,1); }
+    .btn:hover { transform: translateY(-1px); }
+    @media (prefers-reduced-motion: reduce) {
+      .anim-rise { animation: none; opacity: 1; }
+      [data-theme] *, [data-theme] *::before, [data-theme] *::after, .btn, .order-card { transition: none !important; }
+    }
+  </style>
+</helmet>
+
+<div data-theme="{{ theme }}" class="{{ themeReadyClass }}">
+  <div style="display:flex; align-items:stretch; min-height:100vh">
+    <dc-import name="Sidebar" active="pesanan" is-admin-user="{{ false }}" hint-size="236px,100vh"></dc-import>
+    <div style="flex:1; min-width:0">
+      <nav class="nav">
+        <span class="nav-brand">Kviboystore</span>
+        <a href="Kviboystore Katalog.dc.html">Katalog</a>
+        <a href="#" aria-current="page">Pesanan saya</a>
+        <div style="display:flex; align-items:center; gap:8px; margin-left:auto">
+          <button type="button" class="btn btn-secondary btn-icon" aria-label="Ganti tema" onClick="{{ toggleTheme }}">
+            <sc-if value="{{ isDark }}" hint-placeholder-val="{{ false }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            </sc-if>
+            <sc-if value="{{ isLight }}" hint-placeholder-val="{{ true }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            </sc-if>
+          </button>
+          <button type="button" class="btn btn-primary">Masuk</button>
+        </div>
+      </nav>
+
+      <section style="max-width:1200px; margin:0 auto; padding:56px 32px">
+        <h1 class="anim-rise" style="font-size:clamp(28px,4vw,44px); line-height:1.1; margin:0 0 8px; animation-delay:0.04s">Pesanan saya</h1>
+        <p class="anim-rise" style="font-size:15px; opacity:0.72; margin:0 0 32px; animation-delay:0.08s">{{ orderCount }} pesanan · Total belanja {{ totalSpent }}</p>
+
+        <div style="display:flex; gap:12px; margin-bottom:32px">
+          <sc-for list="{{ statusFilters }}" as="filter" hint-placeholder-count="5">
+            <button type="button" class="btn {{ filter.btnClass }}" onClick="{{ filter.onClick }}" style="{{ filter.style }}">{{ filter.label }}</button>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ hasOrders }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; flex-direction:column; gap:16px">
+            <sc-for list="{{ filteredOrders }}" as="order" hint-placeholder-count="4">
+              <div class="order-card anim-rise" style="animation-delay:0.1s">
+                <div style="display:grid; grid-template-columns:1fr auto; gap:16px; margin-bottom:12px">
+                  <div>
+                    <p style="font-weight:800; font-size:14px; margin:0 0 4px">{{ order.orderNumber }}</p>
+                    <p style="font-size:12px; opacity:0.65; margin:0">{{ order.date }}</p>
+                  </div>
+                  <span class="{{ order.statusClass }}" style="font-size:12px; font-weight:700; padding:4px 12px; border-radius:4px; white-space:nowrap">{{ order.status }}</span>
+                </div>
+                <div style="background:color-mix(in srgb, var(--color-text) 5%, transparent); border-radius:6px; padding:12px; margin:12px 0">
+                  <p style="font-size:13px; font-weight:700; margin:0 0 4px">{{ order.items }}</p>
+                  <p style="font-size:12px; opacity:0.65; margin:0">{{ order.productList }}</p>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr auto; gap:16px; align-items:center; margin-top:12px">
+                  <div>
+                    <p style="font-size:12px; opacity:0.65; margin:0 0 2px">Total pembelian</p>
+                    <p style="font-size:16px; font-weight:800; margin:0; color:#ff6b4d">{{ order.total }}</p>
+                  </div>
+                  <div style="display:flex; gap:8px">
+                    <button type="button" class="btn btn-secondary btn-icon" style="width:36px; height:36px" aria-label="Detail pesanan">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-icon" style="width:36px; height:36px" aria-label="Beli lagi">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 2-1.58l1.65-7.42H5.12"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center; padding:64px 24px; border:2px solid var(--color-divider); border-radius:12px">
+            <div style="font-size:56px; margin-bottom:16px">📦</div>
+            <h2 style="font-size:20px; margin:0 0 8px">Belum ada pesanan</h2>
+            <p style="font-size:14px; opacity:0.65; margin:0 0 20px">Mulai belanja sekarang untuk menciptakan pesanan pertama Anda.</p>
+            <a href="Kviboystore Katalog.dc.html" class="btn btn-primary">Mulai belanja</a>
+          </div>
+        </sc-if>
+      </section>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    theme: "light",
+    themeReady: false,
+    activeFilter: "all",
+    orders: [],
+    loading: true,
+  };
+
+  componentDidMount() {
+    requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ themeReady: true })));
+    
+    // Fetch orders dari Supabase
+    this.fetchOrders();
+  }
+
+  fetchOrders = async () => {
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseKey) {
+        this.setState({ loading: false });
+        return;
+      }
+
+      const authToken = localStorage.getItem("auth_token");
+      if (!authToken) {
+        this.setState({ loading: false });
+        return;
+      }
+
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/orders?select=id,state,amount,currency,created_at,listings(products(title))`,
+        {
+          headers: {
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        const mapped = data.map((o) => ({
+          id: o.id,
+          orderNumber: "#" + o.id.substring(0, 8).toUpperCase(),
+          date: new Date(o.created_at).toLocaleDateString("id-ID"),
+          status: this.getStatusLabel(o.state),
+          statusType: this.getStatusType(o.state),
+          items: "1 produk",
+          productList: o.listings?.products?.title || "Produk",
+          total: new Intl.NumberFormat("id-ID", { style: "currency", currency: o.currency, maximumFractionDigits: 0 }).format(o.amount),
+        }));
+        this.setState({ orders: mapped, loading: false });
+      } else {
+        this.setState({ loading: false });
+      }
+    } catch (err) {
+      console.error("Fetch orders error:", err);
+      this.setState({ loading: false });
+    }
+  };
+
+  getStatusLabel = (state) => {
+    const labels = {
+      created: "Menunggu pembayaran",
+      payment_held: "Pembayaran diterima",
+      awaiting_delivery: "Pengiriman diproses",
+      delivered: "Dikirim",
+      buyer_confirmed: "Dikonfirmasi pembeli",
+      completed: "Selesai",
+      cancelled: "Dibatalkan",
+      refunded: "Pengembalian dana",
+    };
+    return labels[state] || state;
+  };
+
+  getStatusType = (state) => {
+    if (["created", "awaiting_delivery"].includes(state)) return "processing";
+    if (["completed", "buyer_confirmed"].includes(state)) return "completed";
+    return state === "cancelled" ? "cancelled" : "processing";
+  }
+
+  toggleTheme = () => {
+    const flip = () => this.setState((s) => ({ theme: s.theme === "dark" ? "light" : "dark" }));
+    if (document.startViewTransition) document.startViewTransition(flip);
+    else flip();
+  };
+
+  setFilter = (filter) => this.setState({ activeFilter: filter });
+
+  renderVals() {
+    const filter = this.state.activeFilter;
+    const filtered = this.state.orders.filter((o) => filter === "all" || o.statusType === filter);
+    const totalSpentNum = this.state.orders.reduce((sum, o) => sum + parseInt(o.total.replace(/\D/g, "")), 0);
+
+    const statusFilters = [
+      { label: "Semua", filter: "all", btnClass: filter === "all" ? "btn-primary" : "btn-secondary" },
+      { label: "Selesai", filter: "completed", btnClass: filter === "completed" ? "btn-primary" : "btn-secondary" },
+      { label: "Sedang diproses", filter: "processing", btnClass: filter === "processing" ? "btn-primary" : "btn-secondary" },
+      { label: "Dibatalkan", filter: "cancelled", btnClass: filter === "cancelled" ? "btn-primary" : "btn-secondary" },
+    ].map((f) => ({
+      ...f,
+      onClick: () => this.setFilter(f.filter),
+      style: "",
+    }));
+
+    const filteredOrders = filtered.map((o) => ({
+      ...o,
+      statusClass: o.statusType === "completed" ? "tag tag-accent" : o.statusType === "processing" ? "tag tag-neutral" : "tag tag-outline",
+    }));
+
+    return {
+      theme: this.state.theme,
+      themeReadyClass: this.state.themeReady ? "theme-ready" : "",
+      isDark: this.state.theme === "dark",
+      isLight: this.state.theme === "light",
+      toggleTheme: this.toggleTheme,
+      statusFilters,
+      filteredOrders,
+      hasOrders: filtered.length > 0,
+      isEmpty: filtered.length === 0,
+      orderCount: this.state.orders.length,
+      totalSpent: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(totalSpentNum),
+    };
+  }
+}
+</script>
+</body>
+</html>
