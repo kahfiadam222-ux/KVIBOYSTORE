@@ -118,32 +118,16 @@ export default async function StorefrontPage({
       </header>
 
       {listings.length === 0 ? (
-        <div className="glass-panel text-center py-16 px-6 rounded-3xl max-w-md mx-auto">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary mb-5">
-            <svg
-              className="h-7 w-7"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <h3 className="text-xl font-bold text-foreground">
+        <div className="text-center py-16 px-6 border border-[var(--glass-border)] max-w-md mx-auto rounded-lg">
+          <h3 className="text-lg font-semibold text-foreground">
             Produk tidak ditemukan
           </h3>
-          <p className="mt-2.5 text-sm text-muted-foreground leading-relaxed">
-            Kami tidak menemukan produk yang cocok. Coba kata kunci lain atau
-            jelajahi kategori di sidebar.
+          <p className="mt-2 text-sm text-muted-foreground">
+            Coba kata kunci lain untuk menemukan produk yang kamu cari.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "20px" }}>
           {listings.map((listing, listingIndex) => {
             const tier = getDeliveryLabel(listing);
             const lowStock = listing.stockCount > 0 && listing.stockCount <= 3;
@@ -160,11 +144,11 @@ export default async function StorefrontPage({
                       alt={listing.title || listing.productTypeName}
                       priority={listingIndex < 6}
                       overlay="product"
-                      className="absolute inset-0 group-hover/card:scale-105 transition-transform duration-500 ease-out"
+                      className="absolute inset-0 group-hover/card:scale-[1.045] transition-transform duration-[450ms] ease-out"
                     />
                     <div className="absolute top-2 left-2 flex flex-col gap-1 items-start max-w-[70%]">
                       {listing.isPlatformOwned && (
-                        <Badge className="bg-red-600/90 backdrop-blur-lg text-white border-0 text-[10px] sm:text-[11px] font-bold py-1 px-2 shadow-sm rounded-md flex items-center gap-1">
+                        <Badge className="text-white border-0 text-[10px] sm:text-[11px] font-bold py-1 px-2 shadow-sm rounded-md flex items-center gap-1" style={{ background: "#ff6b4d" }}>
                           <svg
                             className="h-2.5 w-2.5 shrink-0"
                             viewBox="0 0 24 24"
