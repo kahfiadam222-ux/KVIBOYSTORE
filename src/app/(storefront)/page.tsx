@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { getActiveListings } from "@/lib/catalog/queries";
 import { getDeliveryLabel } from "@/lib/catalog/tierLabels";
 import { getActiveBanners } from "@/lib/banners/queries";
@@ -12,7 +13,6 @@ import { BannerCarousel } from "@/components/storefront/BannerCarousel";
 import { VerticalBannerCarousel } from "@/components/storefront/VerticalBannerCarousel";
 import { HeroSection } from "@/components/storefront/HeroSection";
 import { SearchBar } from "@/components/storefront/SearchBar";
-import { TiltCard } from "@/components/effects/TiltCard";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -127,14 +127,15 @@ export default async function StorefrontPage({
           </p>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "20px" }}>
+        <div className="catalog-grid">
           {listings.map((listing, listingIndex) => {
             const tier = getDeliveryLabel(listing);
             const lowStock = listing.stockCount > 0 && listing.stockCount <= 3;
             return (
               <div
                 key={listing.listingId}
-                className="group/card relative z-0 hover:z-30 rounded-xl product-card-shell h-full transition-transform duration-300 ease-out hover:translate-y-[-4px]"
+                style={{ "--i": Math.min(listingIndex, 12) } as CSSProperties}
+                className="anim-rise group/card relative z-0 hover:z-30 product-card-shell h-full transition-transform duration-300 ease-out hover:translate-y-[-4px]"
               >
                 <Card className="h-full flex flex-col glass-card rounded-[inherit] border-0 shadow-none transition-shadow duration-300 hover:shadow-[var(--shadow-glow)] overflow-hidden">
                   {/* Card image with 4/3 ratio and hover scale */}
@@ -165,45 +166,40 @@ export default async function StorefrontPage({
                         </Badge>
                       )}
                     </div>
-                    <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
-                      <Badge className="bg-[var(--glass-fill)] backdrop-blur-lg text-foreground border-[var(--glass-border)] text-[10px] sm:text-[11px] font-semibold py-1 px-2 shadow-sm rounded-md">
-                        {tier.label.replace(" Delivery", "")}
-                      </Badge>
-                      <Badge
-                        className={`backdrop-blur-lg border-[var(--glass-border)] text-[10px] sm:text-[11px] font-semibold py-1 px-2 shadow-sm rounded-md ${
-                          lowStock
-                            ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                            : "bg-[var(--glass-fill)] text-foreground"
-                        }`}
-                      >
-                        Stok {listing.stockCount}
-                      </Badge>
-                    </div>
                   </div>
-                  <CardHeader className="p-3 sm:p-3.5 pb-0 space-y-1 min-w-0">
-                    <CardTitle className="text-sm sm:text-base font-bold line-clamp-2 leading-snug break-words">
+                  <CardHeader className="p-2.5 sm:p-3.5 pb-0 space-y-1 min-w-0">
+                    <CardTitle className="text-[13px] sm:text-[15px] font-bold line-clamp-2 leading-snug break-words">
                       {listing.title}
                     </CardTitle>
-                    <CardDescription className="text-xs sm:text-xs text-muted-foreground line-clamp-1">
+                    <CardDescription className="text-[11px] sm:text-[12.5px] text-muted-foreground line-clamp-1">
                       {listing.productTypeName}
-                      {listing.description ? ` · ${listing.description}` : ""}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="p-3 sm:p-3.5 pt-2 pb-2 flex-grow min-w-0">
-                    <p className="text-base sm:text-lg font-extrabold text-foreground tabular-nums">
+                  <CardContent className="p-2.5 sm:p-3.5 pt-2 pb-2 flex-grow min-w-0 space-y-2">
+                    {/* Tag pengiriman & stok dibaca sebagai teks di badan kartu,
+                        bukan badge melayang yang menutupi foto produk. */}
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className="tag tag-neutral">
+                        {tier.label.replace(" Delivery", "")}
+                      </span>
+                      <span className={lowStock ? "tag tag-outline" : "tag tag-neutral"}>
+                        Stok {listing.stockCount}
+                      </span>
+                    </div>
+                    <p className="text-[15px] sm:text-[18px] font-extrabold text-foreground tabular-nums">
                       {formatPrice(listing.price, listing.currency)}
                     </p>
                     {!listing.isPlatformOwned &&
                       listing.sellerReputation !== null && (
-                        <p className="mt-0.5 text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-1">
-                          <span className="font-medium text-primary/90">
+                        <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                          <span className="font-bold text-foreground">
                             {listing.sellerReputation.toFixed(1)}
                           </span>
                           <span>rating</span>
                         </p>
                       )}
                   </CardContent>
-                  <CardFooter className="p-3 sm:p-3.5 pt-2 border-t-0 bg-transparent mt-auto">
+                  <CardFooter className="p-2.5 sm:p-3.5 pt-1 border-t-0 bg-transparent mt-auto">
                     <form action={createCheckout} className="w-full">
                       <input
                         type="hidden"
@@ -213,9 +209,9 @@ export default async function StorefrontPage({
                       <Button
                         type="submit"
                         size="sm"
-                        className="w-full h-9 sm:h-10 rounded-xl text-sm font-semibold shadow-md"
+                        className="w-full h-9 sm:h-10 text-[13px] sm:text-sm font-bold"
                       >
-                        Beli Sekarang
+                        Beli sekarang
                       </Button>
                     </form>
                   </CardFooter>

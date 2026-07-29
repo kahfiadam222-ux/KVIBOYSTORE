@@ -729,6 +729,65 @@ img.float-banner-media {
   }
 }
 
+/* Grid katalog mengikuti desain Modernist: 2 kolom rapat di ponsel
+   (minmax 155px / gap 12px) lalu melebar ke 240px / gap 20px di layar besar.
+   Sebelumnya minmax(240px) dipakai di semua ukuran sehingga ponsel hanya
+   dapat 1 kolom. */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .catalog-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+}
+
+/* Chip informasi di badan kartu -- padanan .tag pada _ds/modernist. */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  padding: 3px 9px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.tag-neutral {
+  background: color-mix(in srgb, var(--foreground) 8%, transparent);
+  color: color-mix(in srgb, var(--foreground) 78%, transparent);
+}
+.tag-outline {
+  border: 1px solid var(--primary);
+  color: var(--primary);
+}
+
+/* Elemen naik-halus saat halaman dibuka; --i mengatur giliran per kartu. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+.anim-rise {
+  opacity: 0;
+  animation: rise-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .anim-rise {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 .sidebar-topbar,
 .navbar-topbar {
   height: 4rem;

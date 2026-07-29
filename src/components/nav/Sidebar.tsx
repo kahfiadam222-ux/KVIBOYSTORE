@@ -197,7 +197,7 @@ function SidebarPanel({
                 className={cn(
                   "sidebar-stagger group relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-200",
                   isActive
-                    ? "bg-primary/10 text-foreground"
+                    ? "bg-primary/10 text-foreground font-extrabold"
                     : "text-muted-foreground hover:bg-[var(--accent)] hover:text-foreground",
                   collapsed && "justify-center px-0"
                 )}
@@ -274,7 +274,7 @@ function SidebarPanel({
                   className={cn(
                     "sidebar-stagger group relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-200",
                     isActive
-                      ? "bg-primary/10 text-foreground"
+                      ? "bg-primary/10 text-foreground font-extrabold"
                       : "text-muted-foreground hover:bg-[var(--accent)] hover:text-foreground",
                     collapsed && "justify-center px-0"
                   )}
