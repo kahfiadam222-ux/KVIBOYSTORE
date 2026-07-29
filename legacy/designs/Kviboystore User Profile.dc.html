@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-48d314f0-355a-4c97-840b-9cf683fad669/styles.css">
+  <script src="_ds/modernist-48d314f0-355a-4c97-840b-9cf683fad669/_ds_bundle.js"></script>
+  <style>
+    [data-theme] { --accent-ink: var(--color-accent-700); background: var(--color-bg); color: var(--color-text); min-height: 100vh; }
+    [data-theme="dark"] {
+      --color-bg: #17181a;
+      --color-surface: #212226;
+      --color-text: #f2f0ee;
+      --color-divider: color-mix(in srgb, #f2f0ee 16%, transparent);
+      --accent-ink: var(--color-accent-300);
+    }
+    [data-theme] a { color: #fff; }
+    [data-theme] a:hover { color: #fff; }
+    [data-theme] .nav a { color: inherit; }
+    [data-theme] .nav a:hover, [data-theme] .nav a[aria-current='page'] { color: var(--color-accent); }
+    [data-theme] .input { background: var(--color-surface); color: var(--color-text); }
+    [data-theme] .btn-primary { color: #fff; }
+    [data-theme] .btn-secondary { color: var(--color-text); }
+    [data-theme] .nav a, [data-theme] .nav .nav-brand { color: var(--color-text); opacity: 1; }
+    [data-theme] .nav a:hover, [data-theme] .nav a[aria-current='page'] { color: var(--color-accent); opacity: 1; }
+    [data-theme].theme-ready *, [data-theme].theme-ready *::before, [data-theme].theme-ready *::after {
+      transition: background-color .55s cubic-bezier(.16,1,.3,1), color .55s cubic-bezier(.16,1,.3,1), border-color .55s cubic-bezier(.16,1,.3,1);
+    }
+    @keyframes riseIn { from { opacity: 0; transform: translate3d(0,14px,0); } to { opacity: 1; transform: translate3d(0,0,0); } }
+    .anim-rise { opacity: 0; will-change: transform, opacity; animation: riseIn 0.6s cubic-bezier(.16,1,.3,1) forwards; }
+    .btn { transition: all 0.25s cubic-bezier(.16,1,.3,1); }
+    .btn:hover { transform: translateY(-1px); }
+    .tab { display:none; }
+    .tab.active { display:block; }
+    .loading { opacity: 0.6; pointer-events: none; }
+    .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--color-divider); border-top-color: var(--color-accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .anim-rise { animation: none; opacity: 1; }
+      [data-theme] *, [data-theme] *::before, [data-theme] *::after, .btn { transition: none !important; }
+    }
+  </style>
+</helmet>
+
+<div data-theme="{{ theme }}" class="{{ themeReadyClass }}">
+  <div style="display:flex; align-items:stretch; min-height:100vh">
+    <dc-import name="Sidebar" active="beranda" is-admin-user="{{ false }}" hint-size="236px,100vh"></dc-import>
+    <div style="flex:1; min-width:0">
+      <nav class="nav">
+        <span class="nav-brand">Kviboystore</span>
+        <a href="Kviboystore Katalog.dc.html">Katalog</a>
+        <a href="#" aria-current="page">Akun</a>
+        <div style="display:flex; align-items:center; gap:8px; margin-left:auto">
+          <button type="button" class="btn btn-secondary btn-icon" aria-label="Ganti tema" onClick="{{ toggleTheme }}">
+            <sc-if value="{{ isDark }}" hint-placeholder-val="{{ false }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            </sc-if>
+            <sc-if value="{{ isLight }}" hint-placeholder-val="{{ true }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            </sc-if>
+          </button>
+          <button type="button" class="btn btn-secondary">Logout</button>
+        </div>
+      </nav>
+
+      <section style="max-width:1200px; margin:0 auto; padding:56px 32px">
+        <div style="display:flex; align-items:center; gap:24px; margin-bottom:40px">
+          <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg, var(--color-accent-200), var(--color-accent-100)); display:flex; align-items:center; justify-content:center; font-size:48px; flex-shrink:0">👤</div>
+          <div>
+            <h1 class="anim-rise" style="font-size:clamp(24px,4vw,40px); line-height:1.1; margin:0 0 6px; animation-delay:0.04s">{{ userName }}</h1>
+            <p class="anim-rise" style="font-size:14px; opacity:0.72; margin:0; animation-delay:0.08s">{{ userEmail }}</p>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:12px; margin-bottom:32px; padding-bottom:20px; border-bottom:1px solid var(--color-divider); overflow-x:auto">
+          <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="4">
+            <button type="button" class="btn {{ tab.btnClass }}" onClick="{{ tab.onClick }}" style="{{ tab.style }}">{{ tab.label }}</button>
+          </sc-for>
+        </div>
+
+        <div>
+          <sc-if value="{{ isTabProfile }}" hint-placeholder-val="{{ true }}">
+            <div class="tab active anim-rise" style="animation-delay:0.1s">
+              <h2 style="font-size:18px; font-weight:800; margin:0 0 20px">Data pribadi</h2>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:600px">
+                <div>
+                  <label style="display:block; font-size:12px; font-weight:700; margin:0 0 6px">Nama lengkap</label>
+                  <input class="input" type="text" value="{{ userName }}" onInput="{{ onNameChange }}" />
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; font-weight:700; margin:0 0 6px">Email</label>
+                  <input class="input" type="email" value="{{ userEmail }}" disabled />
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; font-weight:700; margin:0 0 6px">Nomor telepon</label>
+                  <input class="input" type="tel" value="{{ userPhone }}" onInput="{{ onPhoneChange }}" />
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; font-weight:700; margin:0 0 6px">Tanggal lahir</label>
+                  <input class="input" type="date" value="{{ userDOB }}" onInput="{{ onDOBChange }}" />
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary" style="margin-top:24px" onClick="{{ saveProfile }}" {{ saveProfileDisabled }}>{{ saveProfileLabel }}</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isTabAddress }}" hint-placeholder-val="{{ false }}">
+            <div class="tab active anim-rise" style="animation-delay:0.1s">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+                <h2 style="font-size:18px; font-weight:800; margin:0">Alamat pengiriman</h2>
+                <button type="button" class="btn btn-primary btn-icon" style="width:36px; height:36px" onClick="{{ addAddress }}" aria-label="Tambah alamat">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                </button>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:16px">
+                <sc-for list="{{ addresses }}" as="addr" hint-placeholder-count="2">
+                  <div style="background:var(--color-surface); border-radius:8px; padding:16px; border:{{ addr.borderStyle }}" >
+                    <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px">
+                      <p style="font-weight:700; margin:0">{{ addr.label }} {{ addr.badge }}</p>
+                      <button type="button" class="btn btn-secondary btn-icon" style="width:28px; height:28px" onClick="{{ addr.onDelete }}" aria-label="Hapus">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6M10 11v6M14 11v6"/></svg>
+                      </button>
+                    </div>
+                    <p style="margin:0 0 4px; font-size:13px">{{ addr.street }}</p>
+                    <p style="margin:0; font-size:12px; opacity:0.65">{{ addr.city }}, {{ addr.province }} {{ addr.zip }}</p>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isTabPayment }}" hint-placeholder-val="{{ false }}">
+            <div class="tab active anim-rise" style="animation-delay:0.1s">
+              <h2 style="font-size:18px; font-weight:800; margin:0 0 20px">Metode pembayaran</h2>
+              <div style="display:flex; flex-direction:column; gap:12px">
+                <sc-for list="{{ paymentMethods }}" as="pm" hint-placeholder-count="2">
+                  <div style="background:var(--color-surface); border-radius:8px; padding:16px; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--color-divider)">
+                    <div>
+                      <p style="font-weight:700; margin:0 0 4px">{{ pm.label }}</p>
+                      <p style="font-size:12px; opacity:0.65; margin:0">{{ pm.account }}</p>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-icon" style="width:28px; height:28px" aria-label="Hapus">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6M10 11v6M14 11v6"/></svg>
+                    </button>
+                  </div>
+                </sc-for>
+              </div>
+              <button type="button" class="btn btn-secondary" style="margin-top:20px">Tambah metode pembayaran</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isTabSecurity }}" hint-placeholder-val="{{ false }}">
+            <div class="tab active anim-rise" style="animation-delay:0.1s">
+              <h2 style="font-size:18px; font-weight:800; margin:0 0 20px">Keamanan akun</h2>
+              <div style="display:flex; flex-direction:column; gap:16px; max-width:600px">
+                <div style="background:var(--color-surface); border-radius:8px; padding:16px">
+                  <p style="font-weight:700; margin:0 0 6px">Ubah password</p>
+                  <p style="font-size:12px; opacity:0.65; margin:0 0 12px">Terakhir diubah 3 bulan lalu</p>
+                  <button type="button" class="btn btn-secondary">Ubah password</button>
+                </div>
+                <div style="background:var(--color-surface); border-radius:8px; padding:16px">
+                  <p style="font-weight:700; margin:0 0 6px">Verifikasi dua langkah</p>
+                  <p style="font-size:12px; opacity:0.65; margin:0 0 12px">Status: Aktif</p>
+                  <button type="button" class="btn btn-secondary">Kelola</button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    theme: "light",
+    themeReady: false,
+    activeTab: "profile",
+    userName: "",
+    userEmail: "",
+    userPhone: "",
+    userDOB: "",
+    addresses: [],
+    paymentMethods: [],
+    loading: true,
+    saving: false,
+  };
+
+  componentDidMount() {
+    requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ themeReady: true })));
+    this.fetchProfile();
+  }
+
+  fetchProfile = async () => {
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseKey) {
+        this.setState({ loading: false });
+        return;
+      }
+
+      const authToken = localStorage.getItem("auth_token");
+      if (!authToken) {
+        this.setState({ loading: false });
+        return;
+      }
+
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/profiles?select=*`,
+        {
+          headers: {
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.length > 0) {
+          const profile = data[0];
+          this.setState({
+            userName: profile.display_name || "",
+            userEmail: profile.email || "",
+            userPhone: profile.phone || "",
+            loading: false,
+          });
+        }
+      } else {
+        this.setState({ loading: false });
+      }
+    } catch (err) {
+      console.error("Fetch profile error:", err);
+      this.setState({ loading: false });
+    }
+  };
+
+  saveProfileWithValidation = async () => {
+    if (!this.validateName(this.state.userName)) return alert("Nama minimal 2 karakter");
+    if (!this.validatePhone(this.state.userPhone)) return alert("Nomor telepon tidak valid");
+
+    this.setState({ saving: true });
+
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const authToken = localStorage.getItem("auth_token");
+
+      if (!supabaseUrl || !supabaseKey || !authToken) {
+        alert("Configuration error");
+        return;
+      }
+
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/profiles?email=eq.${this.state.userEmail}`,
+        {
+          method: "PATCH",
+          headers: {
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            display_name: this.state.userName,
+            phone: this.state.userPhone,
+          }),
+        }
+      );
+
+      if (res.ok) {
+        alert("Profil berhasil disimpan");
+      } else {
+        alert("Gagal menyimpan profil");
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      this.setState({ saving: false });
+    }
+  }
+
+  toggleTheme = () => {
+    const flip = () => this.setState((s) => ({ theme: s.theme === "dark" ? "light" : "dark" }));
+    if (document.startViewTransition) document.startViewTransition(flip);
+    else flip();
+  };
+
+  setTab = (tab) => this.setState({ activeTab: tab });
+
+  validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  validatePhone = (phone) => /^[0-9\s\-()]{7,}$/.test(phone);
+  validateName = (name) => name.trim().length >= 2;
+
+  renderVals() {
+    const tabs = [
+      { label: "Profil", tab: "profile", btnClass: this.state.activeTab === "profile" ? "btn-primary" : "btn-secondary", onClick: () => this.setTab("profile") },
+      { label: "Alamat", tab: "address", btnClass: this.state.activeTab === "address" ? "btn-primary" : "btn-secondary", onClick: () => this.setTab("address") },
+      { label: "Pembayaran", tab: "payment", btnClass: this.state.activeTab === "payment" ? "btn-primary" : "btn-secondary", onClick: () => this.setTab("payment") },
+      { label: "Keamanan", tab: "security", btnClass: this.state.activeTab === "security" ? "btn-primary" : "btn-secondary", onClick: () => this.setTab("security") },
+    ].map(t => ({ ...t, style: "" }));
+
+    const addressesWithHandlers = this.state.addresses.map(a => ({
+      ...a,
+      borderStyle: a.isDefault ? "2px solid var(--color-accent)" : "1px solid var(--color-divider)",
+      badge: a.badge,
+      onDelete: () => this.setState(s => ({ addresses: s.addresses.filter(x => x.id !== a.id) })),
+    }));
+
+    return {
+      theme: this.state.theme,
+      themeReadyClass: this.state.themeReady ? "theme-ready" : "",
+      isDark: this.state.theme === "dark",
+      isLight: this.state.theme === "light",
+      toggleTheme: this.toggleTheme,
+      userName: this.state.userName,
+      userEmail: this.state.userEmail,
+      userPhone: this.state.userPhone,
+      userDOB: this.state.userDOB,
+      onNameChange: (e) => this.setState({ userName: e.target.value }),
+      onPhoneChange: (e) => this.setState({ userPhone: e.target.value }),
+      onDOBChange: (e) => this.setState({ userDOB: e.target.value }),
+      saveProfile: this.saveProfileWithValidation,
+      saveProfileDisabled: this.state.saving ? "disabled" : "",
+      saveProfileLabel: this.state.saving ? "Menyimpan..." : "Simpan perubahan",
+      addAddress: () => alert("Form tambah alamat"),
+      tabs,
+      isTabProfile: this.state.activeTab === "profile",
+      isTabAddress: this.state.activeTab === "address",
+      isTabPayment: this.state.activeTab === "payment",
+      isTabSecurity: this.state.activeTab === "security",
+      addresses: addressesWithHandlers,
+      paymentMethods: this.state.paymentMethods,
+    };
+  }
+}
+</script>
+</body>
+</html>
