@@ -1,39 +1,38 @@
-export const DEFAULT_THEME = "theme-sakura" as const;
+export const DEFAULT_THEME = "theme-modernist" as const;
 
-export const THEME_IDS = [
-  "theme-daylight",
-  "theme-sakura",
-  "theme-saffron",
-] as const;
+export const THEME_IDS = ["theme-modernist", "theme-modernist-dark"] as const;
 
 export type ThemeId = (typeof THEME_IDS)[number];
 
-const LIGHT_THEMES = new Set<ThemeId>(["theme-daylight"]);
+const LIGHT_THEMES = new Set<ThemeId>(["theme-modernist"]);
 
-/** Map legacy theme ids → current set (only Daylight and Saffron Wash remain) */
+/** Semua tema lama dipetakan ke Modernist — palet lama sudah dihapus. */
 export const LEGACY_THEME_MAP: Record<string, ThemeId> = {
-  "theme-editions": "theme-sakura",
-  "theme-paper": "theme-daylight",
-  "theme-ink": "theme-sakura",
-  "theme-champagne": "theme-sakura",
-  "theme-slate": "theme-sakura",
-  "theme-olive": "theme-sakura",
-  "theme-dusk": "theme-sakura",
-  "theme-rose": "theme-sakura",
-  "theme-cosmic": "theme-sakura",
-  "theme-jetblack": "theme-sakura",
-  "theme-orchid": "theme-sakura",
-  "theme-wineash": "theme-sakura",
-  "theme-turquoise": "theme-sakura",
-  "theme-candyblue": "theme-sakura",
-  "theme-lavender": "theme-sakura",
-  "theme-violet": "theme-sakura",
-  "theme-midnight": "theme-sakura",
-  "theme-mono": "theme-sakura",
-  "theme-ocean": "theme-sakura",
-  "theme-forest": "theme-sakura",
-  "theme-aether": "theme-sakura",
-  "theme-ember": "theme-sakura",
+  "theme-daylight": "theme-modernist",
+  "theme-paper": "theme-modernist",
+  "theme-saffron": "theme-modernist",
+  "theme-sakura": "theme-modernist-dark",
+  "theme-editions": "theme-modernist-dark",
+  "theme-ink": "theme-modernist-dark",
+  "theme-champagne": "theme-modernist-dark",
+  "theme-slate": "theme-modernist-dark",
+  "theme-olive": "theme-modernist-dark",
+  "theme-dusk": "theme-modernist-dark",
+  "theme-rose": "theme-modernist-dark",
+  "theme-cosmic": "theme-modernist-dark",
+  "theme-jetblack": "theme-modernist-dark",
+  "theme-orchid": "theme-modernist-dark",
+  "theme-wineash": "theme-modernist-dark",
+  "theme-turquoise": "theme-modernist-dark",
+  "theme-candyblue": "theme-modernist-dark",
+  "theme-lavender": "theme-modernist-dark",
+  "theme-violet": "theme-modernist-dark",
+  "theme-midnight": "theme-modernist-dark",
+  "theme-mono": "theme-modernist-dark",
+  "theme-ocean": "theme-modernist-dark",
+  "theme-forest": "theme-modernist-dark",
+  "theme-aether": "theme-modernist-dark",
+  "theme-ember": "theme-modernist-dark",
 };
 
 export const THEMES: Array<{
@@ -44,24 +43,17 @@ export const THEMES: Array<{
   mode: "dark" | "light";
 }> = [
   {
-    id: "theme-daylight",
-    label: "Daylight",
-    description: "Terang bersih",
-    swatch: "linear-gradient(135deg, #F7F8FA 0%, #E8ECF2 55%, #3B6E9E 100%)",
+    id: "theme-modernist",
+    label: "Modernist",
+    description: "Kertas terang, aksen merah-oranye",
+    swatch: "linear-gradient(135deg, #f3f2f2 0%, #eae9e9 55%, #ec3013 100%)",
     mode: "light",
   },
   {
-    id: "theme-sakura",
-    label: "Sumi-e",
-    description: "Tinta kuas & merah Jepang",
-    swatch: "linear-gradient(135deg, #101012 0%, #222226 50%, #BC2026 100%)",
-    mode: "dark",
-  },
-  {
-    id: "theme-saffron",
-    label: "Aurora Pastel",
-    description: "Putih bersih, glow biru-lavender",
-    swatch: "linear-gradient(135deg, #FFFFFF 0%, #C4B5FD 50%, #4338CA 100%)",
+    id: "theme-modernist-dark",
+    label: "Modernist Gelap",
+    description: "Arang pekat, aksen merah-oranye",
+    swatch: "linear-gradient(135deg, #17181a 0%, #212226 55%, #ff563c 100%)",
     mode: "dark",
   },
 ];

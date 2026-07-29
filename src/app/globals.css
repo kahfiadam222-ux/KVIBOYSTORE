@@ -53,7 +53,7 @@
   --animate-fade-in-quick: fade-in-quick 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* ── Base (Paper-ready light) ── */
+/* -- Base (Paper-ready light) -- */
 :root {
   /* Sidebar width di-set oleh blocking script di <head>, jangan override di sini */
   --background: #f3f2f2;
@@ -80,7 +80,8 @@
   --chart-3: #dd2b0f;
   --chart-4: #ae1800;
   --chart-5: #ffc4b8;
-  --radius: 0.85rem;
+  /* Modernist bersudut tajam — lihat _ds/modernist (--radius-sm/md/lg: 0px). */
+  --radius: 0rem;
   --glass-fill: rgba(234, 233, 233, 0.72);
   --glass-border: rgba(32, 30, 29, 0.08);
   --gold: #ec3013;
@@ -161,454 +162,116 @@
     linear-gradient(165deg, #181614 0%, #1b1918 45%, #151312 100%);
 }
 
-/* ── Modern theme palette (incl. anime: Sakura, Aether) ── */
+/* ==============================================================
+   MODERNIST -- satu-satunya palet, mengikuti docs/designs/_ds/modernist.
+   Light : bg #f3f2f2 Â· surface #eae9e9 Â· ink #201e1d Â· accent #ec3013
+   Dark  : bg #17181a Â· surface #212226 Â· ink #f2f0ee Â· accent #ff563c
+   Sistem ini rata (tanpa gradasi) dan bersudut tajam (radius 0).
+   ============================================================== */
 
-.theme-midnight {
-  --background: #0D0F14;
-  --foreground: #D5DCE8;
-  --card: #141822;
-  --card-foreground: #D5DCE8;
-  --popover: #171C28;
-  --popover-foreground: #D5DCE8;
-  --primary: #5A7E9E;
-  --primary-foreground: #090E14;
-  --primary-gradient: linear-gradient(135deg, #7496B6 0%, #4D6D8B 50%, #304E6B 100%);
-  --secondary: #19202E;
-  --secondary-foreground: #D5DCE8;
-  --muted: #19202E;
-  --muted-foreground: #7E8C9F;
-  --accent: #21293C;
-  --accent-foreground: #D5DCE8;
-  --destructive: #DC2626;
-  --border: rgba(90, 126, 158, 0.1);
-  --input: rgba(90, 126, 158, 0.14);
-  --ring: #5A7E9E;
-  --gold: #A5B3C2;
-  --gold-soft: #BCC8D6;
-  --gold-deep: #66788A;
-  --gold-gradient: linear-gradient(135deg, #BCC8D6 0%, #8DA1B6 55%, #596D82 100%);
-  --gold-line: linear-gradient(to right, transparent 0%, rgba(90, 126, 158, 0.25) 50%, transparent 100%);
-  --glass-fill: rgba(20, 24, 34, 0.76);
-  --glass-border: rgba(90, 126, 158, 0.08);
-  --shadow-premium: 0 20px 40px -20px rgba(0, 0, 0, 0.45);
-  --shadow-card: 0 8px 24px -14px rgba(0, 0, 0, 0.35);
-  --shadow-glow: 0 0 24px -14px rgba(90, 126, 158, 0.2);
-  --sidebar: #141822;
-  --sidebar-foreground: #D5DCE8;
-  --sidebar-primary: #5A7E9E;
-  --sidebar-primary-foreground: #090E14;
-  --sidebar-accent: #21293C;
-  --sidebar-accent-foreground: #D5DCE8;
-  --sidebar-border: rgba(90, 126, 158, 0.1);
-  --sidebar-ring: #5A7E9E;
-  --body-gradient:
-    radial-gradient(600px 450px at 8% -6%, rgba(90, 126, 158, 0.08), transparent 60%),
-    radial-gradient(500px 380px at 96% 4%, rgba(141, 161, 182, 0.05), transparent 58%),
-    linear-gradient(165deg, #0D0F14 0%, #121620 50%, #080A0E 100%);
+.theme-modernist {
+  --background: #f3f2f2;
+  --foreground: #201e1d;
+  --card: #eae9e9;
+  --card-foreground: #201e1d;
+  --popover: #eae9e9;
+  --popover-foreground: #201e1d;
+  --primary: #ec3013;
+  --primary-foreground: #ffffff;
+  --secondary: #eae9e9;
+  --secondary-foreground: #201e1d;
+  --muted: #eae7e7;
+  --muted-foreground: #605d5d;
+  --accent: #fff2ef;
+  --accent-foreground: #7c1405;
+  --destructive: #ae1800;
+  --border: rgba(32, 30, 29, 0.16);
+  --input: rgba(32, 30, 29, 0.24);
+  --ring: #ec3013;
+  --chart-1: #ec3013;
+  --chart-2: #ef6853;
+  --chart-3: #ff9783;
+  --chart-4: #ae1800;
+  --chart-5: #605d5d;
+  --gold: #ec3013;
+  --gold-soft: #ff9783;
+  --gold-deep: #ae1800;
+  --gold-line: linear-gradient(to right, transparent 0%, rgba(32, 30, 29, 0.28) 50%, transparent 100%);
+  --glass-fill: #eae9e9;
+  --glass-border: rgba(32, 30, 29, 0.16);
+  --shadow-premium: 0 12px 32px color-mix(in srgb, #2d2b2b 22%, transparent);
+  --shadow-card: 0 3px 10px color-mix(in srgb, #2d2b2b 16%, transparent);
+  --shadow-glow: 0 3px 10px color-mix(in srgb, #2d2b2b 16%, transparent);
+  --shadow-gold: 0 1px 2px color-mix(in srgb, #2d2b2b 14%, transparent);
+  --sidebar: #eae9e9;
+  --sidebar-foreground: #201e1d;
+  --sidebar-primary: #ec3013;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fff2ef;
+  --sidebar-accent-foreground: #7c1405;
+  --sidebar-border: rgba(32, 30, 29, 0.16);
+  --sidebar-ring: #ec3013;
+  --wash-1: 255, 151, 131;
+  --wash-2: 255, 224, 217;
 }
 
-.theme-daylight {
-  --background: #F2F4F7;
-  --foreground: #1D232E;
-  --card: #FFFFFF;
-  --card-foreground: #1D232E;
-  --popover: #F8FAFC;
-  --popover-foreground: #1D232E;
-  --primary: #456B8C;
-  --primary-foreground: #F2F6F9;
-  --primary-gradient: linear-gradient(135deg, #5B85A9 0%, #456B8C 55%, #2E4E6D 100%);
-  --secondary: #E4E8EE;
-  --secondary-foreground: #1D232E;
-  --muted: #E4E8EE;
-  --muted-foreground: #606C80;
-  --accent: #D8DFE8;
-  --accent-foreground: #1D232E;
-  --destructive: #B91C1C;
-  --border: rgba(69, 107, 140, 0.12);
-  --input: rgba(69, 107, 140, 0.16);
-  --ring: #456B8C;
-  --gold: #738399;
-  --gold-soft: #93A4BD;
-  --gold-deep: #55657A;
-  --gold-gradient: linear-gradient(135deg, #A8B8CC 0%, #75869E 55%, #4C5D75 100%);
-  --gold-line: linear-gradient(to right, transparent 0%, rgba(69, 107, 140, 0.2) 50%, transparent 100%);
-  --glass-fill: rgba(255, 255, 255, 0.74);
-  --glass-border: rgba(69, 107, 140, 0.08);
-  --shadow-premium: 0 16px 32px -16px rgba(18, 28, 48, 0.12);
-  --shadow-card: 0 6px 16px -12px rgba(18, 28, 48, 0.08);
-  --shadow-glow: 0 0 20px -14px rgba(69, 107, 140, 0.15);
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #1D232E;
-  --sidebar-primary: #456B8C;
-  --sidebar-primary-foreground: #F2F6F9;
-  --sidebar-accent: #D8DFE8;
-  --sidebar-accent-foreground: #1D232E;
-  --sidebar-border: rgba(69, 107, 140, 0.1);
-  --sidebar-ring: #456B8C;
-  --body-gradient:
-    radial-gradient(550px 380px at 10% -4%, rgba(69, 107, 140, 0.05), transparent 60%),
-    radial-gradient(450px 350px at 94% 2%, rgba(115, 131, 153, 0.04), transparent 58%),
-    linear-gradient(165deg, #F2F4F7 0%, #E8EBF1 50%, #DCE1EC 100%);
+.theme-modernist-dark {
+  --background: #17181a;
+  --foreground: #f2f0ee;
+  --card: #212226;
+  --card-foreground: #f2f0ee;
+  --popover: #212226;
+  --popover-foreground: #f2f0ee;
+  --primary: #ff563c;
+  --primary-foreground: #17181a;
+  --secondary: #2a2b30;
+  --secondary-foreground: #f2f0ee;
+  --muted: #2a2b30;
+  --muted-foreground: #9b9797;
+  --accent: #2d2b2b;
+  --accent-foreground: #ffc4b8;
+  --destructive: #ff563c;
+  --border: rgba(242, 240, 238, 0.16);
+  --input: rgba(242, 240, 238, 0.22);
+  --ring: #ff563c;
+  --chart-1: #ff563c;
+  --chart-2: #ff9783;
+  --chart-3: #ffc4b8;
+  --chart-4: #dd2b0f;
+  --chart-5: #9b9797;
+  --gold: #ff563c;
+  --gold-soft: #ffc4b8;
+  --gold-deep: #dd2b0f;
+  --gold-line: linear-gradient(to right, transparent 0%, rgba(242, 240, 238, 0.22) 50%, transparent 100%);
+  --glass-fill: #212226;
+  --glass-border: rgba(242, 240, 238, 0.16);
+  --shadow-premium: 0 16px 48px color-mix(in srgb, #000 55%, transparent);
+  --shadow-card: 0 8px 24px color-mix(in srgb, #000 45%, transparent);
+  --shadow-glow: 0 8px 24px color-mix(in srgb, #000 45%, transparent);
+  --shadow-gold: 0 0 0 1px color-mix(in srgb, #000 30%, transparent);
+  --sidebar: #212226;
+  --sidebar-foreground: #f2f0ee;
+  --sidebar-primary: #ff563c;
+  --sidebar-primary-foreground: #17181a;
+  --sidebar-accent: #2d2b2b;
+  --sidebar-accent-foreground: #ffc4b8;
+  --sidebar-border: rgba(242, 240, 238, 0.16);
+  --sidebar-ring: #ff563c;
+  --wash-1: 255, 86, 60;
+  --wash-2: 255, 151, 131;
 }
 
-.theme-mono {
-  --background: #0E0E12;
-  --foreground: #E3E3E8;
-  --card: #15151C;
-  --card-foreground: #E3E3E8;
-  --popover: #1B1B24;
-  --popover-foreground: #E3E3E8;
-  --primary: #8378A6;
-  --primary-foreground: #0A0A0F;
-  --primary-gradient: linear-gradient(135deg, #9C92C0 0%, #6E6395 55%, #4C436F 100%);
-  --secondary: #1E1E28;
-  --secondary-foreground: #E3E3E8;
-  --muted: #1E1E28;
-  --muted-foreground: #7E7E94;
-  --accent: #262635;
-  --accent-foreground: #E3E3E8;
-  --destructive: #DC2626;
-  --border: rgba(131, 120, 166, 0.1);
-  --input: rgba(131, 120, 166, 0.14);
-  --ring: #8378A6;
-  --gold: #A5A2B5;
-  --gold-soft: #BCBAC8;
-  --gold-deep: #6B687C;
-  --gold-gradient: linear-gradient(135deg, #BCBAC8 0%, #8D8B9B 60%, #5B596A 100%);
-  --gold-line: linear-gradient(to right, transparent 0%, rgba(131, 120, 166, 0.25) 50%, transparent 100%);
-  --glass-fill: rgba(21, 21, 28, 0.76);
-  --glass-border: rgba(131, 120, 166, 0.08);
-  --shadow-premium: 0 20px 40px -20px rgba(0, 0, 0, 0.55);
-  --shadow-card: 0 8px 24px -14px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 0 24px -14px rgba(131, 120, 166, 0.2);
-  --sidebar: #15151C;
-  --sidebar-foreground: #E3E3E8;
-  --sidebar-primary: #8378A6;
-  --sidebar-primary-foreground: #0A0A0F;
-  --sidebar-accent: #262635;
-  --sidebar-accent-foreground: #E3E3E8;
-  --sidebar-border: rgba(131, 120, 166, 0.1);
-  --sidebar-ring: #8378A6;
-  --body-gradient:
-    radial-gradient(550px 380px at 12% 0%, rgba(159, 140, 240, 0.08), transparent 65%),
-    linear-gradient(165deg, #0D0C12 0%, #13121E 50%, #08080C 100%);
-}
-
-/* Ocean — Vibrant Anime Ocean (Color Brush + Interactive Light) */
-.theme-ocean {
-  --background: #0A1628;
-  --foreground: #E0F0FF;
-  --card: #0F223A;
-  --card-foreground: #E0F0FF;
-  --popover: #132B4A;
-  --popover-foreground: #E0F0FF;
-  --primary: #3B82F6;
-  --primary-foreground: #FFFFFF;
-  --primary-gradient: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-  --secondary: #1E3A5F;
-  --secondary-foreground: #E0F0FF;
-  --muted: #1E3A5F;
-  --muted-foreground: #7EA3C9;
-  --accent: #1E40AF;
-  --accent-foreground: #E0F0FF;
-  --destructive: #EF4444;
-  --border: rgba(59, 130, 246, 0.18);
-  --input: rgba(59, 130, 246, 0.22);
-  --ring: #3B82F6;
-  --gold: #60A5FA;
-  --gold-soft: #93C5FD;
-  --gold-deep: #1D4ED8;
-  --gold-gradient: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
-  --gold-line: linear-gradient(to right, transparent 0%, rgba(59, 130, 246, 0.4) 50%, transparent 100%);
-  --glass-fill: rgba(15, 34, 58, 0.78);
-  --glass-border: rgba(59, 130, 246, 0.18);
-  --shadow-premium: 0 24px 48px -20px rgba(0, 0, 0, 0.6);
-  --shadow-card: 0 10px 28px -14px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 36px -12px rgba(59, 130, 246, 0.35);
-  --sidebar: #0F223A;
-  --sidebar-foreground: #E0F0FF;
-  --sidebar-primary: #3B82F6;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #1E40AF;
-  --sidebar-accent-foreground: #E0F0FF;
-  --sidebar-border: rgba(255, 255, 255, 0.06);
-  --sidebar-ring: #3B82F6;
-  --body-gradient:
-    radial-gradient(800px 600px at 20% 30%, rgba(59, 130, 246, 0.12), transparent 70%),
-    radial-gradient(600px 500px at 80% 70%, rgba(147, 197, 253, 0.08), transparent 70%),
-    linear-gradient(165deg, #0A1628 0%, #0F223A 100%);
-}
-
-/* Forest — Vibrant Anime Forest (Color Brush + Light Particles) */
-.theme-forest {
-  --background: #0A140F;
-  --foreground: #E8F5E9;
-  --card: #0F2218;
-  --card-foreground: #E8F5E9;
-  --popover: #13291F;
-  --popover-foreground: #E8F5E9;
-  --primary: #22C55E;
-  --primary-foreground: #FFFFFF;
-  --primary-gradient: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
-  --secondary: #1A3225;
-  --secondary-foreground: #E8F5E9;
-  --muted: #1A3225;
-  --muted-foreground: #7CB98C;
-  --accent: #15803D;
-  --accent-foreground: #E8F5E9;
-  --destructive: #EF4444;
-  --border: rgba(34, 197, 94, 0.18);
-  --input: rgba(34, 197, 94, 0.22);
-  --ring: #22C55E;
-  --gold: #4ADE80;
-  --gold-soft: #86EFAC;
-  --gold-deep: #16A34A;
-  --gold-gradient: linear-gradient(135deg, #4ADE80 0%, #22C55E 100%);
-  --gold-line: linear-gradient(to right, transparent 0%, rgba(34, 197, 94, 0.4) 50%, transparent 100%);
-  --glass-fill: rgba(15, 34, 24, 0.78);
-  --glass-border: rgba(34, 197, 94, 0.18);
-  --shadow-premium: 0 24px 48px -20px rgba(0, 0, 0, 0.6);
-  --shadow-card: 0 10px 28px -14px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 36px -12px rgba(34, 197, 94, 0.35);
-  --sidebar: #0F2218;
-  --sidebar-foreground: #E8F5E9;
-  --sidebar-primary: #22C55E;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #15803D;
-  --sidebar-accent-foreground: #E8F5E9;
-  --sidebar-border: rgba(255, 255, 255, 0.06);
-  --sidebar-ring: #22C55E;
-  --body-gradient:
-    radial-gradient(800px 600px at 25% 25%, rgba(34, 197, 94, 0.12), transparent 70%),
-    radial-gradient(700px 500px at 75% 80%, rgba(163, 230, 174, 0.08), transparent 70%),
-    linear-gradient(165deg, #0A140F 0%, #0F2218 100%);
-}
-
-/* Sumi Ink & Lacquer Red brush stroke concept (Sumi-e) */
-.theme-sakura {
-  --background: #101012;
-  --foreground: #F3EFE9;
-  --card: #19191D;
-  --card-foreground: #F3EFE9;
-  --popover: #1E1E24;
-  --popover-foreground: #F3EFE9;
-  --primary: #BC2026;
-  --primary-foreground: #FAF8F5;
-  --primary-gradient: linear-gradient(135deg, #D32F2F 0%, #A81B21 55%, #7A0C11 100%);
-  --secondary: #24242B;
-  --secondary-foreground: #F3EFE9;
-  --muted: #24242B;
-  --muted-foreground: #A59E92;
-  --accent: #2C2C35;
-  --accent-foreground: #F3EFE9;
-  --destructive: #E53935;
-  --border: rgba(188, 32, 38, 0.14);
-  --input: rgba(188, 32, 38, 0.18);
-  --ring: #BC2026;
-  --gold: #C8A261;
-  --gold-soft: #D9C39E;
-  --gold-deep: #96743B;
-  --gold-gradient: linear-gradient(135deg, #D9C39E 0%, #C8A261 60%, #8A652E 100%);
-  --gold-line: linear-gradient(to right, transparent 0%, rgba(188, 32, 38, 0.4) 50%, transparent 100%);
-  --glass-fill: rgba(25, 25, 29, 0.76);
-  --glass-border: rgba(188, 32, 38, 0.12);
-  --shadow-premium: 0 24px 48px -20px rgba(0, 0, 0, 0.6);
-  --shadow-card: 0 10px 28px -14px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 36px -12px rgba(188, 32, 38, 0.35);
-  --sidebar: #19191D;
-  --sidebar-foreground: #F3EFE9;
-  --sidebar-primary: #BC2026;
-  --sidebar-primary-foreground: #FAF8F5;
-  --sidebar-accent: #2C2C35;
-  --sidebar-accent-foreground: #F3EFE9;
-  --sidebar-border: rgba(188, 32, 38, 0.14);
-  --sidebar-ring: #BC2026;
-  --body-gradient:
-    radial-gradient(600px 450px at 10% -8%, rgba(188, 32, 38, 0.12), transparent 60%),
-    radial-gradient(480px 360px at 92% 8%, rgba(200, 162, 97, 0.08), transparent 58%),
-    radial-gradient(400px 300px at 50% 100%, rgba(122, 12, 17, 0.05), transparent 55%),
-    linear-gradient(165deg, #101012 0%, #19191D 50%, #08080A 100%);
-}
-
-/* Aurora Pastel (dulu "Saffron Wash") — aturan 60-30-10:
-   60% putih bersih · 30% glow biru-langit ↔ lavender · 10% indigo pekat.
-   Catatan: tema ini juga membawa class `.dark`, jadi ketiga token *-gradient
-   di-assert ulang setelah blok FLAT OVERRIDE di bawah agar selalu menang. */
-.theme-saffron {
-  --background: #FFFFFF;
-  --foreground: #1E1B3A;
-  --card: #FFFFFF;
-  --card-foreground: #1E1B3A;
-  --popover: #FFFFFF;
-  --popover-foreground: #1E1B3A;
-  --primary: #4338CA;
-  --primary-foreground: #FFFFFF;
-  --secondary: #EEF1FC;
-  --secondary-foreground: #2A2550;
-  --muted: #F1F3FB;
-  --muted-foreground: #6B6A8C;
-  --accent: #ECEDFB;
-  --accent-foreground: #2A2550;
-  --destructive: #E11D48;
-  --border: rgba(67, 56, 202, 0.12);
-  --input: rgba(67, 56, 202, 0.16);
-  --ring: #6366F1;
-  --chart-1: #4338CA;
-  --chart-2: #7C6FE8;
-  --chart-3: #E11D48;
-  --chart-4: #38BDF8;
-  --chart-5: #A78BFA;
-  --gold: #7C6FE8;
-  --gold-soft: #A5B4FC;
-  --gold-deep: #5B4FCF;
-  --gold-line: linear-gradient(to right, transparent 0%, rgba(124, 111, 232, 0.35) 50%, transparent 100%);
-  --glass-fill: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(67, 56, 202, 0.10);
-  --shadow-premium: 0 24px 48px -22px rgba(67, 56, 202, 0.22);
-  --shadow-card: 0 12px 30px -18px rgba(67, 56, 202, 0.16);
-  --shadow-glow: 0 0 32px -12px rgba(99, 102, 241, 0.30);
-  --shadow-gold: 0 0 28px -12px rgba(124, 111, 232, 0.28);
-  --sidebar: rgba(255, 255, 255, 0.70);
-  --sidebar-foreground: #1E1B3A;
-  --sidebar-primary: #4338CA;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #ECEDFB;
-  --sidebar-accent-foreground: #2A2550;
-  --sidebar-border: rgba(67, 56, 202, 0.10);
-  --sidebar-ring: #6366F1;
-  /* Warna wash (r,g,b) dibaca oleh SaffronWashBackground */
-  --wash-1: 147, 197, 253; /* sky blue */
-  --wash-2: 196, 181, 253; /* lavender */
-}
-
-/* Anime soft cyber — indigo + soft cyan */
-.theme-aether {
-  --background: #09080E;
-  --foreground: #D3D3E2;
-  --card: #12111A;
-  --card-foreground: #D3D3E2;
-  --popover: #181724;
-  --popover-foreground: #D3D3E2;
-  --primary: #6B5DA8;
-  --primary-foreground: #07050E;
-  --primary-gradient: linear-gradient(135deg, #877AA8 0%, #55488C 45%, #3C8CA5 120%);
-  --secondary: #181724;
-  --secondary-foreground: #D3D3E2;
-  --muted: #181724;
-  --muted-foreground: #7E7D9A;
-  --accent: #212035;
-  --accent-foreground: #D3D3E2;
-  --destructive: #EF4444;
-  --border: rgba(107, 93, 168, 0.1);
-  --input: rgba(107, 93, 168, 0.14);
-  --ring: #6B5DA8;
-  --gold: #8397B8;
-  --gold-soft: #A3B5D3;
-  --gold-deep: #55668C;
-  --gold-gradient: linear-gradient(135deg, #A3B5D3 0%, #6B5DA8 50%, #3B7FA5 100%);
-  --gold-line: linear-gradient(to right, transparent 0%, rgba(107, 93, 168, 0.25) 50%, transparent 100%);
-  --glass-fill: rgba(18, 17, 26, 0.76);
-  --glass-border: rgba(107, 93, 168, 0.08);
-  --shadow-premium: 0 20px 40px -20px rgba(0, 0, 0, 0.55);
-  --shadow-card: 0 8px 24px -14px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 0 24px -14px rgba(107, 93, 168, 0.2);
-  --sidebar: #12111A;
-  --sidebar-foreground: #D3D3E2;
-  --sidebar-primary: #6B5DA8;
-  --sidebar-primary-foreground: #07050E;
-  --sidebar-accent: #212035;
-  --sidebar-accent-foreground: #D3D3E2;
-  --sidebar-border: rgba(107, 93, 168, 0.1);
-  --sidebar-ring: #6B5DA8;
-  --body-gradient:
-    radial-gradient(600px 450px at 8% -8%, rgba(107, 93, 168, 0.12), transparent 60%),
-    radial-gradient(480px 360px at 94% 4%, rgba(60, 140, 165, 0.06), transparent 58%),
-    linear-gradient(165deg, #09080E 0%, #100E1D 48%, #040308 100%);
-}
-
-/* Japanese Indigo Dye & Bamboo wash stroke concept (Aizome) */
-.theme-ember {
-  --background: #090C12;
-  --foreground: #E7EAEF;
-  --card: #111621;
-  --card-foreground: #E7EAEF;
-  --popover: #161C2A;
-  --popover-foreground: #E7EAEF;
-  --primary: #4A72A8;
-  --primary-foreground: #FAFBFD;
-  --primary-gradient: linear-gradient(135deg, #5B8BC7 0%, #3B5E91 50%, #233D63 100%);
-  --secondary: #1B2233;
-  --secondary-foreground: #E7EAEF;
-  --muted: #1B2233;
-  --muted-foreground: #8A96AB;
-  --accent: #232B40;
-  --accent-foreground: #E7EAEF;
-  --destructive: #EF4444;
-  --border: rgba(74, 114, 168, 0.14);
-  --input: rgba(74, 114, 168, 0.18);
-  --ring: #4A72A8;
-  --gold: #B9C7A8;
-  --gold-soft: #D3DEC5;
-  --gold-deep: #8A9678;
-  --gold-gradient: linear-gradient(135deg, #D3DEC5 0%, #B9C7A8 60%, #768565 100%);
-  --gold-line: linear-gradient(to right, transparent 0%, rgba(74, 114, 168, 0.3) 50%, transparent 100%);
-  --glass-fill: rgba(17, 22, 33, 0.74);
-  --glass-border: rgba(74, 114, 168, 0.12);
-  --shadow-premium: 0 24px 48px -20px rgba(0, 0, 0, 0.65);
-  --shadow-card: 0 10px 28px -14px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 36px -12px rgba(74, 114, 168, 0.35);
-  --sidebar: #111621;
-  --sidebar-foreground: #E7EAEF;
-  --sidebar-primary: #4A72A8;
-  --sidebar-primary-foreground: #FAFBFD;
-  --sidebar-accent: #232B40;
-  --sidebar-accent-foreground: #E7EAEF;
-  --sidebar-border: rgba(74, 114, 168, 0.14);
-  --sidebar-ring: #4A72A8;
-  --body-gradient:
-    radial-gradient(600px 450px at 10% -8%, rgba(74, 114, 168, 0.15), transparent 60%),
-    radial-gradient(480px 360px at 92% 8%, rgba(185, 199, 168, 0.08), transparent 58%),
-    radial-gradient(400px 300px at 50% 100%, rgba(35, 61, 99, 0.06), transparent 55%),
-    linear-gradient(165deg, #090C12 0%, #141A29 50%, #05080E 100%);
-}
-
-/* ──────────────────────────────────────────────────────────────
-   FLAT COLOR OVERRIDE — no gradients anywhere.
-   Ditempatkan setelah semua definisi tema agar selalu menang.
-   Semua token "*-gradient" dipaksa jadi warna solid (dua-stop sama
-   warna) sehingga `background-image: var(--…-gradient)` tetap valid
-   namun tampil rata/solid. Background halaman juga rata.
-   ────────────────────────────────────────────────────────────── */
+/* Modernist memakai warna rata -- semua token *-gradient dipaksa solid. */
 :root,
 .dark,
-.theme-daylight,
-.theme-sakura,
-.theme-midnight,
-.theme-mono,
-.theme-ocean,
-.theme-forest,
-.theme-aether,
-.theme-ember {
+.theme-modernist,
+.theme-modernist-dark {
   --primary-gradient: linear-gradient(0deg, var(--primary), var(--primary));
   --gold-gradient: linear-gradient(0deg, var(--gold), var(--gold));
   --body-gradient: linear-gradient(0deg, var(--background), var(--background));
 }
 
-/* Aurora Pastel mempertahankan gradasi hidup — ditaruh SETELAH flat override
-   (dan setelah `.dark`, yang juga dibawa tema ini) agar selalu menang. */
-.theme-saffron {
-  --primary-gradient: linear-gradient(135deg, #5B52E0 0%, #4338CA 55%, #362DA8 100%);
-  --gold-gradient: linear-gradient(135deg, #A5B4FC 0%, #7C6FE8 55%, #5B4FCF 100%);
-  --body-gradient:
-    radial-gradient(1100px 820px at -4% 26%, rgba(167, 139, 250, 0.55), transparent 68%),
-    radial-gradient(1050px 800px at 104% 32%, rgba(115, 175, 252, 0.58), transparent 68%),
-    radial-gradient(880px 600px at 66% 6%, rgba(139, 120, 246, 0.42), transparent 64%),
-    radial-gradient(820px 560px at 26% -2%, rgba(170, 205, 254, 0.52), transparent 62%),
-    radial-gradient(1250px 920px at 50% 122%, rgba(140, 160, 250, 0.42), transparent 68%),
-    linear-gradient(180deg, #FDFDFF 0%, #F7F9FF 45%, #ECF0FD 100%);
-}
-
-/* ── 120FPS smooth optimizations and text rendering ── */
+/* -- 120FPS smooth optimizations and text rendering -- */
 html, body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -653,7 +316,7 @@ a {
     max-width: 100vw;
     overflow-x: hidden;
   }
-  /* Background statis — tanpa drift, glow tetap di tempatnya. */
+  /* Background statis -- tanpa drift, glow tetap di tempatnya. */
   body::before {
     content: "";
     position: fixed;
@@ -751,7 +414,7 @@ a {
   text-transform: lowercase;
 }
 
-/* Soft ambient depth — statis, menambah kedalaman warna tanpa gerak */
+/* Soft ambient depth -- statis, menambah kedalaman warna tanpa gerak */
 .ambient-orb {
   position: absolute;
   border-radius: 50%;
@@ -809,6 +472,8 @@ a {
 @utility product-card-shell {
   position: relative;
   isolation: isolate;
+  /* Kartu produk mengikuti `.card-tile` pada desain Modernist: 12px. */
+  border-radius: 12px;
 }
 .product-card-shell::before {
   content: "";
@@ -841,7 +506,7 @@ a {
   scrollbar-color: color-mix(in oklch, var(--border) 80%, transparent) transparent;
 }
 
-/* ── Circular glossy 4-slot banner ring ── */
+/* -- Circular glossy 4-slot banner ring -- */
 .float-banner-scene {
   -webkit-tap-highlight-color: transparent;
 }

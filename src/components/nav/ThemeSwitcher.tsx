@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { Check, Palette, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  DEFAULT_THEME,
   THEMES,
   applyThemeClass,
   resolveThemeId,
@@ -21,7 +22,7 @@ function subscribe() {
 export function ThemeSwitcher() {
   const mounted = useSyncExternalStore(subscribe, () => true, () => false);
   const [activeTheme, setActiveTheme] = useState<ThemeId>(() => {
-    if (typeof window === "undefined") return "theme-sakura";
+    if (typeof window === "undefined") return DEFAULT_THEME;
     return resolveThemeId(localStorage.getItem("kvibo-theme"));
   });
   const [open, setOpen] = useState(false);
